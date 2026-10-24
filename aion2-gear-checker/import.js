@@ -2,7 +2,7 @@
 (() => {
   'use strict';
   const el = id => document.getElementById(id);
-  const esc = value => String(value ?? '').replace(/[&<>"']/g, v=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;':'&quot;',"'":'&#39;'}[v]));
+  const esc = value => String(value ?? '').replace(/[&<>"']/g, v=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[v]));
   const styles = document.createElement('style');
   styles.textContent = '.import-result{display:flex;align-items:center;justify-content:space-between;gap:12px;border:1px solid #465268;padding:11px;margin:8px 0;border-radius:8px;background:#131c2a}.import-result button{flex-shrink:0}.import-result strong{display:block}.import-result span{font-size:12px;color:#acb7c6}.import-msg{padding:11px 0;color:#e6c78d;font-size:13px;white-space:pre-line}.import-msg.success{color:#7fe0af}.import-msg.error{color:#f09595}.import-quiet{font-size:12px;color:#a6b1c1}.import-quiet a{color:#e8c687}.import-stats{display:flex;gap:14px;flex-wrap:wrap;color:#c6d2df;font-size:13px}.import-stats b{color:#e8c687}.import-manual{background:#101a29;padding:11px;border-radius:7px;border:1px solid #3d485a}.import-manual summary{cursor:pointer;color:#e8c687}';
   document.head.appendChild(styles);
@@ -70,7 +70,7 @@
     ev.preventDefault();
     if(loading)return;
     const name=el('import-name').value.trim();if(name.length<2){notice('Mindestens zwei Zeichen eingeben.','error');return;}
-    notice('Suche EU-Charaktere …');listNode.innerHTML='';el('import-summary').innerHTML='';loading=true;el('import-search-button').disabled=true;
+    found=[];notice('Suche EU-Charaktere …');listNode.innerHTML='';el('import-summary').innerHTML='';loading=true;el('import-search-button').disabled=true;
     const viaViki='https://aion2.vi.ki/-/aion2/search?'+new URLSearchParams({region:'eu',name});
     const viaNC='https://api-search.plaync.com/aion2global/search/v2/character?'+new URLSearchParams({keyword:name,region:'eu',localeInfo:'en',serverId:'',page:'1',size:'30'});
     const errors=[];
