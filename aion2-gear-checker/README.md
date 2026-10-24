@@ -1,21 +1,44 @@
-# AION 2 EU – Daeva Gear Checker
+# AION 2 EU – Daeva Gear Checker mit Charakterimport
 
-**Browserseite (sofern GitHub Pages aus main / root aktiv ist):**  
-https://kai-022.github.io/Remote-Einmannrevi/aion2-gear-checker/
+**Webseite:** https://kai-022.github.io/Remote-Einmannrevi/aion2-gear-checker/
 
-## EU-Charakterimport
-1. Webseite öffnen, EU-Charakternamen eingeben, „EU-Charakter suchen“ auswählen.
-2. Bei mehreren Treffern den richtigen Server und Charakter anklicken.
-3. Die Seite versucht, Profil, angelegte Ausrüstung und Zusatzwerte aus öffentlichen Quellen zu importieren.
-4. Auf „Gear“ und „Upgrade-Plan“ werden die erkannten Werte mit Kleriker-PvE-Empfehlungen verglichen.
-5. Fehlende Seelenbindungswerte können in der manuellen Gear-Bearbeitung nachgetragen werden.
-6. Zusätzlich gibt es eine JSON-Datei-Importoption und einen Demo-Modus.
+Charaktersuche, Gear-Import und PvE-Gear-Bewertung für Kleriker (EU). Keine Installation auf dem eigenen PC.
 
-**Wichtig:** Die statische GitHub-Pages-Seite hat keinen eigenen Proxy. Daher erfolgt der Abruf derzeit direkt aus dem Browser über die frei dokumentierte [Vi.ki-API](https://vi.ki/docs) oder die öffentliche NCSOFT-API. Wenn der Browser Cross-Origin-Anfragen (CORS) blockiert oder die offiziellen Server ausfallen, kann der Live-Import scheitern. Ein eigener Cloudflare Worker oder anderer Proxy wäre für zuverlässigen Betrieb sinnvoll. **Der Live-Import konnte noch nicht end-to-end auf einer veröffentlichten Seite geprüft werden.** Die JavaScript-Syntax ist geprüft und die Dateien sind auf GitHub gespeichert.
+## Einmaliges Online-Setup: Cloudflare Worker
+GitHub Pages unterstützt keine serverseitigen Funktionen. Ein Cloudflare Worker überbrückt den CORS-Schutz des Browsers und fragt dafür ausschließlich die dokumentierte öffentliche Vi.ki-API ab. **Der Worker muss einmal in einem eigenen Cloudflare-Konto bereitgestellt werden.** Das kann ChatGPT mit der bestehenden GitHub-Verbindung nicht selbst ausführen.
+
+1. Öffne https://dash.cloudflare.com/ und erstelle bei Bedarf ein kostenloses Konto.
+2. Wähle **Workers & Pages → Create application → GitHub** (bei manchen Layouts erst **Import a repository**).
+3. Verbinde GitHub und wähle **Kai-022/Remote-Einmannrevi**, Branch **main**.
+4. Name für den Worker: **aion2-gear-eu-proxy** (muss zur `wrangler.jsonc` passen).
+5. Root directory: **aion2-gear-checker**; Deploy command: **npx wrangler deploy**. Ein Build-Schritt ist nicht notwendig.
+6. Klicke **Save and Deploy**. Cloudflare liefert eine öffentliche Adresse wie `https://aion2-gear-eu-proxy.DEIN-SUBDOMAIN.workers.dev`.
+7. Öffne den [Gear Checker](https://kai-022.github.io/Remote-Einmannrevi/aion2-gear-checker/), füge die Worker-Adresse im Feld **Worker-Adresse** ein und klicke **Verbindung testen & speichern**.
+
+Alternativ lässt sich die Datei [cloudflare-worker.js](cloudflare-worker.js) ohne Git-Integration im Cloudflare-Worker-Code-Editor hinterlegen und veröffentlichen.
+
+## Charakterimport
+1. EU-Charaktername eingeben und **EU-Charakter suchen** anklicken.
+2. Richtigen Server aus der Trefferliste wählen und **Importieren** klicken.
+3. Vorhandenes Gear, Verbesserungsstufen und – wenn die öffentliche Datenquelle sie liefert – Seelenbindungswerte werden eingelesen. Fehlende Werte kannst du von Hand ergänzen.
+4. Gear- und Upgrade-Empfehlungen sind Richtwerte, keine exakte DPS-Berechnung.
+
+## Probleme und Grenzen
+- **Worker /health ist erreichbar, Suche schlägt fehl:** Das Problem ist bei der öffentlichen Vi.ki- oder NCSOFT-Datenquelle. Diese können zeitweise HTTP 403/502 melden. Der Proxy kann keinen echten Quellserver-Ausfall beheben.
+- **Verbindung testen funktioniert nicht:** Worker-URL und Cloudflare-Deployment kontrollieren.
+- **Gear-Werte unvollständig:** Die öffentlichen Profil-APIs stellen möglicherweise nicht alle Seelenbindungsdaten bereit.
+- **End-to-End:** Der Code und GitHub-Stand wurden geprüft; eine Live-Suche mit einem realen EU-Charakter kann ohne veröffentlichten Worker nicht bestätigt werden.
 
 ## Datenschutz
-Keine Spiel-Logins oder Passwörter. Öffentliche Spielcharakterdaten werden bei einer Suche an die angegebenen externen API-Dienste geschickt. Gear-Einträge werden nur lokal im Browser gespeichert (localStorage). Änderungen betreffen ausschließlich die Webseite, niemals das Spiel. Inoffizielles Fanprojekt ohne Verbindung zu NCSOFT.
+- Kein Spiel-Login, kein Passwort, keine Verbindung zum Spielclient.
+- Die Webseite speichert eingetragene Gear-Daten nur lokal im Browser (localStorage).
+- Eine Suche schickt Charakternamen an **deinen Cloudflare Worker**, der sie zur öffentlichen Vi.ki-API weitergibt. Der Proxy akzeptiert nur feste API-Routen und EU-Region.
+- Die App hat keinen Zugriff auf dein Inventar, geheime Spielinformationen oder deinen Account.
 
-## Dateien
-- `index.html` – Gear- und Pet-Analyse, manuelle Bearbeitung
-- `import.js` – Charaktersuche, Auswahl mehrerer Server und Import
+## Dateistruktur
+- `index.html` – Website, Gear-Auswertung, Pet-Ziele
+- `import.js` – UI, Proxy-Anbindung, Import der Charakterdaten
+- `cloudflare-worker.js` – Cloudflare Worker (EU-only, GET, whitelist)
+- `wrangler.jsonc` – Cloudflare Git-Deploy-Konfiguration
+
+Inoffizielles AION-2-Fanprojekt, nicht mit NCSOFT verbunden. API: https://vi.ki/docs
