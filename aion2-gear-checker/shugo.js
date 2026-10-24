@@ -10,7 +10,7 @@ holder.innerHTML=
 '<p>Nutze den öffentlichen Link deines Shugo.GG-Charakterprofils. Keine Cloudflare-Verbindung, kein Spiel-Login und keine Installation.</p>'+
 '<div class="field"><label for="shugo-link">Shugo.GG-Charakterlink (EU)</label>'+
 '<input id="shugo-link" type="url" placeholder="https://shugo.gg/character/global/eu-siel/DeinName" autocomplete="url"></div>'+
-'<div class="actions"><button type="button" class="primary" id="shugo-fetch">✧ Gear über Link laden</button>'+
+'<div class="actions"><button type="button" class="primary" id="shugo-fetch">Direktabruf versuchen (oft blockiert)</button>'+
 '<button type="button" id="shugo-open">Shugo-Profil öffnen ↗</button>'+
 '<a class="button" href="https://shugo.gg/de/character" target="_blank" rel="noopener noreferrer">Charakter auf Shugo suchen ↗</a></div>'+
 '<div id="shugo-status" class="status" role="status" aria-live="polite"></div>'+
