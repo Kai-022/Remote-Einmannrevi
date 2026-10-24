@@ -215,6 +215,7 @@
   }
   async function importRef(ref) {
     if(loading)return;
+    if(ref.cls && !/cleric|kleriker|치유성|治癒星/i.test(ref.cls) && !confirm('Achtung: Der ausgewählte Charakter ist laut Suche '+ref.cls+'. Die Gear-Empfehlungen dieser Webseite sind für Kleriker. Trotzdem importieren?'))return;
     if(Object.keys(data.gear||{}).length && !confirm('Die importierten Gegenstände ersetzen deine bisherigen Gear-Einträge. Fortfahren?'))return;
     loading=true;listNode.querySelectorAll('button').forEach(b=>b.disabled=true);
     notice('Lade öffentliche Ausrüstung von '+ref.name+' ('+ref.server+') …');
