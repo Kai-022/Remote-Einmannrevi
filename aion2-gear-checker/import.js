@@ -26,8 +26,8 @@
   if(info)info.textContent='Optional: Du kannst Gear jederzeit von Hand ergänzen oder korrigieren. Der automatische EU-Import steht oben.';
   const notice = (s,kind='')=>{const p=el('import-message');p.textContent=s;p.className='import-msg '+kind;};
   const listNode=el('import-results');
-  const get=async url=>{
-    const ctl = new AbortController(); const t=setTimeout(()=>ctl.abort(),22000);
+  const get=async (url,ms=22000)=>{
+    const ctl = new AbortController(); const t=setTimeout(()=>ctl.abort(),ms);
     try{
       const response=await fetch(url,{method:'GET',mode:'cors',headers:{Accept:'application/json'},signal:ctl.signal,credentials:'omit'});
       if(!response.ok)throw Error('HTTP '+response.status);
@@ -130,8 +130,8 @@
     return [n,v].filter(y=>y!==null).join(' ').trim();
   };
   const parseRolls=x=>{
-    const options=arr(x,'subStats','substats','soulBinding.stats','soulBinding.options','soulBindings','soulBindStats','subOptionList','options','rolls','soulImprint','details.subStats','item.subStats');
-    const skills=arr(x,'subSkills','details.subSkills','item.subSkills');
+    const options=arr(x,'subStats','substats','soulBinding.stats','soulBinding.options','subStat.statList','subStats.statList','subSkill.statList','item.subStat.statList','item.subStats','soulBindings','soulBindStats','subOptionList','options','rolls','soulImprint','details.subStats','item.subStats');
+    const skills=arr(x,'subSkills','subSkill.skillList','details.subSkills','item.subSkills');
     return [...options.map(describeStat),...skills.map(q=>[q.name||q.skillName, q.level!=null?('+'+q.level):''].join(' ').trim())].filter(Boolean);
   };
   function equipmentToGear(equipment){
@@ -172,6 +172,47 @@
     }catch(e){errs.push('NCSOFT: '+e.message);}
     throw Error(errs.join(' / '));
   }
+
+  async function addSoulBindings(ref, sourceData){
+    const raw=normalizeEquipment(sourceData);
+    const candidate=raw.find(x=>!parseRolls(x).length && first(x,'id','itemId')!==null && first(x,'slotPos')!==null);
+    if(!candidate)return {count:0,checked:0};
+    // Only query the public equipment detail; never touch client/game or account.
+    const base={region:'eu',lang:'en',characterId:ref.id,serverId:ref.sid};
+    const makeUrls=item=>{
+      const itemId=String(first(item,'id','itemId')),slotPos=String(first(item,'slotPos'));
+      const ench=String(first(item,'enchantLevel')||0),exceed=String(first(item,'exceedLevel')||0);
+      return [
+        ['Vi.ki','https://aion2.vi.ki/-/aion2/item?'+new URLSearchParams({region:'eu',server:ref.sid,id:ref.id,item:itemId,slot:slotPos,enchant:ench})],
+        ['NCSOFT','https://aion2.plaync.com/api/character/equipment/item?'+new URLSearchParams({...base,id:itemId,slotPos,enchantLevel:ench,exceedLevel:exceed})]
+      ];
+    };
+    const takeDetails=rawResponse=>{
+      const o=unwrap(rawResponse);
+      const candidates=[o,first(o,'item'),first(o,'equipment'),first(o,'equipmentItem'),first(o,'details')].filter(Boolean);
+      for(const d of candidates){const rolls=parseRolls(d);if(rolls.length)return rolls;}
+      return[];
+    };
+    let selectedService=null,works=null;
+    for(const [service,url] of makeUrls(candidate)){
+      try{const r=takeDetails(await get(url,7000));if(r.length){selectedService=service;works=r;break;}}catch{}
+    }
+    if(!selectedService)return {count:0,checked:0};
+    candidate.subStats=works;
+    const remaining=raw.filter(x=>x!==candidate && !parseRolls(x).length && first(x,'id','itemId')!==null && first(x,'slotPos')!==null).slice(0,22);
+    let done=1,success=1,cursor=0;
+    const worker=async()=>{
+      while(cursor<remaining.length){
+        const item=remaining[cursor++];
+        const entry=makeUrls(item).find(x=>x[0]===selectedService);
+        if(!entry)continue;
+        try{const r=takeDetails(await get(entry[1],7000));if(r.length){item.subStats=r;success++;}}catch{}
+        done++;
+      }
+    };
+    await Promise.all(Array.from({length:Math.min(3,remaining.length)},()=>worker()));
+    return {count:success,checked:done};
+  }
   async function importRef(ref) {
     if(loading)return;
     if(Object.keys(data.gear||{}).length && !confirm('Die importierten Gegenstände ersetzen deine bisherigen Gear-Einträge. Fortfahren?'))return;
@@ -179,6 +220,8 @@
     notice('Lade öffentliche Ausrüstung von '+ref.name+' ('+ref.server+') …');
     try{
       const result=await getProfileAndEquipment(ref);
+      notice('Ausrüstung geladen. Prüfe, ob die Seelenbindungswerte abrufbar sind …');
+      const detailResult=await addSoulBindings(ref,result.equipment);
       const mapped=equipmentToGear(result.equipment);
       if(!Object.keys(mapped.gear).length)throw Error('Ausrüstung erhalten, aber keine Gear-Slots konnten eindeutig erkannt werden. Bestehende Eingaben bleiben erhalten.');
       isDemo=false;data={name:ref.name,mode:el('mode').value||'hybrid',gear:mapped.gear,sourceRef:ref,source:result.source,importedAt:new Date().toISOString()};
