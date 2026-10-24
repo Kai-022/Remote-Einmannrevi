@@ -5,35 +5,23 @@ const qs=s=>document.querySelector(s);
 const safe=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const holder=document.createElement('section');holder.className='panel';holder.id='shugo-import';
 holder.innerHTML=
-'<div class="eyebrow">EU · SHUGO.GG · CHARAKTERPROFIL</div>'+
-'<h2>✧ Gear über Shugo.GG übernehmen</h2>'+
-'<p>Nutze den öffentlichen Link deines Shugo.GG-Charakterprofils. Keine Cloudflare-Verbindung, kein Spiel-Login und keine Installation.</p>'+
-'<div class="field"><label for="shugo-link">Shugo.GG-Charakterlink (EU)</label>'+
+'<div class="eyebrow">SHUGO.GG · EU · KLERIKER PVE</div>'+
+'<h2>Charakter importieren</h2>'+
+'<p>Füge einfach deinen Shugo.GG-Charakterlink ein. Die Auswertung startet automatisch.</p>'+
+'<div class="grid" style="align-items:end">'+
+'<div class="field"><label for="shugo-link">Dein Shugo.GG-Charakterlink</label>'+
 '<input id="shugo-link" type="url" placeholder="https://shugo.gg/character/global/eu-siel/DeinName" autocomplete="url"></div>'+
-'<div class="actions"><button type="button" class="primary" id="shugo-fetch">Direktabruf versuchen (oft blockiert)</button>'+
-'<button type="button" id="shugo-open">Shugo-Profil öffnen ↗</button>'+
-'<a class="button" href="https://shugo.gg/de/character" target="_blank" rel="noopener noreferrer">Charakter auf Shugo suchen ↗</a></div>'+
+'<button type="button" class="primary" id="shugo-fetch">✧ Ausrüstung importieren</button></div>'+
 '<div id="shugo-status" class="status" role="status" aria-live="polite"></div>'+
-'<details id="shugo-copy" style="margin-top:13px" open>'+
-'<summary style="color:var(--gold);cursor:pointer;font-weight:700">Alternativ: Ausrüstung vom Shugo-Profil kopieren</summary>'+
-'<p class="tiny muted" style="margin:12px 0">Öffne dein Profil bei Shugo.GG, wähle <b>Ausrüstung</b>, markiere den sichtbaren Seiteninhalt mit <b>Strg + A</b> und kopiere ihn mit <b>Strg + C</b>. Füge ihn unten mit <b>Strg + V</b> ein und klicke auf „Kopiertes Gear übernehmen“.</p>'+
+'<div class="tiny muted" style="margin-top:11px">Ohne Cloudflare oder Installation. Zum Lesen der öffentlichen Profilseite nutzt der Checker den <a href="https://jina.ai/reader/" target="_blank" rel="noopener noreferrer">Jina Reader</a>. Dein öffentlicher Shugo-Link wird dabei an diesen Dienst gesendet. Nicht mit Shugo.GG verbunden.</div>'+
+'<details id="shugo-copy" style="margin-top:15px">'+
+'<summary style="color:var(--gold);cursor:pointer;font-weight:700">Falls der automatische Import nicht klappt: Profilinhalt einfügen</summary>'+
+'<p class="tiny muted" style="margin:11px 0">Öffne dein Shugo-Profil, kopiere die Ausrüstungsansicht mit Strg+A, Strg+C und füge sie hier mit Strg+V ein.</p>'+
 '<div class="field"><label for="shugo-paste">Kopierter Text aus dem Charakterprofil</label>'+
-'<textarea id="shugo-paste" rows="5" placeholder="Main Hand   Splendent Wise Dragon Lord Mace +15 ◆5   Unique&#10;Off-hand   Nuakum Guard +15   Unique&#10;..."></textarea></div>'+
-'<div class="actions"><button type="button" class="primary" id="shugo-import-paste">✓ Kopiertes Gear übernehmen</button>'+
-'<button type="button" id="shugo-clear-paste">Text löschen</button></div></details>'+
-'<div class="info" style="margin-top:16px">Shugo.GG bietet keine öffentliche API an. Darum funktioniert der automatische Abruf über den Link nur, wenn die Webseite Browserzugriffe erlaubt. Der Textimport übernimmt die im Profil sichtbaren Gegenstände und Verbesserungsstufen – keine nicht angezeigten Seelenbindungswerte oder Pet-Daten.</div>';
-
-const bookmarkBox=document.createElement('div');
-bookmarkBox.className='import-manual';
-bookmarkBox.style.margin='12px 0 20px';
-bookmarkBox.innerHTML='<strong style="color:var(--gold)">Empfohlen: direkt aus dem geöffneten Shugo-Profil übernehmen</strong>'+
-'<p class="tiny muted" style="margin:9px 0">Ohne Cloudflare oder Copy-Paste: Ziehe den goldenen Link einmal in die Lesezeichenleiste. Öffne danach dein EU-Profil auf Shugo.GG und klicke <b>dort</b> auf das neue Lesezeichen. Der Gear Checker wird geöffnet und übernimmt die sichtbaren Ausrüstungseinträge.</p>'+
-'<div class="actions"><a class="button primary" id="shugo-bookmarklet" style="cursor:grab" title="Diesen Link in die Lesezeichenleiste ziehen" draggable="true">✧ Gear aus Shugo übernehmen</a></div>'+
-'<p class="tiny muted" style="margin:9px 0">Lesezeichenleiste unter Windows: <b>Strg + Umschalt + B</b>. Dies ist eine Testfunktion: Falls Shugo.GG Lesezeichen-Skripte blockiert oder keine Ausrüstung anzeigt, nutze unten den Kopier-Import.</p>';
-const linkField=holder.querySelector('#shugo-link').closest('.field');
-holder.insertBefore(bookmarkBox,linkField);
-const bookmarkAnchor=bookmarkBox.querySelector('#shugo-bookmarklet');
-bookmarkAnchor.href='javascript:('+shugoPageGearTransfer.toString()+')()';
+'<textarea id="shugo-paste" rows="5" placeholder="Main Hand | Mace +15 | Unique"></textarea></div>'+
+'<div class="actions"><button type="button" class="primary" id="shugo-import-paste">Kopiertes Gear übernehmen</button>'+
+'<button type="button" id="shugo-open">Profil auf Shugo öffnen ↗</button>'+
+'<button type="button" id="shugo-clear-paste">Text löschen</button></div></details>';
 const previous=document.getElementById('import-panel');
 if(previous){
  const legacy=document.createElement('details');legacy.id='legacy-import-options';legacy.style.margin='12px 0 24px';
@@ -162,6 +150,24 @@ function extractText(raw) {
  }
  return normalizeRows(rows);
 }
+
+function extractMarkdown(source){
+ const content=String(source||'').replace(/\r/g,'');
+ const position=/(?:^|\n)\s*#{0,3}\s*(?:Equipment|Ausr[uü]stung)\s*(?:\n|$)/im.exec(content);
+ if(!position)return[];
+ let text=content.slice(position.index+position[0].length);
+ const end=/(?:^|\n)\s*(?:#{1,3}\s*)?(?:Other members|Andere Mitglieder|Top Combat Power|Similar characters|[ÄA]hnliche Charaktere|Skills|Stigmas|Stigmen)\s*(?:\n|$)/im.exec(text);
+ if(end)text=text.slice(0,end.index);
+ const clean=v=>String(v||'').replace(/【\d+†([^】]+)】/g,'$1')
+  .replace(/\[([^\]]+)\]\([^)]+\)/g,'$1').replace(/[*_\x60]/g,'').replace(/\s+/g,' ').trim();
+ const rows=[];
+ for(const line of text.split('\n')){
+    const parts=line.split(/\s*\|\s*/).map(clean).filter(Boolean);
+    if(parts.length>=2&&slotName(parts[0])&&parts[1]&&!/^[-:]+$/.test(parts[1]))
+      rows.push({slot:parts[0],item:parts[1],grade:parts[2]||''});
+ }
+ return normalizeRows(rows);
+}
 function importGear(items,ref) {
  const count=items.length;
  if(!count){message('Keine Ausrüstung erkannt. Kopiere auf Shugo.GG möglichst den Bereich „Ausrüstung“ mit den Itemnamen und Slots.',true);return false;}
@@ -178,63 +184,43 @@ function importGear(items,ref) {
 }
 function currentRef(){return parseLink(link.value);}
 
-if(new URLSearchParams(location.search).get('shugoTransfer')==='1'){
-  const params=new URLSearchParams(location.search);
-  const nonce=params.get('nonce')||'';
-  const opener=window.opener;
-  if(opener&&/^[a-f0-9]{24}$/.test(nonce)){
-    message('Empfange Ausrüstungsdaten von Shugo.GG …');
-    let consumed=false;
-    const onData=event=>{
-      if(consumed||event.source!==opener||!['https://shugo.gg','https://www.shugo.gg'].includes(event.origin))return;
-      const msg=event.data;
-      if(!msg||msg.type!=='SHUGO_GEAR_DATA'||msg.version!==1||msg.nonce!==nonce)return;
-      if(!Array.isArray(msg.rows)||msg.rows.length>60||typeof msg.gearText!=='string'||msg.gearText.length>36000)return;
-      let ref;
-      try{ref=parseLink(msg.profileUrl);}catch(e){message('Shugo-Profiladresse beim Transfer ungültig: '+e.message,true);return;}
-      const supplied=msg.rows.slice(0,60).filter(r=>r&&typeof r.slot==='string'&&typeof r.item==='string'&&r.slot.length<=70&&r.item.length<=220);
-      const items=normalizeRows(supplied);
-      const parsed=items.length?items:extractText(msg.gearText);
-      if(!parsed.length){
-        message('Shugo-Profil geöffnet, aber es konnten keine Gear-Slots erkannt werden. Öffne auf Shugo die Ausrüstungsansicht und probiere es erneut oder kopiere den Ausrüstungstext.','error');
-        return;
-      }
-      if(importGear(parsed,ref)){
-        consumed=true;link.value=ref.url;
-        const u=new URL(location.href);u.searchParams.delete('shugoTransfer');u.searchParams.delete('nonce');
-        history.replaceState(null,'',u.toString());
-      }
-    };
-    window.addEventListener('message',onData);
-    for(const ms of [0,400,1100,2500,5000]){
-      setTimeout(()=>{if(!consumed)try{opener.postMessage({type:'SHUGO_CHECKER_READY',nonce},'https://shugo.gg');opener.postMessage({type:'SHUGO_CHECKER_READY',nonce},'https://www.shugo.gg');}catch{}},ms);
-    }
-  }else message('Der Gear Checker wurde nicht über das Shugo-Lesezeichen geöffnet. Bitte vom Profil aus starten.','error');
-}
-
 qs('#shugo-open').addEventListener('click',()=>{
  try{const ref=currentRef();window.open(ref.url,'_blank','noopener,noreferrer');}
  catch(e){message(e.message,true);}
 });
 let fetching=false;
-qs('#shugo-fetch').addEventListener('click',async()=>{
+qs('#shugo-fetch').addEventListener('click',runImport);
+let typingTimer;
+link.addEventListener('input',()=>{
+ clearTimeout(typingTimer);
+ typingTimer=setTimeout(()=>{
+  try {currentRef();runImport();} catch {}
+ },650);
+});
+async function runImport(){
  if(fetching)return;
  let ref;try{ref=currentRef();}catch(e){message(e.message,true);return;}
  fetching=true;const btn=qs('#shugo-fetch');btn.disabled=true;
- message('Profil-Link erkannt. Versuche, die öffentlich sichtbare Ausrüstung abzurufen …');
- const ctrl=new AbortController(),timer=setTimeout(()=>ctrl.abort(),10000);
+ message('Lade dein öffentliches Shugo-Profil und suche die Ausrüstung …');
+ const ctrl=new AbortController(),timer=setTimeout(()=>ctrl.abort(),30000);
  try{
-  const response=await fetch(ref.url,{headers:{Accept:'text/html'},mode:'cors',credentials:'omit',signal:ctrl.signal});
-  if(!response.ok)throw Error('HTTP '+response.status);
-  const html=await response.text();
-  const extracted=extractHtml(html).length?extractHtml(html):extractText(new DOMParser().parseFromString(html,'text/html').body?.innerText||'');
-  if(!extracted.length)throw Error('Im HTML keine Ausrüstungs-Slots erkannt');
-  importGear(extracted,ref);
+  // The public Reader endpoint reads public web pages and exposes a browser-accessible text response.
+  // This is a third-party service; the user-facing UI discloses it explicitly.
+  const url='https://r.jina.ai/'+ref.url;
+  const response=await fetch(url,{method:'GET',mode:'cors',credentials:'omit',headers:{Accept:'text/plain'},signal:ctrl.signal});
+  if(!response.ok)throw Error('Lesedienst: HTTP '+response.status);
+  const txt=await response.text();
+  if(txt.length>750000)throw Error('Profilantwort ist zu groß');
+  if(/(?:^|\n)\s*(?:Error:|Access denied|Blocked by robots\.txt|Forbidden)/i.test(txt.slice(0,600)))throw Error('Profildaten wurden nicht freigegeben');
+  const fromMD=extractMarkdown(txt);
+  const rows=fromMD.length?fromMD:extractText(txt);
+  if(rows.length<2)throw Error('Keine Gear-Liste im Profil gefunden');
+  importGear(rows,ref);
  }catch(e){
-   details.open=true;
-   message('Der Shugo-Link wurde erkannt, aber das automatische Lesen wird blockiert oder liefert keine auswertbaren Gear-Daten ('+String(e.message).slice(0,90)+'). Öffne das Profil, kopiere dort die Ausrüstungsansicht und füge sie unten ein.',true);
+   const reason=e?.name==='AbortError'?'Zeitüberschreitung':String(e?.message||e);
+   message('Der automatische Abruf hat nicht funktioniert ('+reason+'). Du kannst unten bei Bedarf den sichtbaren Profiltext einfügen.',true);
  }finally{clearTimeout(timer);btn.disabled=false;fetching=false;}
-});
+}
 paste.addEventListener('paste',event=>{
  const html=event.clipboardData?.getData('text/html');
  if(html&&html.length<2_000_000)pendingHTML=html;
@@ -248,56 +234,6 @@ qs('#shugo-import-paste').addEventListener('click',()=>{
  if(importGear(rows,ref)){paste.value='';pendingHTML='';}
 });
 qs('#shugo-clear-paste').addEventListener('click',()=>{paste.value='';pendingHTML='';message('Kopierter Text gelöscht.');});
-function shugoPageGearTransfer(){
-  'use strict';
-  const allowedHost=location.hostname==='shugo.gg'||location.hostname==='www.shugo.gg';
-  const profilePath=location.pathname.replace(/^\/(?:de|en|fr|es|pt|ja|ko|zh)(?=\/)/i,'');
-  if(!allowedHost||location.protocol!=='https:'||!/^\/character\/global\/eu-[a-z0-9-]+\/[^/]+\/?$/i.test(profilePath)){
-    alert('Öffne zuerst dein öffentliches EU-Charakterprofil auf shugo.gg. Klicke dann erneut auf das Lesezeichen.');
-    return;
-  }
-  const slotPattern=/^(?:main\s*hand|mainhand|haupthand|hauptwaffe|waffe|off.?hand|sub.?hand|nebenhand|sch[uü]tzer|schild|helmet|helm|head|kopf|shoulders?|schultern?|torso|chest|brust|oberk[oö]rper|legs?|pants|hose|beine|gloves?|handschuh(?:e)?|boots?|schuhe|stiefel|feet|cape|cloak|umhang|mantel|necklace|halskette|earrings?|ohrring(?:e)?|rings?|ring(?:e)?|bracelets?|armband|armb[aä]nder|belt|g[uü]rtel|amulet|amulett|runes?\s*[12]?|arcana\s*[1-5]?|arkana\s*[1-5]?)$/i;
-  const rows=[];
-  for(const tr of document.querySelectorAll('table tr')){
-    const cells=Array.from(tr.querySelectorAll('th,td'),e=>(e.innerText||e.textContent||'').replace(/\s+/g,' ').trim());
-    if(cells.length>=2&&slotPattern.test(cells[0])&&cells[1])
-      rows.push({slot:cells[0].slice(0,70),item:cells[1].slice(0,220),grade:String(cells[2]||'').slice(0,40)});
-    if(rows.length>=60)break;
-  }
-  let gearText='';
-  if(!rows.length){
-    const full=(document.body.innerText||'').slice(0,150000);
-    const marker=/(?:^|\n)\s*(?:Equipment|Ausr[uü]stung)\s*(?:\n|$)/i.exec(full);
-    if(marker){
-      const tail=full.slice(marker.index,marker.index+42000);
-      const rest=tail.slice(marker[0].length);
-      const end=/(?:^|\n)\s*(?:Skills|F[aä]higkeiten|Other members|Andere Mitglieder|Weitere Mitglieder|Similar Characters|[ÄA]hnliche Charaktere|Ranking|Rangliste|Stigmas|Stigmen)\s*(?:\n|$)/i.exec(rest);
-      gearText=(end?tail.slice(0,marker[0].length+end.index):tail).slice(0,35000);
-    }
-  }
-  if(!rows.length&&!gearText.trim()){
-    alert('Auf diesem Shugo-Profil wurde keine Ausrüstungsansicht erkannt. Öffne die Ausrüstung im Profil und versuche es erneut. Du kannst weiterhin mit Strg+A / Strg+C kopieren.');
-    return;
-  }
-  const targetOrigin='https://kai-022.github.io';
-  const nonce=Array.from(crypto.getRandomValues(new Uint8Array(12)),x=>x.toString(16).padStart(2,'0')).join('');
-  const target='https://kai-022.github.io/Remote-Einmannrevi/aion2-gear-checker/?shugoTransfer=1&nonce='+encodeURIComponent(nonce);
-  const dest=window.open(target,'aion2ShugoGearTransfer');
-  if(!dest){
-    alert('Browser hat das Gear-Checker-Fenster blockiert. Pop-ups für shugo.gg erlauben oder den Kopieren-Import verwenden.');
-    return;
-  }
-  let completed=false;
-  const timer=setTimeout(()=>{window.removeEventListener('message',listener);},45000);
-  function listener(event){
-    if(completed||event.origin!==targetOrigin||event.source!==dest||event.data?.type!=='SHUGO_CHECKER_READY'||event.data?.nonce!==nonce)return;
-    completed=true;
-    clearTimeout(timer);
-    window.removeEventListener('message',listener);
-    dest.postMessage({type:'SHUGO_GEAR_DATA',version:1,nonce,profileUrl:location.href,rows,gearText},targetOrigin);
-    try{dest.focus();}catch{}
-  }
-  window.addEventListener('message',listener);
-}
+
 
 })();
