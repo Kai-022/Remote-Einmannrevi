@@ -123,26 +123,30 @@ function extractText(raw) {
      rows.push({slot:columns[0],item:columns[1],grade:columns[2]||''});
    }
  }
- // Copied website layout may have slot and item on separate lines.
+ // Copied website layouts may have item before ("+15 Mace" then "Haupthand")
+ // or item after ("Main Hand" then "Mace +15"). Prefer preceding equipped item
+ // when its +level is visible, to avoid attributing the *next* item to this slot.
  for(let i=0;i<lines.length;i++){
    const spec=slotName(lines[i]);
    if(!spec)continue;
-   // Layout A: the slot label precedes item name
-   for(let k=i+1;k<Math.min(i+4,lines.length);k++){
-     if(slotName(lines[k])||/^(?:Equipment|Ausr[uü]stung|Waffen|R[uü]stung|Item|Slot)$/i.test(lines[k]))break;
-     const hit=lines[k].match(/^(?:\+\s*\d{1,2}\s+)?[\p{L}\p{N}].{3,140}$/u);
-     if(hit && !/^(?:Unique|Epic|Special|Einzigartig|Episch|Image:|Bild:)/i.test(lines[k])){
-       rows.push({slot:lines[i],item:lines[k]});
-       break;
-     }
-   }
-   // Layout B: german client cards often show "+15 Item name" followed by "Haupthand"
+   let chosen=null;
    for(let k=i-1;k>=Math.max(0,i-3);k--){
      if(slotName(lines[k]))break;
      if(/^\+\s*\d{1,2}\s+[\p{L}\p{N}].{3,140}$/u.test(lines[k])){
-       rows.push({slot:lines[i],item:lines[k]});break;
+       chosen=lines[k];break;
      }
    }
+   if(!chosen){
+     for(let k=i+1;k<Math.min(i+4,lines.length);k++){
+       if(slotName(lines[k])||/^(?:Equipment|Ausr[uü]stung|Waffen|R[uü]stung|Item|Slot)$/i.test(lines[k]))break;
+       const candidate=lines[k];
+       if(/^(?:\+\s*\d{1,2}\s+)?[\p{L}\p{N}].{3,140}$/u.test(candidate)&&
+         !/^(?:Unique|Epic|Special|Einzigartig|Episch|Image:|Bild:|Stats|Status|Effect)/i.test(candidate)){
+         chosen=candidate;break;
+       }
+     }
+   }
+   if(chosen)rows.push({slot:lines[i],item:chosen});
  }
  return normalizeRows(rows);
 }
@@ -197,5 +201,4 @@ qs('#shugo-import-paste').addEventListener('click',()=>{
  if(importGear(rows,ref)){paste.value='';pendingHTML='';}
 });
 qs('#shugo-clear-paste').addEventListener('click',()=>{paste.value='';pendingHTML='';message('Kopierter Text gelöscht.');});
-window.__shugoParserTest={parseLink,extractHtml,extractText,slotName}; // for local diagnostics, does not expose user data
 })();
