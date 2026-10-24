@@ -10,32 +10,24 @@
   box.className = 'panel';
   box.id = 'import-panel';
   box.innerHTML = '<h2>✧ Charakter automatisch importieren (EU)</h2>'+
-  '<p>Charakternamen eingeben, passenden Server auswählen und dein Gear laden – ohne Login. Es werden ausschließlich öffentlich sichtbare Charakterdaten abgefragt.</p>'+
+  '<p>Füge deinen offiziellen EU-Charakterlink ein. Die Webseite versucht, die öffentlich freigegebenen Daten direkt abzurufen – ohne zusätzliche Konten oder Verbindung zu weiteren Diensten.</p>'+
   '<form id="import-search-form" class="grid" style="align-items:end"><div class="field"><label for="import-name">Charaktername (mindestens 2 Zeichen)</label><input id="import-name" placeholder="Dein Charaktername" required minlength="2" maxlength="40" autocomplete="off"></div><button type="submit" class="primary" id="import-search-button">🔎 EU-Charakter suchen</button></form>'+
   '<div class="import-msg" id="import-message" role="status" aria-live="polite">Bereit für die Suche.</div>'+
   '<div id="import-results" aria-label="Gefundene Charaktere"></div>'+
   '<div id="import-summary" class="import-stats"></div>'+
-  '<p class="import-quiet" style="margin-top:15px">Daten: <a href="https://aion2.plaync.com/en-us/characters/index?region=eu" target="_blank" rel="noopener noreferrer">NCSOFT</a> über die <a href="https://vi.ki/docs" target="_blank" rel="noopener noreferrer">öffentliche Vi.ki-API</a>. Wenn die API Anfragen anderer Webseiten blockiert, ist ein eigener Online-Proxy nötig.</p>'+
+  '<p class="import-quiet" style="margin-top:15px">Direktabruf über öffentlich zugängliche Daten von NCSOFT und Vi.ki. Falls die Quellseite Browseranfragen blockiert, wird kein Gear importiert und deine bisherigen Werte bleiben erhalten.</p>'+
   '<details class="import-manual"><summary>Alternative: Charakterdaten als JSON importieren</summary><p class="import-quiet">Falls du eine JSON-Datei der öffentlichen Charakter-/Equipment-Daten hast, kannst du sie hier öffnen. Keine Logins oder Zugangsdaten verwenden.</p><input type="file" id="import-json-file" accept=".json,application/json"><button id="import-json-button" type="button" style="margin-top:10px">JSON-Daten prüfen und importieren</button></details>';
   // Profiles from the public AION 2 EU armory already carry both IDs; searching is optional.
   const linkPanel = document.createElement('div');
   linkPanel.className = 'import-manual';
   linkPanel.style.margin='14px 0';
   linkPanel.innerHTML='<strong style="color:#e8c687">Einfacher: Charakterlink einfügen</strong>'+
-    '<p class="import-quiet">Kopiere die Adresse deiner offiziellen AION-2-Charakterseite hier hinein. Dein Server und die Charakter-ID werden automatisch erkannt – keine Namenssuche nötig.</p>'+
+    '<p class="import-quiet">Der Link wird lokal ausgewertet. Server und Charakter-ID werden ohne Namenssuche erkannt.</p>'+
     '<form id="profile-link-form" class="grid" style="align-items:end">'+
     '<div class="field"><label for="profile-link">Offizieller AION-2-Charakterlink (EU)</label><input type="url" id="profile-link" placeholder="https://aion2.plaync.com/en-us/characters/…?region=eu" required autocomplete="off"></div>'+
     '<button type="submit" class="primary" id="profile-link-button">✧ Gear aus Link importieren</button></form>'+
-    '<div class="import-quiet" style="margin-top:8px">Es werden keine Spiel-Zugangsdaten benötigt. Falls NCSOFT Browseranfragen blockiert, bleibt ein kleiner Online-Datenserver nötig.</div>';
+    '<div class="import-quiet" style="margin-top:8px">Keine Installation und kein zusätzliches Konto. Hinweis: Bei HTTP 403 oder CORS können wir die Ausrüstung aus dem Link allein nicht abrufen. Dann bleibt der manuelle oder JSON-Import.</div>';
   box.insertBefore(linkPanel,box.querySelector('#import-search-form'));
-  const proxyConfig = document.createElement('div');
-  proxyConfig.className='import-manual';
-  proxyConfig.style.margin='14px 0';
-  proxyConfig.innerHTML='<strong style="color:#e8c687">Einmalige Verbindung zum EU-Datenserver</strong>'+
-   '<p class="import-quiet">Optional bei Zugriffssperre (HTTP 403/CORS): Verbinde einen eigenen Cloudflare Worker. Ein Link spart die Suche, hebt die Datensperre aber nicht automatisch auf.</p>'+
-   '<div class="grid"><div class="field"><label for="proxy-url">Worker-Adresse (https://...workers.dev)</label><input type="url" id="proxy-url" placeholder="https://aion2-gear-eu-proxy.DEIN-NAME.workers.dev" autocomplete="url"></div><div class="field" style="justify-content:end"><button type="button" id="proxy-test">Verbindung testen & speichern</button></div></div>'+
-   '<details style="margin-top:10px"><summary>Cloudflare Worker ohne Installation einrichten</summary><ol class="import-quiet"><li>Öffne <a href="https://dash.cloudflare.com/" target="_blank" rel="noopener noreferrer">Cloudflare</a> und erstelle ggf. ein kostenloses Konto.</li><li>Gehe zu <b>Workers & Pages → Create application → GitHub</b> und verbinde das Repository <b>Kai-022/Remote-Einmannrevi</b>.</li><li>Wähle <b>main</b> und als <b>Root directory</b> den Ordner <code>aion2-gear-checker</code>. Worker-Name: <code>aion2-gear-eu-proxy</code>. Deploy.</li><li>Kopiere die <code>https://...workers.dev</code>-Adresse hier hinein und klicke <b>Verbindung testen & speichern</b>.</li></ol><p class="import-quiet">Alternativ kann die Datei <a href="https://github.com/Kai-022/Remote-Einmannrevi/blob/main/aion2-gear-checker/cloudflare-worker.js" target="_blank" rel="noopener noreferrer">cloudflare-worker.js</a> im Cloudflare-Code-Editor eingefügt werden.</p></details>';
-  box.insertBefore(proxyConfig,el('import-search-form')||box.querySelector('#import-search-form'));
   const currentPanel = el('charname').closest('.panel');
   currentPanel.parentNode.insertBefore(box,currentPanel);
   // Correction: label the older section as optional manual editor.
@@ -45,33 +37,8 @@
   if(info)info.textContent='Optional: Du kannst Gear jederzeit von Hand ergänzen oder korrigieren. Der automatische EU-Import steht oben.';
   const notice = (s,kind='')=>{const p=el('import-message');p.textContent=s;p.className='import-msg '+kind;};
   const listNode=el('import-results');
-  const proxyInput=el('proxy-url');
-  proxyInput.value=localStorage.getItem('aion2_proxy_url')||'';
-  function proxyBase() {
-    let u;
-    try{u=new URL(proxyInput.value.trim());}catch{throw Error('Trage zuerst die Adresse deines Cloudflare Workers ein.');}
-    if(u.protocol!=='https:'||(!u.hostname.endsWith('.workers.dev')&&u.hostname!=='workers.dev'))
-      throw Error('Bitte eine gültige HTTPS-Worker-Adresse (…workers.dev) eingeben.');
-    if(u.pathname!=='/'&&u.pathname!=='')throw Error('Bitte die Worker-Grundadresse ohne Pfad einfügen.');
-    return u.origin;
-  }
-  function proxyUrl(path,params={}) {
-    const u=new URL(path,proxyBase());
-    u.search=new URLSearchParams(params).toString();
-    return u.toString();
-  }
-  el('proxy-test').addEventListener('click',async()=>{
-    const b=el('proxy-test');b.disabled=true;
-    try{
-      notice('Prüfe Worker-Verbindung …');
-      const response=await get(proxyUrl('/health'),12000);
-      if(!response.ok)throw Error('Worker antwortet nicht korrekt.');
-      const normalized=proxyBase();
-      localStorage.setItem('aion2_proxy_url',normalized);proxyInput.value=normalized;
-      notice('Worker verbunden und gespeichert! Du kannst jetzt EU-Charaktere suchen.','success');
-    }catch(e){notice('Verbindung fehlgeschlagen: '+e.message+' – Überprüfe, ob Cloudflare den Worker veröffentlicht hat.','error');}
-    finally{b.disabled=false;}
-  });
+  // No proxy, no extra account. Direct requests work only when AION 2/Vi.ki permit browser access.
+  try{localStorage.removeItem('aion2_proxy_url');}catch{}
   const get=async (url,ms=22000)=>{
     const ctl = new AbortController(); const t=setTimeout(()=>ctl.abort(),ms);
     try{
@@ -115,25 +82,38 @@
   async function search(ev){
     ev.preventDefault();
     if(loading)return;
-    const name=el('import-name').value.trim();if(name.length<2){notice('Mindestens zwei Zeichen eingeben.','error');return;}
-    found=[];notice('Suche EU-Charaktere …');listNode.innerHTML='';el('import-summary').innerHTML='';loading=true;el('import-search-button').disabled=true;
+    const name=el('import-name').value.trim();
+    if(name.length<2){notice('Mindestens zwei Zeichen eingeben.','error');return;}
+    found=[];listNode.innerHTML='';el('import-summary').innerHTML='';
+    notice('Suche direkt über die öffentlichen EU-Datenquellen …');
+    loading=true;el('import-search-button').disabled=true;
+    const sources=[
+      ['Vi.ki','https://aion2.vi.ki/-/aion2/search?'+new URLSearchParams({region:'eu',name})],
+      ['NCSOFT','https://api-search.plaync.com/aion2global/search/v2/character?'+new URLSearchParams({keyword:name,region:'eu',localeInfo:'en',serverId:'',page:'1',size:'30'})]
+    ];
+    const errors=[];
     try{
-      try{
-        const result=await get(proxyUrl('/search',{name}));
-        const objects=rawMatches(result);
-        if(!objects.length){notice('Keine Charaktere gefunden. Prüfe die Schreibweise und den EU-Server.','error');return;}
-        found=objects.map(normalizeMatch).filter(Boolean);
-        if(!found.length){notice('Die Datenquelle antwortet, aber das Suchformat ist unbekannt. Bitte die Fehlermeldung melden.','error');return;}
-        activeSource='Cloudflare / Vi.ki';
-      }catch(err){
-        notice('Import-Suche nicht möglich: '+err.message+'. Der Worker umgeht die Browser-CORS-Sperre, aber wenn NCSOFT selbst offline ist, hilft auch der Worker nicht.','error');
+      for(const [source,url] of sources){
+        try{
+          const result=await get(url,10000);
+          const objects=rawMatches(result);
+          if(!objects.length){errors.push(source+': keine Treffer');continue;}
+          const matches=objects.map(normalizeMatch).filter(Boolean);
+          if(!matches.length){errors.push(source+': Antwortformat nicht erkannt');continue;}
+          found=matches;activeSource=source;break;
+        }catch(e){errors.push(source+': '+e.message);}
+      }
+      if(!found.length){
+        notice('Keine Ergebnisse über die direkte Verbindung. '+errors.join(' / ')+
+          '. Die Webseiten dürfen öffentliche Daten blockieren (CORS/HTTP 403). Ohne einen zusätzlichen Server ist dann nur die manuelle Gear-Eingabe oder der JSON-Dateiimport möglich.','error');
         return;
       }
-      listNode.innerHTML='<div class="import-quiet">'+found.length+' Treffer gefunden. Wähle deinen Charakter auf dem richtigen EU-Server:</div>'+
+      listNode.innerHTML='<div class="import-quiet">'+found.length+' Treffer gefunden. Wähle deinen EU-Charakter:</div>'+
         found.slice(0,50).map((x,i)=>'<div class="import-result"><div><strong>'+esc(x.name)+'</strong><span>'+esc(x.server)+' · '+esc(x.cls||'Klasse nicht angegeben')+(x.level?' · Level '+esc(x.level):'')+'</span></div><button type="button" class="import-pick" data-index="'+i+'">Importieren</button></div>').join('');
-      notice('Suche erfolgreich über '+activeSource+'. Wähle jetzt deinen Charakter.','success');
+      notice('Suche über '+activeSource+' erfolgreich.','success');
     }finally{loading=false;el('import-search-button').disabled=false;}
   }
+
   const slotMap = str=>{
     const s=String(str||'').replace(/[\s_-]/g,'').toLowerCase();
     if(!s)return null;
@@ -196,73 +176,28 @@
   }
   async function getProfileAndEquipment(ref){
     const errors=[];
-    // Configured, user-owned Cloudflare Worker is the preferred path when available.
-    if(proxyInput.value.trim()){
-      try{
-        const d=unwrap(await get(proxyUrl('/character',{server:ref.sid,id:ref.id}),16000));
-        const equipment=normalizeEquipment(d).length?d:first(d,'equipment','character','profile','characterData')||d;
-        if(normalizeEquipment(equipment).length)return {profile:d,equipment,source:'Cloudflare / Vi.ki'};
-        errors.push('Worker: Antwort enthält keine Ausrüstung');
-      }catch(e){errors.push('Worker: '+e.message);}
-    }
-    // Direct requests can work only if the source authorizes cross-origin browser access.
-    const qs=new URLSearchParams({region:'eu',server:ref.sid,id:ref.id});
+    const q=new URLSearchParams({region:'eu',server:ref.sid,id:ref.id});
     try{
-      const d=unwrap(await get('https://aion2.vi.ki/-/aion2/character?'+qs,14000));
+      const d=unwrap(await get('https://aion2.vi.ki/-/aion2/character?'+q,10000));
       const equipment=normalizeEquipment(d).length?d:first(d,'equipment','character','profile','characterData')||d;
       if(normalizeEquipment(equipment).length)return {profile:d,equipment,source:'Vi.ki direkt'};
-      errors.push('Vi.ki: keine Ausrüstung');
-    }catch(e){errors.push('Vi.ki direkt: '+e.message);}
+      errors.push('Vi.ki: keine erkennbaren Ausrüstungsdaten');
+    }catch(e){errors.push('Vi.ki: '+e.message);}
+    const args=new URLSearchParams({region:'eu',lang:'en',characterId:ref.id,serverId:ref.sid});
     try{
-      const args=new URLSearchParams({region:'eu',lang:'en',characterId:ref.id,serverId:ref.sid});
       const base='https://aion2.plaync.com/api/character/';
-      const gear=unwrap(await get(base+'equipment?'+args,14000));
-      if(!normalizeEquipment(gear).length)throw Error('Keine Ausrüstung in der Antwort');
+      const gear=unwrap(await get(base+'equipment?'+args,10000));
+      if(!normalizeEquipment(gear).length)throw Error('Keine erkennbaren Ausrüstungsdaten');
       let profile={};
-      try{profile=unwrap(await get(base+'info?'+args,9000));}catch{}
+      try{profile=unwrap(await get(base+'info?'+args,8000));}catch{}
       return {profile,equipment:gear,source:'NCSOFT direkt'};
-    }catch(e){errors.push('NCSOFT direkt: '+e.message);}
-    throw Error(errors.join(' / ')+'. Dein Link wurde erkannt, aber die Datenquelle blockiert möglicherweise den Browserzugriff. Dann ist ein eigener Worker/Server erforderlich.');
+    }catch(e){errors.push('NCSOFT: '+e.message);}
+    throw Error(errors.join(' / ')+'. Der Link wurde erkannt, aber diese Datenquellen erlauben möglicherweise keine direkte Abfrage aus GitHub Pages. Du kannst dein Gear weiterhin manuell oder über eine JSON-Datei eintragen.');
   }
 
-  async function addSoulBindings(ref, sourceData){
-    if(!proxyInput.value.trim())return {count:0,checked:0};
-    const raw=normalizeEquipment(sourceData);
-    const candidate=raw.find(x=>!parseRolls(x).length && first(x,'id','itemId')!==null && first(x,'slotPos')!==null);
-    if(!candidate)return {count:0,checked:0};
-    // Only query the public equipment detail; never touch client/game or account.
-    const makeUrls=item=>{
-      const itemId=String(first(item,'id','itemId'));
-      const slotPos=String(first(item,'slotPos'));
-      const ench=String(first(item,'enchantLevel')||0);
-      return [['Cloudflare / Vi.ki',proxyUrl('/item',{server:ref.sid,id:ref.id,item:itemId,slot:slotPos,enchant:ench})]];
-    };
-    const takeDetails=rawResponse=>{
-      const o=unwrap(rawResponse);
-      const candidates=[o,first(o,'item'),first(o,'equipment'),first(o,'equipmentItem'),first(o,'details')].filter(Boolean);
-      for(const d of candidates){const rolls=parseRolls(d);if(rolls.length)return rolls;}
-      return[];
-    };
-    let selectedService=null,works=null;
-    for(const [service,url] of makeUrls(candidate)){
-      try{const r=takeDetails(await get(url,7000));if(r.length){selectedService=service;works=r;break;}}catch{}
-    }
-    if(!selectedService)return {count:0,checked:0};
-    candidate.subStats=works;
-    const remaining=raw.filter(x=>x!==candidate && !parseRolls(x).length && first(x,'id','itemId')!==null && first(x,'slotPos')!==null).slice(0,22);
-    let done=1,success=1,cursor=0;
-    const worker=async()=>{
-      while(cursor<remaining.length){
-        const item=remaining[cursor++];
-        const entry=makeUrls(item).find(x=>x[0]===selectedService);
-        if(!entry)continue;
-        try{const r=takeDetails(await get(entry[1],7000));if(r.length){item.subStats=r;success++;}}catch{}
-        done++;
-      }
-    };
-    await Promise.all(Array.from({length:Math.min(3,remaining.length)},()=>worker()));
-    return {count:success,checked:done};
-  }
+  // Seelenbindungs-Detailwerte werden nur übernommen, wenn die öffentlich
+  // zugängliche Charakterantwort diese bereits enthält; keine Umgehung von Zugriffssperren.
+  async function addSoulBindings(){return {count:0,checked:0};}
   async function importRef(ref) {
     if(loading)return;
     if(ref.cls && !/cleric|kleriker|치유성|治癒星/i.test(ref.cls) && !confirm('Achtung: Der ausgewählte Charakter ist laut Suche '+ref.cls+'. Die Gear-Empfehlungen dieser Webseite sind für Kleriker. Trotzdem importieren?'))return;
@@ -307,7 +242,7 @@
     if(loading)return;
     let ref;
     try{ref=parseOfficialProfileLink(el('profile-link').value);}catch(e){notice(e.message,'error');return;}
-    notice('EU-Profil-Link erkannt (Server '+ref.sid+'). Lade öffentliche Ausrüstungsdaten …');
+    notice('EU-Profil-Link erkannt (Server '+ref.sid+'). Versuche öffentliche Gear-Daten direkt zu laden …');
     await importRef(ref);
   });
   el('import-search-form').addEventListener('submit',search);
