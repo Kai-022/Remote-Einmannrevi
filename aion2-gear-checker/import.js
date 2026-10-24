@@ -17,11 +17,22 @@
   '<div id="import-summary" class="import-stats"></div>'+
   '<p class="import-quiet" style="margin-top:15px">Daten: <a href="https://aion2.plaync.com/en-us/characters/index?region=eu" target="_blank" rel="noopener noreferrer">NCSOFT</a> über die <a href="https://vi.ki/docs" target="_blank" rel="noopener noreferrer">öffentliche Vi.ki-API</a>. Wenn die API Anfragen anderer Webseiten blockiert, ist ein eigener Online-Proxy nötig.</p>'+
   '<details class="import-manual"><summary>Alternative: Charakterdaten als JSON importieren</summary><p class="import-quiet">Falls du eine JSON-Datei der öffentlichen Charakter-/Equipment-Daten hast, kannst du sie hier öffnen. Keine Logins oder Zugangsdaten verwenden.</p><input type="file" id="import-json-file" accept=".json,application/json"><button id="import-json-button" type="button" style="margin-top:10px">JSON-Daten prüfen und importieren</button></details>';
+  // Profiles from the public AION 2 EU armory already carry both IDs; searching is optional.
+  const linkPanel = document.createElement('div');
+  linkPanel.className = 'import-manual';
+  linkPanel.style.margin='14px 0';
+  linkPanel.innerHTML='<strong style="color:#e8c687">Einfacher: Charakterlink einfügen</strong>'+
+    '<p class="import-quiet">Kopiere die Adresse deiner offiziellen AION-2-Charakterseite hier hinein. Dein Server und die Charakter-ID werden automatisch erkannt – keine Namenssuche nötig.</p>'+
+    '<form id="profile-link-form" class="grid" style="align-items:end">'+
+    '<div class="field"><label for="profile-link">Offizieller AION-2-Charakterlink (EU)</label><input type="url" id="profile-link" placeholder="https://aion2.plaync.com/en-us/characters/…?region=eu" required autocomplete="off"></div>'+
+    '<button type="submit" class="primary" id="profile-link-button">✧ Gear aus Link importieren</button></form>'+
+    '<div class="import-quiet" style="margin-top:8px">Es werden keine Spiel-Zugangsdaten benötigt. Falls NCSOFT Browseranfragen blockiert, bleibt ein kleiner Online-Datenserver nötig.</div>';
+  box.insertBefore(linkPanel,box.querySelector('#import-search-form'));
   const proxyConfig = document.createElement('div');
   proxyConfig.className='import-manual';
   proxyConfig.style.margin='14px 0';
   proxyConfig.innerHTML='<strong style="color:#e8c687">Einmalige Verbindung zum EU-Datenserver</strong>'+
-   '<p class="import-quiet">Damit die Charaktersuche nicht durch Browser-Sperren blockiert wird, verbinde hier deinen eigenen Cloudflare Worker. Ein kostenloses Cloudflare-Konto genügt, auf deinem PC ist keine Installation erforderlich.</p>'+
+   '<p class="import-quiet">Optional bei Zugriffssperre (HTTP 403/CORS): Verbinde einen eigenen Cloudflare Worker. Ein Link spart die Suche, hebt die Datensperre aber nicht automatisch auf.</p>'+
    '<div class="grid"><div class="field"><label for="proxy-url">Worker-Adresse (https://...workers.dev)</label><input type="url" id="proxy-url" placeholder="https://aion2-gear-eu-proxy.DEIN-NAME.workers.dev" autocomplete="url"></div><div class="field" style="justify-content:end"><button type="button" id="proxy-test">Verbindung testen & speichern</button></div></div>'+
    '<details style="margin-top:10px"><summary>Cloudflare Worker ohne Installation einrichten</summary><ol class="import-quiet"><li>Öffne <a href="https://dash.cloudflare.com/" target="_blank" rel="noopener noreferrer">Cloudflare</a> und erstelle ggf. ein kostenloses Konto.</li><li>Gehe zu <b>Workers & Pages → Create application → GitHub</b> und verbinde das Repository <b>Kai-022/Remote-Einmannrevi</b>.</li><li>Wähle <b>main</b> und als <b>Root directory</b> den Ordner <code>aion2-gear-checker</code>. Worker-Name: <code>aion2-gear-eu-proxy</code>. Deploy.</li><li>Kopiere die <code>https://...workers.dev</code>-Adresse hier hinein und klicke <b>Verbindung testen & speichern</b>.</li></ol><p class="import-quiet">Alternativ kann die Datei <a href="https://github.com/Kai-022/Remote-Einmannrevi/blob/main/aion2-gear-checker/cloudflare-worker.js" target="_blank" rel="noopener noreferrer">cloudflare-worker.js</a> im Cloudflare-Code-Editor eingefügt werden.</p></details>';
   box.insertBefore(proxyConfig,el('import-search-form')||box.querySelector('#import-search-form'));
@@ -184,13 +195,38 @@
     return {gear,extra,ambiguous,withRolls};
   }
   async function getProfileAndEquipment(ref){
-    const d=unwrap(await get(proxyUrl('/character',{server:ref.sid,id:ref.id}),22000));
-    const equipment=normalizeEquipment(d).length?d:first(d,'equipment','character','profile','characterData')||d;
-    if(!normalizeEquipment(equipment).length)throw Error('Die Datenquelle lieferte keine erkennbaren Ausrüstungsplätze. Möglicherweise ist das Profil derzeit nicht verfügbar.');
-    return {profile:d,equipment,source:'Cloudflare / Vi.ki'};
+    const errors=[];
+    // Configured, user-owned Cloudflare Worker is the preferred path when available.
+    if(proxyInput.value.trim()){
+      try{
+        const d=unwrap(await get(proxyUrl('/character',{server:ref.sid,id:ref.id}),16000));
+        const equipment=normalizeEquipment(d).length?d:first(d,'equipment','character','profile','characterData')||d;
+        if(normalizeEquipment(equipment).length)return {profile:d,equipment,source:'Cloudflare / Vi.ki'};
+        errors.push('Worker: Antwort enthält keine Ausrüstung');
+      }catch(e){errors.push('Worker: '+e.message);}
+    }
+    // Direct requests can work only if the source authorizes cross-origin browser access.
+    const qs=new URLSearchParams({region:'eu',server:ref.sid,id:ref.id});
+    try{
+      const d=unwrap(await get('https://aion2.vi.ki/-/aion2/character?'+qs,14000));
+      const equipment=normalizeEquipment(d).length?d:first(d,'equipment','character','profile','characterData')||d;
+      if(normalizeEquipment(equipment).length)return {profile:d,equipment,source:'Vi.ki direkt'};
+      errors.push('Vi.ki: keine Ausrüstung');
+    }catch(e){errors.push('Vi.ki direkt: '+e.message);}
+    try{
+      const args=new URLSearchParams({region:'eu',lang:'en',characterId:ref.id,serverId:ref.sid});
+      const base='https://aion2.plaync.com/api/character/';
+      const gear=unwrap(await get(base+'equipment?'+args,14000));
+      if(!normalizeEquipment(gear).length)throw Error('Keine Ausrüstung in der Antwort');
+      let profile={};
+      try{profile=unwrap(await get(base+'info?'+args,9000));}catch{}
+      return {profile,equipment:gear,source:'NCSOFT direkt'};
+    }catch(e){errors.push('NCSOFT direkt: '+e.message);}
+    throw Error(errors.join(' / ')+'. Dein Link wurde erkannt, aber die Datenquelle blockiert möglicherweise den Browserzugriff. Dann ist ein eigener Worker/Server erforderlich.');
   }
 
   async function addSoulBindings(ref, sourceData){
+    if(!proxyInput.value.trim())return {count:0,checked:0};
     const raw=normalizeEquipment(sourceData);
     const candidate=raw.find(x=>!parseRolls(x).length && first(x,'id','itemId')!==null && first(x,'slotPos')!==null);
     if(!candidate)return {count:0,checked:0};
@@ -235,6 +271,8 @@
     notice('Lade öffentliche Ausrüstung von '+ref.name+' ('+ref.server+') …');
     try{
       const result=await getProfileAndEquipment(ref);
+      const liveName=first(result.profile,'profile.characterName','characterName','profile.name','name');
+      if(typeof liveName==='string' && liveName.trim())ref={...ref,name:liveName.trim()};
       notice('Ausrüstung geladen. Prüfe, ob die Seelenbindungswerte abrufbar sind …');
       const detailResult=await addSoulBindings(ref,result.equipment);
       const mapped=equipmentToGear(result.equipment);
@@ -248,6 +286,30 @@
     }catch(e){notice('Import nicht möglich: '+e.message+'. Deine bisherigen Gear-Daten bleiben erhalten.','error');}
     finally{loading=false;listNode.querySelectorAll('button').forEach(b=>b.disabled=false);}
   }
+  function parseOfficialProfileLink(raw){
+    let url;
+    try{url=new URL(raw.trim());}catch{throw Error('Bitte einen vollständigen offiziellen Link einfügen.');}
+    if(url.protocol!=='https:' || url.hostname!=='aion2.plaync.com')
+      throw Error('Bitte einen offiziellen Link von aion2.plaync.com verwenden.');
+    if(url.searchParams.get('region')!=='eu')
+      throw Error('Dieser Gear Checker ist für die EU-Version. Der Link muss region=eu enthalten.');
+    const match=url.pathname.match(/^\/[a-z]{2}-[a-z]{2}\/characters\/(\d+)\/([^/]+)\/?$/i);
+    if(!match)throw Error('Der Link enthält keine gültige Server-ID und Charakter-ID.');
+    const server=match[1];
+    let id;
+    try{id=decodeURIComponent(match[2]);}catch{throw Error('Charakter-ID ist ungültig codiert.');}
+    if(!/^\d{1,8}$/.test(server) || !/^[a-zA-Z0-9_+\/=\-]{8,256}$/.test(id))
+      throw Error('Server-ID oder Charakter-ID ist ungültig.');
+    return {id,sid:server,name:'Charakter (Server '+server+')',server:'Server '+server,cls:''};
+  }
+  el('profile-link-form').addEventListener('submit',async event=>{
+    event.preventDefault();
+    if(loading)return;
+    let ref;
+    try{ref=parseOfficialProfileLink(el('profile-link').value);}catch(e){notice(e.message,'error');return;}
+    notice('EU-Profil-Link erkannt (Server '+ref.sid+'). Lade öffentliche Ausrüstungsdaten …');
+    await importRef(ref);
+  });
   el('import-search-form').addEventListener('submit',search);
   listNode.addEventListener('click',e=>{const b=e.target.closest('.import-pick');if(b && found[Number(b.dataset.index)])importRef(found[Number(b.dataset.index)]);});
   el('import-json-button').addEventListener('click',async()=>{
