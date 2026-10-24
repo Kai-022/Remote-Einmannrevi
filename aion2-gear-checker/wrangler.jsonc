@@ -1,0 +1,6 @@
+{
+  "name": "aion2-gear-eu-proxy",
+  "main": "cloudflare-worker.js",
+  "compatibility_date": "2026-10-24",
+  "workers_dev": true
+}
