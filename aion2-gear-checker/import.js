@@ -32,10 +32,10 @@
   transferPanel.className='import-manual';
   transferPanel.style.margin='14px 0';
   transferPanel.innerHTML =
-    '<strong style="color:#e8c687">Ohne Cloudflare: direkt von deiner geöffneten AION-2-Seite übernehmen (Testfunktion)</strong>'+
+    '<strong style="color:#e8c687">Direkt von deiner geöffneten AION-2-Seite übernehmen (Testfunktion)</strong>'+
     '<p class="import-quiet">Wenn die direkte Suche blockiert wird, kannst du den Gear-Abruf auf der offiziellen AION-2-Seite selbst starten. Ziehe den folgenden Link einmal in deine Lesezeichenleiste und klicke das Lesezeichen, während dein offizielles Charakterprofil geöffnet ist.</p>'+
     '<div class="actions"><a class="button primary" id="gear-bookmark" style="cursor:grab" title="In die Lesezeichenleiste ziehen">✧ AION-2-Gear übernehmen</a>'+
-    '<a class="button" target="_blank" rel="noopener noreferrer" href="https://aion2.plaync.com/en-us/characters/1305/GXf_uDNlKcYJYIHNvVUVBbBYQmXHGspXUlVENSk2RAc%3D?region=eu">Offizielles Profil öffnen ↗</a></div>'+
+    '<a class="button" target="_blank" rel="noopener noreferrer" href="https://aion2.plaync.com/en-us/characters/index?region=eu">Offizielle Charaktersuche ↗</a></div>'+
     '<p class="import-quiet">Ablauf: <b>1.</b> Lesezeichenleiste mit Strg+Umschalt+B einblenden. <b>2.</b> Goldenen Link dorthin ziehen. <b>3.</b> Offizielles EU-Profil öffnen und dort auf das neue Lesezeichen klicken. Es öffnet diesen Gear Checker mit deinen Daten. Keine Installation, kein zusätzliches Konto. Funktioniert nur, wenn NCSOFT die Ausrüstungsdaten auf seiner eigenen Seite freigibt und Lesezeichen-Skripte erlaubt.</p>';
   box.insertBefore(transferPanel,box.querySelector('#import-search-form'));
   const bookmark = transferPanel.querySelector('#gear-bookmark');
