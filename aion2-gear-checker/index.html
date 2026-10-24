@@ -23,7 +23,7 @@ a{color:var(--gold)}.wrap{max-width:1180px;margin:0 auto;padding:0 22px}.top{dis
 <script>
 'use strict';
 const $=s=>document.getElementById(s), safe=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const names=['Waffe','Nebenhand','Helm','Schultern','Brust','Hose','Handschuhe','Schuhe','Umhang','Halskette','Ohrring 1','Ohrring 2','Ring 1','Ring 2','Armband 1','Armband 2','Amulett','Gürtel','Rune 1','Rune 2'];
+const names=['Waffe','Nebenhand','Helm','Schultern','Brust','Hose','Handschuhe','Schuhe','Umhang','Halskette','Ohrring 1','Ohrring 2','Ring 1','Ring 2','Armband 1','Armband 2','Amulett','Gürtel','Rune 1','Rune 2','Arkana 1','Arkana 2','Arkana 3','Arkana 4','Arkana 5'];
 const targets={
 'Waffe':[['Schadensverstärkung','Kampftempo'],['Waffenschadensverstärkung','Macht','Angriff','Präzision']],
 'Nebenhand':[['Schadensverstärkung','Kampftempo'],['Waffenschadensverstärkung','Macht','Angriff']],
@@ -119,4 +119,4 @@ $('clear').addEventListener('click',()=>{if(confirm('Wirklich alle Gear-Eingaben
 document.querySelectorAll('[data-tab]').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('[data-tab]').forEach(x=>x.classList.toggle('active',x===b));['gear','upgrades','pets'].forEach(x=>$('tab-'+x).classList.toggle('hidden',x!==b.dataset.tab));}));
 $('copy').addEventListener('click',async()=>{const lines=['AION 2 Kleriker – '+data.name,'Build: '+labelMode(),''].concat(Object.entries(data.gear).map(([s,i])=>s+': +'+i.plus+' '+i.name+' | '+i.rolls.join(', ')));try{await navigator.clipboard.writeText(lines.join('\n'));msg('Ausrüstungsliste kopiert.');}catch{msg('Kopieren ist hier nicht möglich.',true);}});
 pets();msg('Bereit. Starte deinen Charakter oder lade die Demo.');
-</script><script src="./import.js?v=9"></script></body></html>
+</script><script src="./import.js?v=9"></script><script src="./shugo.js?v=2"></script></body></html>
