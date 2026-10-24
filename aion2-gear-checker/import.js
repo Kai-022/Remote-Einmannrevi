@@ -17,6 +17,14 @@
   '<div id="import-summary" class="import-stats"></div>'+
   '<p class="import-quiet" style="margin-top:15px">Daten: <a href="https://aion2.plaync.com/en-us/characters/index?region=eu" target="_blank" rel="noopener noreferrer">NCSOFT</a> über die <a href="https://vi.ki/docs" target="_blank" rel="noopener noreferrer">öffentliche Vi.ki-API</a>. Wenn die API Anfragen anderer Webseiten blockiert, ist ein eigener Online-Proxy nötig.</p>'+
   '<details class="import-manual"><summary>Alternative: Charakterdaten als JSON importieren</summary><p class="import-quiet">Falls du eine JSON-Datei der öffentlichen Charakter-/Equipment-Daten hast, kannst du sie hier öffnen. Keine Logins oder Zugangsdaten verwenden.</p><input type="file" id="import-json-file" accept=".json,application/json"><button id="import-json-button" type="button" style="margin-top:10px">JSON-Daten prüfen und importieren</button></details>';
+  const proxyConfig = document.createElement('div');
+  proxyConfig.className='import-manual';
+  proxyConfig.style.margin='14px 0';
+  proxyConfig.innerHTML='<strong style="color:#e8c687">Einmalige Verbindung zum EU-Datenserver</strong>'+
+   '<p class="import-quiet">Damit die Charaktersuche nicht durch Browser-Sperren blockiert wird, verbinde hier deinen eigenen Cloudflare Worker. Ein kostenloses Cloudflare-Konto genügt, auf deinem PC ist keine Installation erforderlich.</p>'+
+   '<div class="grid"><div class="field"><label for="proxy-url">Worker-Adresse (https://...workers.dev)</label><input type="url" id="proxy-url" placeholder="https://aion2-gear-eu-proxy.DEIN-NAME.workers.dev" autocomplete="url"></div><div class="field" style="justify-content:end"><button type="button" id="proxy-test">Verbindung testen & speichern</button></div></div>'+
+   '<details style="margin-top:10px"><summary>Cloudflare Worker ohne Installation einrichten</summary><ol class="import-quiet"><li>Öffne <a href="https://dash.cloudflare.com/" target="_blank" rel="noopener noreferrer">Cloudflare</a> und erstelle ggf. ein kostenloses Konto.</li><li>Gehe zu <b>Workers & Pages → Create application → GitHub</b> und verbinde das Repository <b>Kai-022/Remote-Einmannrevi</b>.</li><li>Wähle <b>main</b> und als <b>Root directory</b> den Ordner <code>aion2-gear-checker</code>. Worker-Name: <code>aion2-gear-eu-proxy</code>. Deploy.</li><li>Kopiere die <code>https://...workers.dev</code>-Adresse hier hinein und klicke <b>Verbindung testen & speichern</b>.</li></ol><p class="import-quiet">Alternativ kann die Datei <a href="https://github.com/Kai-022/Remote-Einmannrevi/blob/main/aion2-gear-checker/cloudflare-worker.js" target="_blank" rel="noopener noreferrer">cloudflare-worker.js</a> im Cloudflare-Code-Editor eingefügt werden.</p></details>';
+  box.insertBefore(proxyConfig,el('import-search-form')||box.querySelector('#import-search-form'));
   const currentPanel = el('charname').closest('.panel');
   currentPanel.parentNode.insertBefore(box,currentPanel);
   // Correction: label the older section as optional manual editor.
@@ -26,12 +34,39 @@
   if(info)info.textContent='Optional: Du kannst Gear jederzeit von Hand ergänzen oder korrigieren. Der automatische EU-Import steht oben.';
   const notice = (s,kind='')=>{const p=el('import-message');p.textContent=s;p.className='import-msg '+kind;};
   const listNode=el('import-results');
+  const proxyInput=el('proxy-url');
+  proxyInput.value=localStorage.getItem('aion2_proxy_url')||'';
+  function proxyBase() {
+    let u;
+    try{u=new URL(proxyInput.value.trim());}catch{throw Error('Trage zuerst die Adresse deines Cloudflare Workers ein.');}
+    if(u.protocol!=='https:'||(!u.hostname.endsWith('.workers.dev')&&u.hostname!=='workers.dev'))
+      throw Error('Bitte eine gültige HTTPS-Worker-Adresse (…workers.dev) eingeben.');
+    if(u.pathname!=='/'&&u.pathname!=='')throw Error('Bitte die Worker-Grundadresse ohne Pfad einfügen.');
+    return u.origin;
+  }
+  function proxyUrl(path,params={}) {
+    const u=new URL(path,proxyBase());
+    u.search=new URLSearchParams(params).toString();
+    return u.toString();
+  }
+  el('proxy-test').addEventListener('click',async()=>{
+    const b=el('proxy-test');b.disabled=true;
+    try{
+      notice('Prüfe Worker-Verbindung …');
+      const response=await get(proxyUrl('/health'),12000);
+      if(!response.ok)throw Error('Worker antwortet nicht korrekt.');
+      const normalized=proxyBase();
+      localStorage.setItem('aion2_proxy_url',normalized);proxyInput.value=normalized;
+      notice('Worker verbunden und gespeichert! Du kannst jetzt EU-Charaktere suchen.','success');
+    }catch(e){notice('Verbindung fehlgeschlagen: '+e.message+' – Überprüfe, ob Cloudflare den Worker veröffentlicht hat.','error');}
+    finally{b.disabled=false;}
+  });
   const get=async (url,ms=22000)=>{
     const ctl = new AbortController(); const t=setTimeout(()=>ctl.abort(),ms);
     try{
       const response=await fetch(url,{method:'GET',mode:'cors',headers:{Accept:'application/json'},signal:ctl.signal,credentials:'omit'});
-      if(!response.ok)throw Error('HTTP '+response.status);
-      const content=await response.json();
+      const content=await response.json().catch(()=>null);
+      if(!response.ok)throw Error((content?.code?content.code+': ':'')+(content?.error||'HTTP '+response.status));
       if(content && typeof content==='object' && content.error)throw Error(content.code ? content.code+': '+content.error : content.error);
       return content;
     }finally{clearTimeout(t);}
@@ -52,13 +87,13 @@
   const rawMatches=(raw)=>{
     const o=unwrap(raw);
     if(Array.isArray(o))return o;
-    const known=arr(o,'characters','matches','list','items','results','characterList','result.list','data.list','data.characters','searchResults');
+    const known=arr(o,'characters','matches','list','items','results','characterList','result.list','data.list','data.characters','searchResults','results.characters','results.items','result.characters','characters.list','characters.items','data.matches','data.results','data.items');
     if(known.length)return known;
     return [];
   };
   const normalizeMatch=x=>{
-    const id=first(x,'characterId','character_id','ref.characterId','charId','id');
-    const sid=first(x,'serverId','server_id','ref.serverId','server.id');
+    const id=first(x,'characterId','character_id','ref.characterId','charId','id','character.id','character.characterId');
+    const sid=first(x,'serverId','server_id','ref.serverId','server.id','character.serverId');
     if(id===null||sid===null)return null;
     const n=first(x,'characterName','name','character_name','nickname','profile.characterName')||'Unbekannt';
     const server=first(x,'serverName','server_name','worldName','server.name')||('Server '+sid);
@@ -71,20 +106,18 @@
     if(loading)return;
     const name=el('import-name').value.trim();if(name.length<2){notice('Mindestens zwei Zeichen eingeben.','error');return;}
     found=[];notice('Suche EU-Charaktere …');listNode.innerHTML='';el('import-summary').innerHTML='';loading=true;el('import-search-button').disabled=true;
-    const viaViki='https://aion2.vi.ki/-/aion2/search?'+new URLSearchParams({region:'eu',name});
-    const viaNC='https://api-search.plaync.com/aion2global/search/v2/character?'+new URLSearchParams({keyword:name,region:'eu',localeInfo:'en',serverId:'',page:'1',size:'30'});
-    const errors=[];
     try{
-      for(const [source,url] of [['Vi.ki',viaViki],['NCSOFT',viaNC]]){
-        try{
-          const result=await get(url);let objects=rawMatches(result);
-          if(!objects.length){errors.push(source+': keine Treffer');continue;}
-          const resultMatches=objects.map(normalizeMatch).filter(Boolean);
-          if(!resultMatches.length){errors.push(source+': Antwortformat unbekannt');continue;}
-          found=resultMatches;activeSource=source;break;
-        }catch(err){errors.push(source+': '+err.message);}
+      try{
+        const result=await get(proxyUrl('/search',{name}));
+        const objects=rawMatches(result);
+        if(!objects.length){notice('Keine Charaktere gefunden. Prüfe die Schreibweise und den EU-Server.','error');return;}
+        found=objects.map(normalizeMatch).filter(Boolean);
+        if(!found.length){notice('Die Datenquelle antwortet, aber das Suchformat ist unbekannt. Bitte die Fehlermeldung melden.','error');return;}
+        activeSource='Cloudflare / Vi.ki';
+      }catch(err){
+        notice('Import-Suche nicht möglich: '+err.message+'. Der Worker umgeht die Browser-CORS-Sperre, aber wenn NCSOFT selbst offline ist, hilft auch der Worker nicht.','error');
+        return;
       }
-      if(!found.length){notice('Automatische Suche fehlgeschlagen. '+errors.join(' / ')+'. Falls „Failed to fetch“ angezeigt wird, blockiert der Browser die Verbindung (CORS) oder die API ist nicht erreichbar. Für eine dauerhaft zuverlässige Suche brauchen wir dann einen Online-Proxy.','error');return;}
       listNode.innerHTML='<div class="import-quiet">'+found.length+' Treffer gefunden. Wähle deinen Charakter auf dem richtigen EU-Server:</div>'+
         found.slice(0,50).map((x,i)=>'<div class="import-result"><div><strong>'+esc(x.name)+'</strong><span>'+esc(x.server)+' · '+esc(x.cls||'Klasse nicht angegeben')+(x.level?' · Level '+esc(x.level):'')+'</span></div><button type="button" class="import-pick" data-index="'+i+'">Importieren</button></div>').join('');
       notice('Suche erfolgreich über '+activeSource+'. Wähle jetzt deinen Charakter.','success');
@@ -119,7 +152,7 @@
   };
   const normalizeEquipment=o=>{
     const a=unwrap(o);
-    const raw=arr(a,'equipment.equipmentList','equipment.slots','equipmentList','slots','gear','gears','equipped','items','equipment','character.equipment','character.gear','equipment.items','profile.equipment');
+    const raw=arr(a,'equipment.equipmentList','equipment.slots','equipmentList','slots','gear','gears','equipped','items','equipment','character.equipment','character.gear','equipment.items','profile.equipment','equipment.equipmentList','character.equipmentList','character.equipment.slots','character.gear.slots','gear.slots');
     return raw.filter(v=>v && typeof v==='object'&&(v.name||v.itemName||v.id||v.item?.name));
   };
   const describeStat=x=>{
@@ -151,26 +184,10 @@
     return {gear,extra,ambiguous,withRolls};
   }
   async function getProfileAndEquipment(ref){
-    const qs=new URLSearchParams({region:'eu',server:ref.sid,id:ref.id});
-    const vi='https://aion2.vi.ki/-/aion2/character?'+qs.toString();
-    const direct=new URLSearchParams({region:'eu',lang:'en',characterId:ref.id,serverId:ref.sid});
-    const ncp='https://aion2.plaync.com/api/character/info?'+direct;
-    const nce='https://aion2.plaync.com/api/character/equipment?'+direct;
-    const errs=[];
-    for(const [source,url] of [['Vi.ki',vi]]){
-      try{
-        const d=unwrap(await get(url));
-        const equipment=normalizeEquipment(d).length?d:first(d,'equipment','character','profile');
-        if(equipment&&normalizeEquipment(equipment).length)return{profile:d,equipment,source};
-        errs.push(source+': Keine Ausrüstungsliste in der Antwort');
-      }catch(e){errs.push(source+': '+e.message);}
-    }
-    try{
-      const [p,e]=await Promise.all([get(ncp),get(nce)]);
-      if(!normalizeEquipment(e).length)throw Error('Keine Ausrüstungsdaten in der Antwort');
-      return {profile:unwrap(p),equipment:unwrap(e),source:'NCSOFT'};
-    }catch(e){errs.push('NCSOFT: '+e.message);}
-    throw Error(errs.join(' / '));
+    const d=unwrap(await get(proxyUrl('/character',{server:ref.sid,id:ref.id}),22000));
+    const equipment=normalizeEquipment(d).length?d:first(d,'equipment','character','profile','characterData')||d;
+    if(!normalizeEquipment(equipment).length)throw Error('Die Datenquelle lieferte keine erkennbaren Ausrüstungsplätze. Möglicherweise ist das Profil derzeit nicht verfügbar.');
+    return {profile:d,equipment,source:'Cloudflare / Vi.ki'};
   }
 
   async function addSoulBindings(ref, sourceData){
@@ -178,14 +195,11 @@
     const candidate=raw.find(x=>!parseRolls(x).length && first(x,'id','itemId')!==null && first(x,'slotPos')!==null);
     if(!candidate)return {count:0,checked:0};
     // Only query the public equipment detail; never touch client/game or account.
-    const base={region:'eu',lang:'en',characterId:ref.id,serverId:ref.sid};
     const makeUrls=item=>{
-      const itemId=String(first(item,'id','itemId')),slotPos=String(first(item,'slotPos'));
-      const ench=String(first(item,'enchantLevel')||0),exceed=String(first(item,'exceedLevel')||0);
-      return [
-        ['Vi.ki','https://aion2.vi.ki/-/aion2/item?'+new URLSearchParams({region:'eu',server:ref.sid,id:ref.id,item:itemId,slot:slotPos,enchant:ench})],
-        ['NCSOFT','https://aion2.plaync.com/api/character/equipment/item?'+new URLSearchParams({...base,id:itemId,slotPos,enchantLevel:ench,exceedLevel:exceed})]
-      ];
+      const itemId=String(first(item,'id','itemId'));
+      const slotPos=String(first(item,'slotPos'));
+      const ench=String(first(item,'enchantLevel')||0);
+      return [['Cloudflare / Vi.ki',proxyUrl('/item',{server:ref.sid,id:ref.id,item:itemId,slot:slotPos,enchant:ench})]];
     };
     const takeDetails=rawResponse=>{
       const o=unwrap(rawResponse);
