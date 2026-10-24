@@ -29,6 +29,18 @@ if(previous){
  legacy.appendChild(sum);previous.parentNode.insertBefore(legacy,previous);legacy.appendChild(previous);
  legacy.parentNode.insertBefore(holder,legacy);
 }else{document.querySelector('.hero')?.after(holder);}
+const manualCharacterPanel=document.getElementById('charname')?.closest('.panel');
+if(manualCharacterPanel){
+ const advanced=document.createElement('details');
+ advanced.style.margin='12px 0 24px';
+ const summary=document.createElement('summary');
+ summary.textContent='Manuell Charakter anlegen (optional)';
+ summary.style.color='var(--muted)';
+ summary.style.cursor='pointer';
+ advanced.appendChild(summary);
+ manualCharacterPanel.parentNode.insertBefore(advanced,manualCharacterPanel);
+ advanced.appendChild(manualCharacterPanel);
+}
 const link=qs('#shugo-link'),paste=qs('#shugo-paste'),details=qs('#shugo-copy');
 const state=qs('#shugo-status');
 const message=(m,error=false)=>{state.textContent=m;state.classList.toggle('error',error);};
