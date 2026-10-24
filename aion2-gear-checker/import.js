@@ -28,6 +28,20 @@
     '<button type="submit" class="primary" id="profile-link-button">✧ Gear aus Link importieren</button></form>'+
     '<div class="import-quiet" style="margin-top:8px">Keine Installation und kein zusätzliches Konto. Hinweis: Bei HTTP 403 oder CORS können wir die Ausrüstung aus dem Link allein nicht abrufen. Dann bleibt der manuelle oder JSON-Import.</div>';
   box.insertBefore(linkPanel,box.querySelector('#import-search-form'));
+  const transferPanel = document.createElement('div');
+  transferPanel.className='import-manual';
+  transferPanel.style.margin='14px 0';
+  transferPanel.innerHTML =
+    '<strong style="color:#e8c687">Ohne Cloudflare: direkt von deiner geöffneten AION-2-Seite übernehmen (Testfunktion)</strong>'+
+    '<p class="import-quiet">Wenn die direkte Suche blockiert wird, kannst du den Gear-Abruf auf der offiziellen AION-2-Seite selbst starten. Ziehe den folgenden Link einmal in deine Lesezeichenleiste und klicke das Lesezeichen, während dein offizielles Charakterprofil geöffnet ist.</p>'+
+    '<div class="actions"><a class="button primary" id="gear-bookmark" style="cursor:grab" title="In die Lesezeichenleiste ziehen">✧ AION-2-Gear übernehmen</a>'+
+    '<a class="button" target="_blank" rel="noopener noreferrer" href="https://aion2.plaync.com/en-us/characters/1305/GXf_uDNlKcYJYIHNvVUVBbBYQmXHGspXUlVENSk2RAc%3D?region=eu">Offizielles Profil öffnen ↗</a></div>'+
+    '<p class="import-quiet">Ablauf: <b>1.</b> Lesezeichenleiste mit Strg+Umschalt+B einblenden. <b>2.</b> Goldenen Link dorthin ziehen. <b>3.</b> Offizielles EU-Profil öffnen und dort auf das neue Lesezeichen klicken. Es öffnet diesen Gear Checker mit deinen Daten. Keine Installation, kein zusätzliches Konto. Funktioniert nur, wenn NCSOFT die Ausrüstungsdaten auf seiner eigenen Seite freigibt und Lesezeichen-Skripte erlaubt.</p>';
+  box.insertBefore(transferPanel,box.querySelector('#import-search-form'));
+  const bookmark = transferPanel.querySelector('#gear-bookmark');
+  bookmark.href = 'javascript:('+importAion2FromOfficialSite.toString()+')()';
+  bookmark.setAttribute('draggable','true');
+
   const currentPanel = el('charname').closest('.panel');
   currentPanel.parentNode.insertBefore(box,currentPanel);
   // Correction: label the older section as optional manual editor.
@@ -237,6 +251,51 @@
       throw Error('Server-ID oder Charakter-ID ist ungültig.');
     return {id,sid:server,name:'Charakter (Server '+server+')',server:'Server '+server,cls:''};
   }
+
+  if(new URLSearchParams(location.search).get('receive')==='1'){
+    const officialOrigin='https://aion2.plaync.com';
+    const parent=window.opener;
+    notice('Bereit, Gear direkt von der offiziellen AION-2-Seite zu empfangen …');
+    let finished=false;
+    window.addEventListener('message',event=>{
+      if(finished||event.origin!==officialOrigin||event.source!==parent||!event.data)return;
+      const msg=event.data;
+      if(msg.type==='AION2_GEAR_ERROR'){
+        finished=true;
+        notice('Die offizielle AION-2-Seite konnte das Gear nicht laden: '+String(msg.error||'Unbekannter Fehler').slice(0,300)+'. Die öffentliche NCSOFT-API ist möglicherweise derzeit nicht verfügbar.','error');
+        return;
+      }
+      if(msg.type!=='AION2_GEAR_TRANSFER'||msg.version!==1)return;
+      if(!/^\d{1,8}$/.test(String(msg.serverId))||
+         !/^[a-zA-Z0-9_+\/=\-]{8,256}$/.test(String(msg.characterId))||
+         !msg.equipment||typeof msg.equipment!=='object')return;
+      const equipped=normalizeEquipment(msg.equipment);
+      if(equipped.length>100)return;
+      const mapped=equipmentToGear(msg.equipment);
+      const count=Object.keys(mapped.gear).length;
+      if(!count){notice('NCSOFT hat Daten geliefert, aber keine Ausrüstung konnte zugeordnet werden. Deine bisherigen Eingaben bleiben unverändert.','error');return;}
+      if(Object.keys(data.gear||{}).length && !confirm('Offizielle Gear-Daten übernehmen und bisherige Gear-Einträge ersetzen?'))return;
+      finished=true;
+      const profile=unwrap(msg.profile||{});
+      const charName=first(profile,'profile.characterName','characterName','profile.name','name')||'EU-Charakter';
+      const ref={id:String(msg.characterId),sid:String(msg.serverId),name:String(charName),server:'EU '+msg.serverId};
+      isDemo=false;
+      data={name:ref.name,mode:el('mode').value||'hybrid',gear:mapped.gear,
+        sourceRef:ref,source:'NCSOFT Profil-Lesezeichen',importedAt:new Date().toISOString()};
+      el('dash').classList.remove('hidden');
+      el('charname').value=ref.name;
+      el('type').textContent='OFFIZIELLE PROFILDATEN';
+      render();store();
+      el('import-summary').innerHTML='<span><b>'+count+'</b> Gear-Slots</span><span><b>'+mapped.withRolls+'</b> Slots mit Zusatzwerten</span>';
+      notice(count+' Gear-Slots direkt von der offiziellen AION-2-Seite übernommen. '+(mapped.withRolls===0?'Die offizielle Übersicht enthält keine Seelenbindungswerte; diese kannst du manuell ergänzen.':''),'success');
+      el('dash').scrollIntoView({behavior:'smooth'});
+    });
+    if(parent){
+      const ready=()=>{if(!finished)try{parent.postMessage({type:'AION2_GEAR_READY'},officialOrigin);}catch{}};
+      [0,500,1500,3000,5000].forEach(ms=>setTimeout(ready,ms));
+    } else notice('Keine Verbindung zur offiziellen Profilseite. Öffne den Gear Checker über das Lesezeichen im offiziellen Profil.','error');
+  }
+
   el('profile-link-form').addEventListener('submit',async event=>{
     event.preventDefault();
     if(loading)return;
@@ -261,4 +320,63 @@
       notice(Object.keys(mapped.gear).length+' Gear-Slots aus JSON-Datei importiert.','success');el('dash').scrollIntoView({behavior:'smooth'});
     }catch(e){notice('JSON-Import fehlgeschlagen: '+e.message,'error');}
   });
+function importAion2FromOfficialSite() {
+  const checker = 'https://kai-022.github.io/Remote-Einmannrevi/aion2-gear-checker/';
+  const targetOrigin = 'https://kai-022.github.io';
+  if (location.protocol !== 'https:' || location.hostname !== 'aion2.plaync.com') {
+    alert('Bitte diesen Favoriten auf der offiziellen AION-2-Charakterseite benutzen.');
+    return;
+  }
+  const m = location.pathname.match(/\/characters\/(\d+)\/([^/?#]+)/);
+  const region = new URLSearchParams(location.search).get('region');
+  if (!m || region !== 'eu') {
+    alert('Öffne zuerst das offizielle Charakterprofil für die Region EU.');
+    return;
+  }
+  const server = m[1];
+  let characterId;
+  try { characterId = decodeURIComponent(m[2]); }
+  catch { alert('Charakter-ID konnte nicht gelesen werden.'); return; }
+  if (!/^[a-zA-Z0-9_+\/=\-]{8,256}$/.test(characterId)) {
+    alert('Unbekanntes Charakter-ID-Format.');
+    return;
+  }
+  let dest;
+  let sent = false;
+  const receiver = async event => {
+    if (sent || event.origin !== targetOrigin || event.source !== dest ||
+        event.data?.type !== 'AION2_GEAR_READY') return;
+    sent = true;
+    const send = payload => dest.postMessage(payload, targetOrigin);
+    const base = '/api/character/';
+    const args = new URLSearchParams({
+      region: 'eu', lang: 'en', characterId, serverId: server
+    }).toString();
+    try {
+      const equipResp = await fetch(base+'equipment?'+args,{credentials:'same-origin',headers:{Accept:'application/json'}});
+      if (!equipResp.ok) throw new Error('NCSOFT HTTP '+equipResp.status);
+      const equipment = await equipResp.json();
+      if (!equipment || typeof equipment !== 'object' || !Array.isArray(equipment.equipment?.equipmentList)) {
+        throw new Error('Ausrüstungsliste fehlt in der Antwort.');
+      }
+      let profile = {};
+      try {
+        const profileResp = await fetch(base+'info?'+args,{credentials:'same-origin',headers:{Accept:'application/json'}});
+        if (profileResp.ok) profile = await profileResp.json();
+      } catch {}
+      send({type:'AION2_GEAR_TRANSFER',version:1,serverId:server,characterId,
+        profile,equipment});
+    } catch (error) {
+      send({type:'AION2_GEAR_ERROR',error:String(error?.message||error).slice(0,280)});
+    } finally {
+      window.removeEventListener('message',receiver);
+    }
+  };
+  window.addEventListener('message',receiver);
+  dest = window.open(checker+'?receive=1','aion2GearCheckerImport');
+  if (!dest) {
+    window.removeEventListener('message',receiver);
+    alert('Das Fenster wurde blockiert. Erlaube Pop-ups für aion2.plaync.com und versuche es erneut.');
+  }
+}
 })();
