@@ -1,35 +1,35 @@
-# AION 2 EU – Daeva Gear Checker (Kleriker PvE)
+# AION 2 – Daeva Gear Checker (EU, Kleriker PvE)
 
-**Webseite:** https://kai-022.github.io/Remote-Einmannrevi/aion2-gear-checker/?v=shugo3
+**Website:** https://kai-022.github.io/Remote-Einmannrevi/aion2-gear-checker/?v=shugo4
 
-## Gear aus Shugo.GG übernehmen – ohne Cloudflare und ohne Installation
+## Einfach: Shugo-Link einfügen
 
-**Empfohlen: Lesezeichen-Import.** Ein normaler `fetch()` aus einer GitHub-Pages-Webseite zu Shugo.GG schlägt bei Browser-CORS-Sperren mit `Failed to fetch` fehl. Shugo.GG bietet laut [FAQ](https://shugo.gg/de/faq) außerdem keine öffentliche API.
+1. Öffne den Gear Checker.
+2. Füge deinen EU-Charakterlink von Shugo.GG ein (z. B. `https://shugo.gg/character/global/eu-siel/Jacode`).
+3. Die öffentliche Profilseite wird im Hintergrund über **Jina Reader** als Text abgefragt. Dazu wird dein öffentlicher Profil-Link an Jina AI gesendet. Eine Installation, ein API-Schlüssel, Cloudflare oder ein eigenes Serverkonto sind nicht nötig.
+4. Soweit der Dienst das Profil bereitstellt, werden die aufgeführten Ausrüstungs-Slots, Gegenstände, Verzauberungsstufen (+N) und Durchbruchsstufen (◆N) übernommen.
+5. Die Auswertung zeigt den bestehenden PvE-Kleriker-Gear-Plan und die Pet-Ziele. *Seelenbindungswerte, die das Profil nicht enthält, werden nicht erfunden.*
 
-1. Gear Checker auf dem **Desktop** öffnen.
-2. Lesezeichenleiste mit **Strg + Umschalt + B** anzeigen.
-3. Den goldenen Link **„✧ Gear aus Shugo übernehmen“** in die Lesezeichenleiste **ziehen** (nicht im Gear Checker anklicken).
-4. Das öffentliche EU-Charakterprofil unter `https://shugo.gg/character/global/eu-SERVER/NAME` öffnen und warten, bis die Ausrüstung angezeigt wird.
-5. **Auf Shugo.GG** das neue Lesezeichen anklicken.
-6. Der Gear Checker öffnet sich. Das Lesezeichen versucht, ausschließlich die sichtbare Ausrüstung aus Shugo.GG zu übertragen. Die Webseite erkennt bekannte Slots und die im Profil sichtbaren +Verzauberungs- und ◆Durchbruchsstufen.
+**Wichtig:** Der Seitenparser ist mit dem öffentlichen Shugo-Profilformat getestet. Ein erfolgreicher Browser-End-to-End-Import via Jina Reader ist noch **nicht** nachgewiesen. Jina kann Limits haben, Antworten zurückhalten oder durch den Zielserver blockiert werden. Da Shugo.GG [keine öffentliche API](https://shugo.gg/de/faq) anbietet, kann ein Einfügen des Links **keinen garantierten Live-Import** liefern.
 
-Es werden keine Passwörter, Cookies, Spiel-Login-Daten oder versteckten API-Daten übertragen. Der Gear Checker akzeptiert den Transfer nur aus dem öffnenden Shugo.GG-Browserfenster.
+## Falls der automatische Abruf fehlschlägt
 
-**Einschränkungen:**
-- Dieser Ablauf ist **experimentell** und konnte nicht mit einem echten Shugo-Profil im Browser vollständig getestet werden.
-- Wenn das Profil keine Ausrüstung anzeigt, Shugo Lesezeichen-Skripte blockiert oder der Browser das zusätzliche Fenster abtrennt, klappt die Übernahme nicht.
-- Shugo.GG zeigt nicht alle Seelenbindungswerte; fehlende Werte müssen im Gear Editor ergänzt werden.
-- Ein Profil-Link alleine kann die Cross-Origin-Sperre nicht aufheben.
-- Ein automatischer Live-Import direkt nur durch das Einfügen eines Shugo-Links ist **nicht** als zuverlässig funktionierende Funktion anzusehen.
+Klicke auf „Falls der automatische Import nicht klappt“, öffne das Profil auf Shugo.GG und kopiere die sichtbare Ausrüstungsansicht mittels Strg+A, Strg+C. Füge diesen Text anschließend in das Textfeld ein und übernimm das erkannte Gear.
 
-## Fallback: kopieren und einfügen
-Shugo-Profil öffnen, **Ausrüstung** anzeigen, **Strg + A**, **Strg + C**. Dann Text in den Gear Checker im Feld „Kopierter Text aus dem Charakterprofil“ mit **Strg + V** einsetzen und **Kopiertes Gear übernehmen** wählen.
+Erweiterte alte NCSOFT- und JSON-Importmöglichkeiten sowie die manuelle Eingabe bleiben eingeklappt verfügbar.
 
-Weitere Optionen: manuelle Gear-Eingabe, Import einer bereits vorhandenen JSON-Datei, Demo. Alle lokalen Eingaben bleiben im Browser gespeichert.
+## Datenschutz und Grenzen
 
-## Dateien
-- `index.html`: Gear- und Pet-Bewertung, Editor inklusive Arkana
-- `shugo.js`: Shugo Link, optionaler Direktabruf, Textparser, Lesezeichen-Transfer
-- `import.js`: offizielle Profile und JSON-Import als ältere Alternativen
+- Kein Spiel-Login, keine Cookies, keine Passwörter.
+- Beim Einfügen eines vollständigen Links wird dessen **öffentliche Profiladresse** an Jina Reader gesendet. Das ist ein **externer Lesedienst**, aber kein eigenes Cloudflare-Konto.
+- Der Gear Checker speichert die übernommenen Werte nur im eigenen Browser (localStorage).
+- Ein Profil-Link allein beinhaltet keine Ausrüstungsdaten. Ohne eine vom Browser erreichbare Datenquelle kann keine statische GitHub-Pages-Seite automatisch importieren.
+- Profile können gecacht, unvollständig oder vorübergehend nicht verfügbar sein. Die angezeigten PvE-Empfehlungen sind heuristisch und nicht als exakte DPS-Rechnung zu verstehen.
 
-Fanprojekt, keine Verbindung zu Shugo.GG oder NCSOFT.
+## Projektdateien
+
+- `index.html` – Gear- und Pet-Auswertung, Bearbeitung
+- `shugo.js` – ein Linkfeld, Reader-Abfrage, Gear-Parsing, Fehlerbehandlung
+- `import.js` – ältere Importmöglichkeiten (eingeklappt)
+
+Fanprojekt ohne Verbindung zu NCSOFT oder Shugo.GG.
