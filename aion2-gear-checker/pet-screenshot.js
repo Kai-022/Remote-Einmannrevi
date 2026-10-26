@@ -39,11 +39,11 @@ const lexicon=[
 ];
 const panel=document.createElement('section');
 panel.id='pet-screenshot';panel.className='panel';
-panel.innerHTML='<div class="eyebrow">BETA · SCREENSHOT-IMPORT</div>'+
-'<h2>📷 Pet-Talente aus Screenshot übernehmen</h2>'+
-'<p>Öffne im Spiel <b>Pet → Spezieskenntnis</b>, wähle die Spezies und lade einen Screenshot hoch. Markiere den Bereich mit den neun Werte-Zeilen, damit die Texterkennung nicht die übrige Oberfläche mitliest.</p>'+
+panel.innerHTML='<div class="eyebrow">BETA · SPIELBILD ODER SCREENSHOT</div>'+
+'<h2>🎮 Pet-Talente automatisch einlesen</h2>'+
+'<p>Nutze die direkte Fensterfreigabe als Hauptweg. Alternativ kannst du unten einen Screenshot hochladen. Falls nicht alle neun Werte erkannt werden, markiere im Bild nur den Bereich mit den Talent-Zeilen und versuche es erneut.</p>'+
 '<div class="grid"><div class="field"><label for="pet-ocr-species">Spezies</label><select id="pet-ocr-species">'+species.map(s=>'<option value="'+s+'">'+s+'</option>').join('')+'</select></div>'+
-'<div class="field"><label for="pet-ocr-upload">Screenshot (PNG, JPG, WebP)</label><input type="file" id="pet-ocr-upload" accept="image/png,image/jpeg,image/webp"></div></div>'+
+'<div class="field"><label for="pet-ocr-upload">Alternativ: Screenshot (PNG, JPG, WebP)</label><input type="file" id="pet-ocr-upload" accept="image/png,image/jpeg,image/webp"></div></div>'+
 '<canvas id="pet-ocr-canvas" aria-label="Screenshot, Wertebereich durch Ziehen auswählen" style="display:none;max-width:100%;height:auto;touch-action:none;cursor:crosshair;border:1px solid #64748b;border-radius:8px;margin:12px 0"></canvas>'+
 '<div class="actions"><button type="button" id="pet-ocr-reset">Auswahl zurücksetzen</button><button type="button" class="primary" id="pet-ocr-read" disabled>Werte aus Screenshot lesen</button></div>'+
 '<div id="pet-ocr-status" class="status" role="status" aria-live="polite"></div>'+
@@ -135,14 +135,21 @@ function drawReview(lines,raw){
  results=lines;
  const review=$('pet-ocr-review');
  if(!lines.length){
-  review.innerHTML='<div class="info">Keine sicher zuordenbaren Werte gefunden. Markiere bitte nur die Zeilen mit den Eigenschaften und versuche es erneut.</div><details><summary>Erkannter Rohtext anzeigen</summary><pre style="white-space:pre-wrap;overflow-wrap:anywhere;font-size:12px">'+esc(raw.slice(0,3000))+'</pre></details>';
+  review.innerHTML='<div class="info">Keine sicher zuordenbaren Talente erkannt. Versuche im angezeigten Bild nur den Wertebereich zu markieren und lies noch einmal aus.</div><details><summary>Erkannter Rohtext</summary><pre style="white-space:pre-wrap;overflow-wrap:anywhere;font-size:12px">'+esc(raw.slice(0,3000))+'</pre></details>';
   return;
  }
- const rows=lines.map((l,i)=>'<tr><td>Slot '+(i+1)+'</td><td><input data-ocr-roll data-slot="'+(i+1)+'" value="'+esc(l.name)+'" aria-label="Erkannter Wert Slot '+(i+1)+'"></td><td>'+Math.round(l.confidence||0)+' %</td></tr>').join('');
+ const complete=lines.length===9;
+ const rows=lines.map((l,i)=>{
+  const options='<option value="">Slot auswählen</option>'+Array.from({length:9},(_,j)=>'<option value="'+(j+1)+'"'+(complete&&i===j?' selected':'')+'>Slot '+(j+1)+'</option>').join('');
+  return '<tr data-ocr-row><td><select data-ocr-slot aria-label="Slot für erkannte Zeile '+(i+1)+'">'+options+'</select></td>'+
+   '<td><input data-ocr-roll value="'+esc(l.name)+'" aria-label="Erkannter Wert '+(i+1)+'"></td>'+
+   '<td>'+Math.round(l.confidence||0)+' %</td></tr>';
+ }).join('');
  review.innerHTML='<h3 style="margin-top:14px">Erkannte Talente – bitte prüfen</h3>'+
- '<p class="tip">Die Reihenfolge der erkannten Zeilen entspricht vorläufig den Slots 1–'+lines.length+'. Wenn der Screenshot nicht bei Slot 1 beginnt oder Texte fehlen, noch nicht importieren.</p>'+
- '<div style="overflow:auto"><table style="width:100%"><thead><tr><th>Slot</th><th>Erkannter Wert (korrigierbar)</th><th>OCR</th></tr></thead><tbody>'+rows+'</tbody></table></div>'+
- '<div class="actions"><button type="button" class="primary" id="pet-ocr-apply">Erkannte Werte übernehmen</button></div>'+
+ (complete?'<p class="tip">Neun Talentzeilen erkannt. Die Slotnummern sind anhand der Reihenfolge vorgeschlagen und können korrigiert werden.</p>':
+ '<p class="tip" style="color:#ffce8b">Nur '+lines.length+' von 9 Talentzeilen erkannt. Damit keine Werte in die falschen Slots kommen, wähle die Slotnummern für die erkannten Zeilen selbst aus. Leere Slots bleiben unverändert.</p>')+
+ '<div style="overflow:auto"><table style="width:100%"><thead><tr><th>Slot auswählen</th><th>Erkannter Wert (korrigierbar)</th><th>OCR</th></tr></thead><tbody>'+rows+'</tbody></table></div>'+
+ '<div class="actions"><button type="button" class="primary" id="pet-ocr-apply">Geprüfte Werte übernehmen</button></div>'+
  '<details><summary>Erkannter Rohtext zur Kontrolle</summary><pre style="white-space:pre-wrap;overflow-wrap:anywhere;font-size:12px">'+esc(raw.slice(0,3000))+'</pre></details>';
 }
 $('pet-ocr-read').addEventListener('click',async()=>{
@@ -169,9 +176,12 @@ $('pet-ocr-review').addEventListener('click',e=>{
  if(e.target.id!=='pet-ocr-apply')return;
  const name=$('pet-ocr-species').value;
  if(!species.includes(name)||!results.length)return;
- const entries=[...$('pet-ocr-review').querySelectorAll('input[data-ocr-roll]')]
-  .map(x=>({slot:Number(x.dataset.slot),roll:x.value.trim().slice(0,90)}))
+ const entries=[...$('pet-ocr-review').querySelectorAll('tr[data-ocr-row]')]
+  .map(row=>({slot:Number(row.querySelector('[data-ocr-slot]').value),roll:row.querySelector('[data-ocr-roll]').value.trim().slice(0,90)}))
   .filter(x=>x.slot>=1&&x.slot<=9&&x.roll);
+ if(new Set(entries.map(x=>x.slot)).size!==entries.length){
+  status('Eine Slotnummer ist mehrfach vergeben. Bitte jeden Slot höchstens einmal auswählen.',true);return;
+ }
  if(!entries.length){status('Keine ausgelesenen Werte vorhanden.',true);return}
  if(!confirm(entries.length+' Talente für '+name+' speichern? Vorhandene Werte in diesen Slots werden ersetzt.'))return;
  const key='aion2-pets-v2:'+String(data?.sourceRef?.sid||'local')+':'+String(data?.sourceRef?.id||data?.name||'Charakter').normalize('NFKC');
