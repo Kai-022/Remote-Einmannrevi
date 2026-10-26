@@ -62,7 +62,7 @@ function drawProgress(){
  }).join('');
  result.textContent=count+' von 5 Spezies vollständig erkannt. Grün bedeutet „ausgelesen“, nicht automatisch „bester Talentwert“. Die vorhandenen roten/gelben/grünen BiS-Bewertungen stehen darunter.';
 }
-progress.addEventListener('click',e=>{
+section.addEventListener('click',e=>{
  const btn=e.target.closest('[data-pet-review]');if(!btn)return;
  const name=btn.dataset.petReview;
  const review=reviewQueue.get(name);if(!review)return;
@@ -134,7 +134,7 @@ async function runAuto(){
    reviewQueue.set('unassigned',{lines,raw});
    status(lines.length+' Talentzeilen erfasst, aber die Spezies ist im Bild nicht eindeutig. Bitte einen einzelnen Pet-Reiter einblenden oder später manuell zuordnen.');
    // Include explicit manual fallback without automatically guessing a genus.
-   result.textContent='Unzugeordnet: '+lines.length+' Wert(e). Wechsle zum Einzelbild oder prüfe die Werte im Formular.';
+   result.innerHTML='Unzugeordnet: '+lines.length+' Wert(e). <button type="button" data-pet-review="unassigned" style="padding:5px;margin-left:6px">Manuell zuordnen</button>';
    return;
   }
   if(lines.length!==9 || avgConfidence(lines)<55){
@@ -206,6 +206,8 @@ single.addEventListener('click',async()=>{
  processing=true;controls();
  try{
   const file=await oneFrame();
+  read.disabled=true;
+  preview.style.display='none';
   const dt=new DataTransfer();dt.items.add(file);
   upload.value='';upload.files=dt.files;
   upload.dispatchEvent(new Event('change',{bubbles:true}));
