@@ -104,7 +104,7 @@ const useData=(d,ref)=>{
  const rawSkills=Array.isArray(extra.skillList)?extra.skillList:[];
  const group=(cat)=>rawSkills.filter(i=>i&&i.category===cat).map(i=>({
   name:String(i.name||''),level:i.skillLevel?'Stufe '+i.skillLevel:'Nicht erlernt',
-  icon:String(i.icon||''),category:String(i.category||''),equipped:!!i.equip,acquired:!!i.acquired
+  id:Number(i.id||0),icon:i.id?'./nc-icons/skills/'+Number(i.id)+'.webp':String(i.icon||''),category:String(i.category||''),equipped:!!i.equip,acquired:!!i.acquired
  }));
  const boards=d.info?.daevanion?.boardList||[];
  const av=Array.isArray(boards)?boards.map(b=>({
