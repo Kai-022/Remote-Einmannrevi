@@ -33,3 +33,14 @@ Erweiterte alte NCSOFT- und JSON-Importmöglichkeiten sowie die manuelle Eingabe
 - `import.js` – ältere Importmöglichkeiten (eingeklappt)
 
 Fanprojekt ohne Verbindung zu NCSOFT oder Shugo.GG.
+
+## Want to Buy – Einkaufsplan für Marken (EU / PvE-Kleriker)
+
+Oben unter dem Kopfbereich steht jetzt der Knopf **🛒 Want to Buy**. Die Liste funktioniert auch ohne erfolgreichen Gear-Import und umfasst die Shugo-Festival-, Albtraum-, Saison-, Abgrund- und Daeva-Pass-Shops. Vorrang haben nachhaltige Charakter-Upgrades, dann situative Fortschritte und zuletzt Skins. Für jeden Eintrag lässt sich **Gekauft** abhaken; offene Einkäufe können gefiltert werden. Unter **Eigenen Wunsch hinzufügen** kannst du weitere Shop-Gegenstände eintragen. Die Liste wird nur lokal im Browser gespeichert. Mit **Gekauft-Häkchen zurücksetzen** startest du eine neue Runde. Es gibt keine automatischen Resets und keine erfundenen aktuellen Preise.
+
+Quellen zum Gegenprüfen:
+- https://metabot.gg/en/aion-2/shops
+- https://www.odealo.com/articles/best-items-to-buy-first-aion-2-currency-shop-guide
+- https://metaroad.gg/aion2/getting-started/aion-2-events-and-shugo-festa
+
+Die Prioritäten sind PvE-Richtwerte, keine vollständige oder garantiert aktuelle 1:1-Liste der Shop-Angebote im Spiel.
