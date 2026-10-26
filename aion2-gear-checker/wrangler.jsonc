@@ -1,0 +1,12 @@
+{
+  "name": "remote-einmannrevi",
+  "main": "./_worker.js",
+  "compatibility_date": "2026-10-26",
+  "assets": {
+    "directory": ".",
+    "binding": "ASSETS",
+    "run_worker_first": [
+      "/api/*"
+    ]
+  }
+}
