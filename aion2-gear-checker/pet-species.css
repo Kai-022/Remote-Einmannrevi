@@ -1,0 +1,24 @@
+
+#pet-list .ps-info{padding:12px;border:1px solid #776344;background:#30291e;color:#efd8ab;border-radius:9px;font-size:12px;margin-bottom:13px}
+#pet-list .ps-legend{display:flex;flex-wrap:wrap;gap:9px;font-size:12px;color:#cbd5e1;margin-bottom:14px}
+#pet-list details.ps-group{border:1px solid #46556e;border-radius:10px;margin:10px 0;background:#182334;overflow:hidden}
+#pet-list details.ps-group[open]{border-color:#b4935e}
+#pet-list summary.ps-summary{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:13px;cursor:pointer;list-style:none}
+#pet-list summary.ps-summary::-webkit-details-marker{display:none}
+#pet-list .ps-name{font-weight:800;color:#f1d19b}
+#pet-list .ps-progress{color:#aebed0;font-size:12px}
+#pet-list .ps-grid{padding:0 13px 13px;display:grid;grid-template-columns:repeat(auto-fill,minmax(205px,1fr));gap:9px}
+#pet-list .ps-cell{padding:10px;background:#1b2a3b;border:1px solid #526178;border-radius:8px}
+#pet-list .ps-cell.good{background:#1b3a2d;border-color:#5ebd86}
+#pet-list .ps-cell.alt{background:#37301f;border-color:#c4a35b}
+#pet-list .ps-cell.bad{background:#3f252b;border-color:#da7988}
+#pet-list .ps-title{display:flex;justify-content:space-between;gap:7px;font-size:12px;font-weight:800}
+#pet-list .ps-cell.good .ps-state{color:#88efae}
+#pet-list .ps-cell.alt .ps-state{color:#ffe08d}
+#pet-list .ps-cell.bad .ps-state{color:#ffadb8}
+#pet-list .ps-cell.unknown .ps-state{color:#acbdce}
+#pet-list .ps-cell label{display:block;margin:10px 0 5px;color:#bdcbd8;font-size:11px}
+#pet-list .ps-cell select{width:100%;font-size:12px;padding:8px}
+#pet-list .ps-tip{font-size:11px;color:#cad6e4;margin-top:8px}
+#pet-list .ps-tip b{color:#f0cb8b}
+@media(max-width:640px){#pet-list .ps-grid{grid-template-columns:1fr}}
