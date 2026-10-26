@@ -114,7 +114,7 @@ function statPills(stats){
 function card(item){
  const has=owned.has(item.id)||placed.has(item.id),put=placed.has(item.id);
  return '<article class="pan-card '+(put?'placed':has?'owned':'')+'">'+
- '<div class="pan-top">'+image(item)+'<div class="pan-title"><strong>'+esc(item.name)+'</strong>'+
+ '<div class="pan-top">'+image(item)+'<div class="pan-title"><strong>'+esc(item.nameDe||item.name)+'</strong>'+
  '<div class="pan-tags"><span>'+esc(labels[item.kind])+'</span>'+
  (item.grade?'<span>'+esc(grades[item.grade]||item.grade)+'</span>':'')+
  (item.faction!=='alle'?'<span>'+esc(item.faction==='elyos'?'Elyos':'Asmodier')+'</span>':'')+
@@ -161,7 +161,7 @@ function renderList(){
   if(filters.status==='owned'&&!has)return false;
   if(filters.status==='placed'&&!placed.has(x.id))return false;
   if(filters.faction!=='all'&&x.faction!=='alle'&&x.faction!==filters.faction)return false;
-  return !q||[x.name,x.where,x.kind,...Object.keys(x.stats||{})].join(' ').toLocaleLowerCase('de-DE').includes(q);
+  return !q||[x.name,x.nameDe||'',x.where,x.kind,...Object.keys(x.stats||{})].join(' ').toLocaleLowerCase('de-DE').includes(q);
  });
  const rank={Heroic:5,Unique:4,Epic:3,Rare:2,Common:1};
  list.sort((a,b)=>filters.sort==='name'?a.name.localeCompare(b.name,'de'):
