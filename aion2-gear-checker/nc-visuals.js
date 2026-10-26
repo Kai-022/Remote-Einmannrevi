@@ -57,3 +57,48 @@ nav.querySelectorAll('button[data-tab]').forEach(button=>button.addEventListener
  boardButton.classList.remove('active');page.classList.add('hidden');
 }));
 let selected=null;
+function portrait(){
+ const info=data?.characterExtras?.profile||{};
+ const symbol=$('dash')?.querySelector('.char .symbol');
+ if(!symbol)return;
+ symbol.textContent='✧';
+ try{
+  const u=new URL(String(info.icon||''));
+  if(u.protocol==='https:'&&u.hostname==='profileimg.plaync.com'){
+   const img=document.createElement('img');img.src=u.href;
+   img.alt='Charakterbild';img.className='aion-profile-pic';
+   img.referrerPolicy='no-referrer';img.onerror=()=>img.remove();
+   symbol.replaceChildren(img);
+  }
+ }catch{}
+ const char=$('dash')?.querySelector('.char');
+ let line=$('aion-profile-meta');
+ if(!line&&char){
+  line=document.createElement('small');line.id='aion-profile-meta';
+  char.querySelector('.right')?.before(line);
+ }
+ if(line){
+  line.textContent=info.name?((info.className||'Charakter')+
+   (info.level?' · Lv. '+info.level:'')+
+   (info.combatPower?' · '+Number(info.combatPower).toLocaleString('de-DE')+' CP':'')):'';
+ }
+}
+function tile(n,index){
+ if(!n||n.type==='None')return '<div class="aion-node filler" aria-hidden="true"></div>';
+ const on=!!n.open,special=n.type==='SkillLevel'||n.grade==='Legend';
+ const title=esc((n.name||n.type||'Knoten')+(on?' · Freigeschaltet':' · Nicht freigeschaltet'));
+ return '<button type="button" class="aion-node '+(on?'on':'off')+(special?' special':'')+
+ '" data-node="'+index+'" title="'+title+'" aria-label="'+title+'">'+
+ image(n.icon,29)+(on?'<span class="tick">✓</span>':'')+'</button>';
+}
+function panelFor(node){
+ const root=$('aion-board-node-detail');if(!root||!node)return;
+ const effects=Array.isArray(node.effects)?node.effects:[];
+ root.innerHTML='<div class="aion-node-detail"><div style="display:flex;gap:12px;align-items:center">'+image(node.icon,47)+
+  '<div><strong>'+esc(node.name||'Knoten')+'</strong>'+
+  '<div class="tip">'+esc(node.grade||node.type||'')+' · '+
+   (node.open?'✓ Freigeschaltet':'○ Noch gesperrt')+'</div></div></div>'+
+  '<div style="margin-top:12px">'+
+  (effects.length?effects.map(x=>'<div class="gear-roll" style="margin-top:5px">'+esc(x)+'</div>').join(''):
+  '<div class="tip">Für diesen Knoten liegen keine zusätzlichen Effekte vor.</div>')+'</div></div>';
+}
