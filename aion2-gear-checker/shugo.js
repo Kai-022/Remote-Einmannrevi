@@ -185,14 +185,15 @@ function extractMarkdown(source){
  }
  return normalizeRows(rows);
 }
-function importGear(items,ref) {
+function importGear(items,ref,rawProfile='') {
  const count=items.length;
  if(!count){message('Keine Ausrüstung erkannt. Kopiere auf Shugo.GG möglichst den Bereich „Ausrüstung“ mit den Itemnamen und Slots.',true);return false;}
  if(Object.keys(data?.gear||{}).length && !confirm('Die '+count+' von Shugo.GG erkannten Items ersetzen deine bisherigen Gear-Einträge. Fortfahren?'))return false;
  const gear={};for(const r of items)gear[r.target]=r.info;
+ const extras=(rawProfile&&window.aionProfileExtras)?window.aionProfileExtras.parse(rawProfile):{};
  const name=ref?.name||'Shugo-Profil';
  isDemo=false;
- data={name,mode:qs('#mode')?.value||'hybrid',gear,source:'Shugo.GG (sichtbare Profildaten)',sourceUrl:ref?.url||null,importedAt:new Date().toISOString()};
+ data={name,mode:qs('#mode')?.value||'hybrid',gear,source:'Shugo.GG (sichtbare Profildaten)',sourceUrl:ref?.url||null,characterExtras:extras,importedAt:new Date().toISOString()};
  qs('#dash').classList.remove('hidden');qs('#charname').value=name;qs('#type').textContent='SHUGO.GG · PROFILDATEN';
  render();store();
  message(count+' Gear-Slots übernommen. Zusatzwerte werden nur übernommen, soweit sie eindeutig aus den Quelldaten hervorgehen. Fehlende Werte bitte im Editor ergänzen; unbekannte Werte werden nicht als schlecht bewertet.');
@@ -232,7 +233,7 @@ async function runImport(){
   const fromMD=extractMarkdown(txt);
   const rows=fromMD.length?fromMD:extractText(txt);
   if(rows.length<2)throw Error('Keine Gear-Liste im Profil gefunden');
-  importGear(rows,ref);
+  importGear(rows,ref,txt);
  }catch(e){
    const reason=e?.name==='AbortError'?'Zeitüberschreitung':String(e?.message||e);
    message('Der automatische Abruf hat nicht funktioniert ('+reason+'). Du kannst unten bei Bedarf den sichtbaren Profiltext einfügen.',true);
@@ -248,7 +249,7 @@ qs('#shugo-import-paste').addEventListener('click',()=>{
  try{if(link.value.trim())ref=currentRef();}catch(e){message(e.message,true);return;}
  const fromHTML=extractHtml(pendingHTML);
  const rows=fromHTML.length?fromHTML:extractText(paste.value);
- if(importGear(rows,ref)){paste.value='';pendingHTML='';}
+ if(importGear(rows,ref,paste.value)){paste.value='';pendingHTML='';}
 });
 qs('#shugo-clear-paste').addEventListener('click',()=>{paste.value='';pendingHTML='';message('Kopierter Text gelöscht.');});
 
