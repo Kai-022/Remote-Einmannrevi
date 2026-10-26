@@ -22,3 +22,13 @@
 #pet-list .ps-tip{font-size:11px;color:#cad6e4;margin-top:8px}
 #pet-list .ps-tip b{color:#f0cb8b}
 @media(max-width:640px){#pet-list .ps-grid{grid-template-columns:1fr}}
+
+/* Manuelle Eingabe: kompakte Slots, frei eingebbare Talentnamen und Zahlenwerte. */
+#pet-list .ps-name .ps-count{display:inline-block;margin-left:9px;padding:2px 8px;border-radius:999px;background:#293b4b;border:1px solid #52687c;color:#e6edfa;font-size:11px;font-weight:600}
+#pet-list .ps-saved{min-height:20px;color:#8ee1b1;font-size:12px;margin:0 0 10px}
+#pet-list .ps-grid{grid-template-columns:repeat(auto-fill,minmax(245px,1fr))}
+#pet-list .ps-cell input{width:100%;min-height:38px;padding:9px;font-size:13px}
+#pet-list .ps-cell select{min-height:38px}
+#pet-list .ps-title{font-size:12px;align-items:center}
+#pet-list .ps-title .ps-state{font-size:11px;white-space:nowrap}
+@media(max-width:640px){#pet-list .ps-grid{grid-template-columns:1fr}}
