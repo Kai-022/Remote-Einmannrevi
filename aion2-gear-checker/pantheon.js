@@ -43,6 +43,22 @@ page.innerHTML='<section class="panel"><div class="eyebrow">AION 2 · SAMMLUNG</
 '<p class="tiny muted" style="margin-top:15px">Kuratierte Auswahl, keine vollständige Live-Datenbank. Einige Bilder sind Kategorie-Symbole. DPS-Sortierung ist keine Simulation. Quelle: <a href="https://wikily.gg/aion-2/pantheon-decor" target="_blank" rel="noopener noreferrer">Wikily</a>, <a href="https://github.com/austinsc/aion2-planner/blob/main/tools/pantheon_base.json" target="_blank" rel="noopener noreferrer">Pantheon-Guidedaten</a> und <a href="https://shugo.gg/de/items/pantheon" target="_blank" rel="noopener noreferrer">Shugo.GG</a>.</p>'+
 '</section>';
 $('dash').append(page);
+const preview=document.createElement('section');
+preview.id='pantheon-preview';preview.className='panel';
+preview.innerHTML='<div class="eyebrow">NEU · PANTHEON-SAMMLUNG</div>'+
+ '<h2>🖼️ Gemälde & Statuen sammeln</h2>'+
+ '<p class="pan-lead">Entdecke Pantheon-Sammelstücke, ihre Fundorte und Boni. Du kannst sie auch ohne aktiven Charakterimport ansehen.</p>'+
+ '<div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin:14px 0">'+
+ '<img src="./pantheon-icons/fire-temple.png" alt="Feuertempel-Gemälde" loading="lazy" style="width:88px;height:88px;object-fit:contain;border-radius:9px;background:#202b3d">'+
+ '<img src="./pantheon-icons/bakarma.png" alt="Transzendierter Bakarma" loading="lazy" style="width:88px;height:88px;object-fit:contain;border-radius:9px;background:#202b3d">'+
+ '<img src="./pantheon-icons/colossus-guardian-lord-nahma.webp" alt="Wächtergott Nahma" loading="lazy" style="width:88px;height:88px;object-fit:contain;border-radius:9px;background:#202b3d">'+
+ '</div><button id="pantheon-preview-open" type="button" class="primary">▣ Pantheon-Sammlung öffnen</button>';
+const host=$('nc-official-import')||document.querySelector('.hero');
+host?.after(preview);
+preview.querySelector('#pantheon-preview-open').addEventListener('click',()=>{
+ $('dash').classList.remove('hidden');
+ button.click();
+});
 button.addEventListener('click',()=>{
  nav.querySelectorAll('button').forEach(b=>b.classList.toggle('active',b===button));
  for(const id of ['gear','upgrades','pets','daevanion'])$('tab-'+id)?.classList.add('hidden');
