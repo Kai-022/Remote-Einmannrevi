@@ -7,7 +7,7 @@ const box=document.createElement('section');box.id='pan-screenshot';box.classNam
 box.innerHTML='<div class="eyebrow">BETA · LOKALE BILDERKENNUNG</div><h2>📷 Pantheon-Screenshot einlesen</h2>'+
 '<p>Screenshot hochladen, Raster ausschneiden und Items zuordnen. Die Verarbeitung erfolgt lokal im Browser. Weil viele Original-Icons noch fehlen, musst du unsichere Treffer auswählen und bestätigen.</p>'+
 '<input type="file" id="psc-upload" accept="image/png,image/jpeg,image/webp">'+
-'<p class="tip">Klicke im Vorschaubild auf die <b>obere linke Ecke des ersten Items</b>. Du siehst anschließend die eingezeichneten Kacheln und kannst die Abstände korrigieren.</p>'+
+'<p class="tip">Die automatische Rastererkennung schätzt die Kachelposition aus dem Bild. Falls die Rahmen nicht stimmen, klicke auf die <b>obere linke Ecke des ersten Items</b>. Du siehst anschließend die eingezeichneten Kacheln und kannst die Abstände korrigieren.</p>'+
 '<canvas id="psc-preview" role="img" aria-label="Screenshot mit auswählbarem Raster" style="display:none;max-width:100%;width:auto;height:auto;cursor:crosshair;border:1px solid #94754c;border-radius:8px;margin:10px 0"></canvas>'+
 '<div class="grid" style="margin:12px 0">'+
 '<div class="field"><label>Start X (Pixel)</label><input id="psc-x" type="number" value="85"></div>'+
@@ -17,7 +17,7 @@ box.innerHTML='<div class="eyebrow">BETA · LOKALE BILDERKENNUNG</div><h2>📷 P
 '<div class="field"><label>Abstand senkrecht</label><input id="psc-gap-y" type="number" value="6"></div>'+
 '<div class="field"><label>Spalten</label><input id="psc-cols" type="number" value="4"></div>'+
 '<div class="field"><label>Reihen</label><input id="psc-rows" type="number" value="6"></div></div>'+
-'<p class="tip">Für dein Beispielbild sind Position und Raster vorbelegt. Wenn du einen anderen Ausschnitt hochlädst, kannst du sie anpassen.</p>'+
+'<p class="tip">Die Rastererkennung ist experimentell. Kontrolliere die gelben Rahmen vor dem Import; verschiedene Spieloberflächen und Bildausschnitte können eine Korrektur erfordern.</p>'+
 '<div class="actions"><button id="psc-scan" type="button" class="primary">Screenshot auswerten</button>'+
 '<button id="psc-save" type="button" disabled>Bestätigte Items übernehmen</button></div>'+
 '<p id="psc-note" role="status" aria-live="polite"></p>'+
@@ -57,6 +57,67 @@ for(const id of ['psc-x','psc-y','psc-size','psc-gap','psc-gap-y','psc-cols','ps
  $(id).addEventListener('input',drawPreview);
 }
 
+// Detect repeating square UI tiles from contrast edges; fall back to manual alignment.
+function autoGrid(img){
+ const W=img.naturalWidth,H=img.naturalHeight,scale=Math.min(1,900/W,1200/H);
+ const w=Math.round(W*scale),h=Math.round(H*scale);
+ if(w<170||h<170)return null;
+ const cv=document.createElement('canvas');cv.width=w;cv.height=h;
+ const ctx=cv.getContext('2d',{willReadFrequently:true});ctx.drawImage(img,0,0,w,h);
+ const px=ctx.getImageData(0,0,w,h).data;
+ const lum=new Float32Array(w*h);
+ for(let i=0,j=0;i<px.length;i+=4,j++)lum[j]=px[i]*.299+px[i+1]*.587+px[i+2]*.114;
+ const xp=new Float32Array(w),yp=new Float32Array(h);
+ // Image-space gradient energy; averaging suppresses individual artwork detail.
+ for(let y=3;y<h-3;y+=3)for(let x=3;x<w-3;x+=3){
+  const i=y*w+x;
+  xp[x]+=Math.abs(lum[i+2]-lum[i-2]);
+  yp[y]+=Math.abs(lum[i+2*w]-lum[i-2*w]);
+ }
+ const smooth=a=>{const out=new Float32Array(a.length);for(let i=3;i<a.length-3;i++){let n=0;for(let k=-3;k<=3;k++)n+=a[i+k];out[i]=n/7;}return out};
+ const X=smooth(xp),Y=smooth(yp);
+ function candidates(a,minPitch,maxPitch){
+  let best={score:0};
+  const mean=a.reduce((v,z)=>v+z,0)/a.length||1;
+  for(let pitch=minPitch;pitch<=maxPitch;pitch++){
+   // Search for a recurring lattice of edges, rather than the strongest single edge.
+   for(let phase=0;phase<pitch;phase+=2){
+    let energy=0,count=0;
+    for(let pos=phase;pos<a.length;pos+=pitch){energy+=a[pos];count++}
+    const score=(energy/count)/mean;
+    if(score>best.score)best={pitch,phase,score};
+   }
+  }
+  return best;
+ }
+ const min=Math.max(27,Math.round(w*.065)),max=Math.min(180,Math.round(w*.26));
+ const cx=candidates(X,min,max),cy=candidates(Y,min,Math.min(200,Math.round(h*.26)));
+ if(cx.score<1.23||cy.score<1.23)return null;
+ const p=Math.round((cx.pitch+cy.pitch)/2);
+ if(Math.abs(cx.pitch-cy.pitch)>p*.16)return null;
+ // First strong vertical/horizontal border in the early image, then complete cells.
+ const getStart=(a,pitch,phase,lower,upper)=>{
+  const peak=a.reduce((v,z)=>Math.max(v,z),0);
+  let best=null;
+  for(let n=0;n<a.length/pitch;n++){
+   const pos=phase+n*pitch;
+   if(pos<lower||pos>upper)continue;
+   if(a[pos]>peak*.16){best=pos;break}
+  }
+  return best;
+ };
+ const sx=getStart(X,cx.pitch,cx.phase,Math.round(w*.02),Math.round(w*.55));
+ const sy=getStart(Y,cy.pitch,cy.phase,Math.round(h*.02),Math.round(h*.55));
+ if(sx===null||sy===null)return null;
+ const pitch=Math.round((cx.pitch+cy.pitch)/2);
+ // Gap estimated from a normal 4-10% cell separation; confirm through preview.
+ const gap=Math.max(2,Math.round(pitch*.065)),size=pitch-gap;
+ const cols=Math.min(8,Math.floor((w-sx+gap)/pitch));
+ const rows=Math.min(18,Math.floor((h-sy+gap)/pitch));
+ if(cols<3||rows<2)return null;
+ const factor=1/scale;
+ return {x:Math.round(sx*factor),y:Math.round(sy*factor),size:Math.round(size*factor),gap:Math.round(gap*factor),cols,rows,score:Math.min(cx.score,cy.score)};
+}
 const load=src=>new Promise((resolve,reject)=>{
  const img=new Image();img.onload=()=>resolve(img);img.onerror=reject;img.src=src;
 });
@@ -95,17 +156,20 @@ $('psc-upload').addEventListener('change',async e=>{
  }
  if(imageUrl)URL.revokeObjectURL(imageUrl);
  imageUrl=URL.createObjectURL(file);
- try{picture=await load(imageUrl);/* Reference calibration: 704 px wide Pantheon screenshot, first tile at (85,136), 86 px tile with 6 px gaps. */
- const scale=picture.naturalWidth/704;
- $('psc-x').value=Math.round(85*scale);
- $('psc-y').value=Math.round(136*scale);
- $('psc-size').value=Math.max(20,Math.round(86*scale));
- $('psc-gap').value=Math.max(0,Math.round(6*scale));
- $('psc-gap-y').value=Math.max(0,Math.round(6*scale));
- const heightLeft=picture.naturalHeight-Number($('psc-y').value);
- const pitch=Number($('psc-size').value)+Number($('psc-gap-y').value);
- const maxRows=Math.max(1,Math.floor((heightLeft+Number($('psc-gap-y').value))/pitch));
- $('psc-rows').value=Math.min(6,maxRows);drawPreview();$('psc-note').textContent='Bild geladen: '+picture.naturalWidth+' × '+picture.naturalHeight+' Pixel. Klicke in der Vorschau auf das erste Item.'}
+ try{picture=await load(imageUrl);
+ const detected=autoGrid(picture);
+ if(detected){
+  for(const [id,value] of Object.entries({'psc-x':detected.x,'psc-y':detected.y,'psc-size':detected.size,'psc-gap':detected.gap,'psc-gap-y':detected.gap,'psc-cols':detected.cols,'psc-rows':detected.rows}))$(id).value=value;
+ }else{
+  const scale=picture.naturalWidth/704;
+  $('psc-x').value=Math.round(85*scale);$('psc-y').value=Math.round(136*scale);
+  $('psc-size').value=Math.max(20,Math.round(86*scale));
+  $('psc-gap').value=Math.max(0,Math.round(6*scale));
+  $('psc-gap-y').value=Math.max(0,Math.round(6*scale));
+  $('psc-cols').value=4;
+  $('psc-rows').value=Math.max(1,Math.min(6,Math.floor((picture.naturalHeight-Number($('psc-y').value)+Number($('psc-gap-y').value))/(Number($('psc-size').value)+Number($('psc-gap-y').value)))));
+ }
+ drawPreview();$('psc-note').textContent='Bild geladen: '+picture.naturalWidth+' × '+picture.naturalHeight+' Pixel. '+(detected?'Raster automatisch vorgeschlagen. Bitte gelbe Rahmen kontrollieren.':'Raster nicht sicher erkannt – bitte erstes Item im Bild anklicken und Werte kontrollieren.')}
  catch{picture=null;$('psc-note').textContent='Bild nicht lesbar.'}
 });
 $('psc-scan').addEventListener('click',async()=>{
