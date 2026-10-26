@@ -1,3 +1,36 @@
+# Schon angelegten Cloudflare Worker verwenden (remote-einmannrevi)
+
+Wenn in Cloudflare der Pfad `Workers → remote-einmannrevi → Production → Builds` zu sehen ist, ist **bereits ein Worker** vorhanden. Du musst dafür **kein neues Pages-Projekt** erstellen.
+
+Das GitHub-Repository enthält nun zwei gleichwertige Wrangler-Konfigurationen:
+
+- `/wrangler.jsonc` für **Root directory: `/`** (Repository-Hauptverzeichnis).
+- `/aion2-gear-checker/wrangler.jsonc` für **Root directory: `aion2-gear-checker`**.
+
+Beide stellen genau den vorhandenen Worker **`remote-einmannrevi`** bereit und veröffentlichen dessen AION-2-Frontend zusammen mit der Abfrage-API. So sind beide üblichen Root-Einstellungen abgedeckt.
+
+## Einstellungen unter Workers → remote-einmannrevi → Settings → Builds
+
+| Einstellung | Wert |
+|---|---|
+| Verbundenes GitHub-Repository | `Kai-022/Remote-Einmannrevi` |
+| Production branch | `main` |
+| Root directory | `/` oder `aion2-gear-checker` – beide werden unterstützt |
+| Build command | Leer lassen; falls Pflichtfeld: `echo ready` |
+| Deploy command | `npx wrangler deploy` |
+| Worker name | `remote-einmannrevi` (muss übereinstimmen) |
+
+Ein GitHub-Commit löst bei aktivierter Git-Anbindung einen neuen Cloudflare-Build aus. Beim **erfolgreichen Production-Deployment** auf die angezeigte Worker-Adresse gehen:
+
+- `/` → Webseite (AION 2 Gear Checker)
+- `/api/health` → JSON mit `{"ok":true}`
+- `/api/search?serverId=1305&name=Taty` → öffentliche EU-Charaktersuche
+- `/api/character?... ` → öffentliche Ausrüstung, Skills und Daevanion-Boards
+
+**Wichtig:** Einen erfolgreich veröffentlichten Worker erkennt man an einem erfolgreichen Production-Build und an `/api/health`. Die genaue `workers.dev`-Adresse findet man im Cloudflare-Dashboard beim Worker über **Visit**. Der private Cloudflare-Dashboard-Link ist nicht die öffentliche Webseite. Der erste echte Live-Import sollte mit Taty/Yustiel getestet werden; mögliche Sperren der NCSOFT-API müssen beim realen Cloudflare-Aufruf geprüft werden.
+
+---
+
 # AION 2 Gear Checker – Cloudflare Pages einrichten
 
 Mit dieser Git-Anbindung soll der Gear Checker öffentlich auffindbare EU-Charaktere über **Server + Name** importieren, ohne ZAP-vServer und ohne zusätzliche Serverkosten.
