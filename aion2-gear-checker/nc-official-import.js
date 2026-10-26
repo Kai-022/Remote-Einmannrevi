@@ -146,6 +146,30 @@ $('nc-import-name').addEventListener('click',async()=>{
   const name=$('nc-character-name').value.trim();
   if(!serverId||name.length<2)throw Error('Bitte Server und Charakternamen eingeben.');
   note('Lade öffentliche Charakterdaten …');
+  const api=apiOrigin();
+  if(api){
+   note('Suche '+name+' auf dem ausgewählten Server …');
+   const u=new URL('/api/search',api);
+   u.search=new URLSearchParams({serverId,name}).toString();
+   const response=await fetch(u,{mode:'cors',signal:AbortSignal.timeout(20000)});
+   const answer=await response.json();
+   if(!response.ok)throw Error(answer.error||'Charaktersuche fehlgeschlagen.');
+   const same=(answer.characters||[]).filter(x=>
+    String(x.serverId)===serverId&&String(x.name).trim().toLowerCase()===name.toLowerCase());
+   if(same.length!==1)throw Error(same.length?'Mehrere Treffer: bitte den offiziellen Profil-Link verwenden.':'Charakter auf diesem Server nicht gefunden.');
+   const id=same[0].characterId;
+   const url=new URL('/api/character',api);
+   url.search=new URLSearchParams({serverId,characterId:id}).toString();
+   const full=await fetch(url,{mode:'cors',signal:AbortSignal.timeout(60000)});
+   const result=await full.json();
+   if(!full.ok)throw Error(result.error||'Ausrüstungsabruf fehlgeschlagen.');
+   if(String(result.serverId)!==serverId||String(result.characterId)!==id||
+      String(result.info?.profile?.characterName||'').toLowerCase()!==name.toLowerCase())
+     throw Error('Datenserver lieferte nicht den ausgewählten Charakter.');
+   useData(result,{serverId,characterId:id});
+   return;
+  }
+
   const response=await fetch('./nc-character-snapshot.json?t='+Date.now(),{cache:'no-store'});
   if(!response.ok)throw Error('Testdatensatz nicht verfügbar.');
   const d=await response.json();
