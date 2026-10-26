@@ -24,6 +24,7 @@ page.innerHTML='<section class="panel"><div class="eyebrow">AION 2 · SAMMLUNG</
 '<p class="pan-lead">Fundorte und Pantheon-Boni nachschlagen, Sammelstücke abhaken und die besten 17 Dekorationen aufstellen.</p>'+
 '<div class="pan-note"><b>Manuelle Sammlung:</b> Der bisherige öffentliche AION-2-Charakterimport zeigt nicht, welche Pantheon-Stücke du besitzt. Deine Häkchen und Aufstellungen werden getrennt für jeden Charakter in diesem Browser gespeichert – sie verändern nichts im Spiel.</div>'+
 '<div class="pan-summary" id="pan-summary" aria-live="polite"></div>'+
+'<div class="pan-bonus"><strong>Gottheiten-Attribute aus deinem importierten Charakterprofil</strong>'+'<div id="pan-official-stats" class="pan-bonus-list"></div>'+'<'+'small class="pan-lead">Gesamtwerte des Charakters – können auch von Armbändern, Arkana und anderen Quellen stammen. Das ist keine automatische Inventarliste.</small></div>'+
 '<div class="pan-bonus"><strong>Pantheon-Boni deiner markierten Aufstellung</strong>'+
 '<div id="pan-bonus-list" class="pan-bonus-list"></div>'+
 '<small class="pan-lead">Nur aus den hier markierten Dekorationen, nicht deine vollständigen Charakterwerte.</small></div>'+
@@ -125,6 +126,12 @@ function card(item){
  '</div></article>';
 }
 function renderSummary(){
+ const official=(data?.characterExtras?.stats||[]).filter(x=>x&&
+  Object.keys(gods).some(k=>String(x.name||'').startsWith(k+' ['))&&
+  Number.isFinite(Number(x.value)));
+ $('pan-official-stats').innerHTML=official.length?
+ official.map(x=>'<span>'+esc(x.name)+': '+esc(x.value)+'</span>').join(''):
+ '<small class="pan-lead">Noch keine offiziellen Charakterwerte importiert.</small>';
  const all=items(),totals={},counts={artwork:0,statue:0,colossus:0};
  for(const x of all)if(placed.has(x.id)){
   counts[x.kind]++;
