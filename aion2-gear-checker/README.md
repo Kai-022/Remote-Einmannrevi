@@ -44,3 +44,20 @@ Quellen zum Gegenprüfen:
 - https://metaroad.gg/aion2/getting-started/aion-2-events-and-shugo-festa
 
 Die Prioritäten sind PvE-Richtwerte, keine vollständige oder garantiert aktuelle 1:1-Liste der Shop-Angebote im Spiel.
+
+
+## Offizieller NCSOFT EU-Import (getestet am 26.10.2026)
+
+Im Abschnitt **AION 2 – offizieller Charakterimport (Test)** kannst du einen offiziellen EU-Charakterlink eingeben. Für das einmalig getestete Profil (Server-ID `1305`) wurde ein tatsächlicher Serverabruf von NCSOFT mit HTTP 200 bestätigt: **25 Gear-Slots, alle 25 Item-Detailantworten, 35 Skills und 5 Daevanion-Tafeln**. Die Details enthalten Seelenbindung, Basiswerte, Manasteine und Göttersteine, wo vom Quellserver angegeben.
+
+Der Browser importiert dazu die Datei `nc-character-snapshot.json` von unserer **eigenen GitHub-Pages-Seite**. Es ist kein Cloudflare und keine CORS-Ausnahme erforderlich. Es ist aktuell ein **Snapshot nur dieses einen EU-Charakters** und **kein beliebig live abrufbarer Import**. Die Webseite zeigt den Daten-Zeitstempel. Für andere Charaktere wäre später ein öffentlicher Datenserver nötig.
+
+Zum Aktualisieren dieses Testdatensatzes:
+1. Auf GitHub ins Repository **Kai-022/Remote-Einmannrevi** unter **Actions** gehen.
+2. **AION 2 Official API Probe** auswählen, dann **Run workflow**.
+3. Der Workflow fragt die öffentlichen Charakter- und Item-Daten sparsam ab und ersetzt den Snapshot bei Erfolg.
+4. Nach erfolgreicher GitHub-Pages-Veröffentlichung die Webseite neu öffnen und denselben offiziellen Profil-Link importieren.
+
+Hinweise: Die offiziellen Web-Endpunkte besitzen keinen zugesicherten Public-API-Vertrag; zukünftige HTTP-403-Fehler sind möglich. Der Snapshot enthält ausschließlich öffentlich sichtbare Charakterdaten aus der offiziellen Profilseite und ist als statische JSON-Datei in diesem **öffentlichen GitHub-Repository** lesbar. Manuell eingetragene Gear-Werte werden nur nach Bestätigung ersetzt. Die Funktion greift nicht auf deinen Spielclient oder Logindaten zu.
+
+`nc-probe.py` prüft die zwei öffentlichen API-Endpunkte; `nc-snapshot.py` erstellt den Datensatz mit Gear-Detailantworten. Die Dateien werden per `.github/workflows/aion2-official-probe.yml` ausgeführt.
