@@ -1,0 +1,22 @@
+name: AION 2 Pantheon Estimator Test
+on:
+  push:
+    paths:
+      - 'aion2-gear-checker/pantheon-inference.js'
+      - 'aion2-gear-checker/tests/pantheon-inference.mjs'
+      - 'aion2-gear-checker/index.html'
+      - '.github/workflows/aion2-pantheon-inference-test.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: node --check aion2-gear-checker/pantheon-inference.js
+      - run: node aion2-gear-checker/tests/pantheon-inference.mjs
