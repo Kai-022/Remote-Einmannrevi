@@ -13,5 +13,8 @@
       "hasCharacterId": true
     }
   ],
-  "exactMatches": 1
+  "exactMatches": 1,
+  "httpHealth": true,
+  "httpSearchExact": true,
+  "corsOK": true
 }
