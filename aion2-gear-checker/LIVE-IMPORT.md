@@ -28,3 +28,15 @@ api.example.de {
 Das Skript darf nicht direkt unverschlüsselt über das Internet veröffentlicht werden. Ein Reverse Proxy sollte zusätzlich Verbindungs- und Anfrage-Limits setzen. Der Dienst beschränkt die Quelle auf NCSOFT, validiert IDs, begrenzt die Zahl gleichzeitiger Anfragen, verzögert Upstream-Anfragen und nutzt einen kurzen In-Memory-Cache. Es werden keine Zugangsdaten benötigt oder verarbeitet. Ohne HTTPS-Domain und laufenden Prozess ist der Live-Import anderer Charaktere **noch nicht aktiv**.
 
 **Nicht verwechseln:** GitHub Pages kann selbst keinen Python-Server ausführen. Die GitHub-Actions-Testdatei `nc-character-snapshot.json` ist nur eine Momentaufnahme eines einzelnen Charakters.
+
+## Alternative: Docker (z. B. Linux-Server oder Synology Container Manager)
+
+Im Repository-Hauptverzeichnis:
+
+```bash
+docker build -t aion2-eu-api -f aion2-gear-checker/Dockerfile aion2-gear-checker
+docker run -d --restart unless-stopped --name aion2-eu-api \
+  -p 127.0.0.1:8765:8765 aion2-eu-api
+```
+
+Auch bei Docker wird eine öffentlich erreichbare HTTPS-Domain mit Reverse Proxy benötigt, damit der Browser auf GitHub Pages die Daten laden darf. Docker allein schaltet die GitHub-Webseite **nicht** für alle Charaktere frei. Wenn du keinen SSH-Zugang hast, kann der Container über die Container-Verwaltung des Hosts eingerichtet werden, sofern sie verfügbar ist.
