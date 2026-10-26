@@ -47,8 +47,9 @@ function findPanel(source){
  const [barLeft,barRight]=runs[0],bw=barRight-barLeft+1;
  if(bw<Math.max(50,w*.024)||bw>w*.40)return null;
  const pitch=bw*.125,first=best.y+bw*.166;
- const x0=Math.max(0,Math.round(barLeft+bw*.145));
- const x1=Math.min(w,Math.round(barRight+bw*.06));
+ // Start before the cyan bar: icon column, short labels (e.g. LP +) and the first letters must remain visible.
+ const x0=Math.max(0,Math.round(barLeft-bw*.052));
+ const x1=Math.min(w,Math.round(barRight+bw*.075));
  if(x1-x0<100||first+8*pitch>h-8)return null;
  const active=detectSelectedIcon(bytes,w,h,best.y,bw);
  const crop=document.createElement('canvas');
@@ -64,13 +65,13 @@ function findPanel(source){
   const cy=first+i*pitch;
   const y0=Math.max(0,Math.round(cy-pitch*.47));
   const height=Math.min(h-y0,Math.round(pitch*.94));
-  ctx.filter='contrast(1.5) brightness(1.24)';
+  ctx.filter='contrast(1.25) brightness(1.15)';
   ctx.drawImage(scene,x0,y0,x1-x0,height,55,i*rowHeight+3,crop.width-60,rowHeight-6);
   ctx.filter='none';
   ctx.fillStyle='white';
   ctx.fillText(String(i+1)+':',5,i*rowHeight+rowHeight*.52);
  }
- return {canvas:crop,active,barLeft,barY:best.y,barWidth:bw,rowHeight,slots:9,sourceWidth:w,sourceHeight:h};
+ return {canvas:crop,active,barLeft,barY:best.y,barWidth:bw,textLeft:x0,textRight:x1,rowHeight,slots:9,sourceWidth:w,sourceHeight:h};
 }
 function detectSelectedIcon(px,w,h,barY,bw){
  // HUD left has five round icons following a gentle curve.
