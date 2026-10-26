@@ -19,6 +19,15 @@ FILES = {
     "colossus-tyrant-tassin-bound.webp": SRC + "colossus-tyrant-tassin-bound.webp",
     "bakarma.png": "https://media.wikily.gg/d9ef9e2b-cdbf-43cb-a423-2947e69d538d/2026-09-30/cf4d45e8-8781-4a69-9f27-ebba70ea694b-icon_ad_statues_a_u_mob_bakarma_02.png",
     "fire-temple.png": "https://media.wikily.gg/d9ef9e2b-cdbf-43cb-a423-2947e69d538d/2026-09-30/223a26ee-72d7-4af3-bfee-88021e3c0a5a-icon_ad_pic_a_u_fire_temple.png",
+    "urugugu.webp": "https://media.wikily.gg/d9ef9e2b-cdbf-43cb-a423-2947e69d538d/2026-10-01/d2835208-eb11-4ffe-9a40-491649ccdf47-ad_pic_a_u_urugugu_canyon.webp",
+    "draupnir.webp": "https://media.wikily.gg/d9ef9e2b-cdbf-43cb-a423-2947e69d538d/2026-10-01/154b4d2a-920c-4845-8dae-2722d8be10d6-ad_pic_a_u_draupnir.webp",
+    "drakan-guruta.webp": "https://media.wikily.gg/d9ef9e2b-cdbf-43cb-a423-2947e69d538d/2026-10-01/3e382c12-bc38-482f-98e1-5fc1cea26c49-ad_pic_a_mob_beritrad_04_v01.webp",
+    "veteran-shujakan.webp": "https://media.wikily.gg/d9ef9e2b-cdbf-43cb-a423-2947e69d538d/2026-10-01/d7e9ca22-6a4c-49c7-bb43-6cd2ee06050f-ad_pic_a_mob_lycan_05.webp",
+    "dark-shadow-vishwada.webp": "https://media.wikily.gg/d9ef9e2b-cdbf-43cb-a423-2947e69d538d/2026-10-01/1a09535d-f08a-46d6-a1db-b87fdf8b7b5f-ad_pic_a_mob_beritrad_03_v01.webp",
+    "divine-ansas.webp": "https://media.wikily.gg/d9ef9e2b-cdbf-43cb-a423-2947e69d538d/2026-10-01/27cd5ce7-231e-4ad2-b1f3-3434cf7b6738-ad_pic_a_mob_guardit_03.webp",
+    "visionary-karuka.webp": "https://media.wikily.gg/d9ef9e2b-cdbf-43cb-a423-2947e69d538d/2026-10-01/0a9081f6-7cc9-4cfe-8b89-ed148c15b762-ad_pic_a_mob_lycan_04.webp",
+    "harvest-moshav.webp": "https://media.wikily.gg/d9ef9e2b-cdbf-43cb-a423-2947e69d538d/2026-10-01/e29545f7-1e54-4d54-a240-ac5350df1dc9-ad_pic_a_mob_drakanelite_03_v01.webp",
+    "blue-wave-kelpina.webp": "https://media.wikily.gg/d9ef9e2b-cdbf-43cb-a423-2947e69d538d/2026-10-01/efc0d6d0-cdeb-4878-aad2-b1f534127509-ad_pic_a_mob_waterele_04_v01.webp",
 }
 
 def main():
