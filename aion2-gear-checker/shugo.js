@@ -102,6 +102,11 @@ function normalizeRows(rows) {
  for(const x of rows){
   const spec=slotName(x.slot);if(!spec)continue;
   const item=convertItem(spec,x.item,x.grade);
+  if(item){
+   const name=item.info.name.toLowerCase();
+   const clues=[['Helm',/\b(helm|helmet|hood|headgear|kapuze)\b/i],['Hose',/\b(pants|trousers|greaves|leggings|hose|beinkleid)\b/i],['Handschuhe',/\b(gloves|gauntlets|handschuhe)\b/i],['Schuhe',/\b(boots|shoes|stiefel|schuhe)\b/i],['Brust',/\b(breastplate|chestplate|robe|tunic|brustplatte)\b/i]];
+   for(const [target,re] of clues)if(re.test(name)&&target!==spec.base){item.target=target;break;}
+  }
   if(!item)continue;
   let {target}=item;
   if(out.some(i=>i.target===target)&&['Ring','Ohrring','Armband','Rune'].includes(spec.base)&&!spec.index){
@@ -190,7 +195,7 @@ function importGear(items,ref) {
  data={name,mode:qs('#mode')?.value||'hybrid',gear,source:'Shugo.GG (sichtbare Profildaten)',sourceUrl:ref?.url||null,importedAt:new Date().toISOString()};
  qs('#dash').classList.remove('hidden');qs('#charname').value=name;qs('#type').textContent='SHUGO.GG · PROFILDATEN';
  render();store();
- message(count+' Gear-Slots übernommen. Verbesserungsstufen sind eingetragen; Seelenbindungswerte kann Shugo.GG aus der Profilübersicht nicht vollständig liefern. Ergänze sie bei Bedarf manuell.');
+ message(count+' Gear-Slots übernommen. Zusatzwerte werden nur übernommen, soweit sie eindeutig aus den Quelldaten hervorgehen. Fehlende Werte bitte im Editor ergänzen; unbekannte Werte werden nicht als schlecht bewertet.');
  qs('#dash').scrollIntoView({behavior:'smooth',block:'start'});
  return true;
 }
