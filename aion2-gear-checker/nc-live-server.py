@@ -81,7 +81,7 @@ def search_character(sid, name):
         if (clean_name.casefold() != name.casefold() or
                 str(entry.get("serverId")) != str(sid)):
             continue
-        cid = str(entry.get("characterId", ""))
+        cid = urllib.parse.unquote(str(entry.get("characterId", "")))
         if not re.fullmatch(r"[a-zA-Z0-9_+=/\\-]{8,256}", cid):
             continue
         found.append({
