@@ -129,6 +129,19 @@ $('nc-import').addEventListener('click',async()=>{
  const btn=$('nc-import');btn.disabled=true;
  try{
   const ref=parseOfficialLink($('nc-public-link').value);
+  const api=apiOrigin();
+  if(api){
+   note('Lade aktuelle Daten vom EU-Datenserver …');
+   const url=new URL('/api/character',api);
+   url.search=new URLSearchParams(ref).toString();
+   const response=await fetch(url,{mode:'cors',signal:AbortSignal.timeout(60000)});
+   const d=await response.json();
+   if(!response.ok)throw Error(d.error||'Datenserver konnte den Charakter nicht laden.');
+   if(String(d.serverId)!==ref.serverId||d.characterId!==ref.characterId)
+    throw Error('Server lieferte einen anderen Charakter.');
+   useData(d,ref);
+   return;
+  }
   note('Prüfe offiziellen NCSOFT-Datensatz …');
   const r=await fetch('./nc-character-snapshot.json?t='+Date.now(),{method:'GET',cache:'no-store'});
   if(!r.ok)throw Error('Testdatensatz noch nicht veröffentlicht (HTTP '+r.status+').');
