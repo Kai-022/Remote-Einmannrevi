@@ -31,6 +31,14 @@
       status.textContent = 'Aktuell geladener Charakter: ' + data.name + '. Für einen anderen Charakter zuerst dessen Profil laden.';
   }
   syncProfile();
+  // Restore last manual character name without triggering any external import.
+  if (!nameInput.value.trim()) {
+    try {
+      const last = JSON.parse(localStorage.getItem('aion2-checker-eu-v1')||'null');
+      if(last?.name && last.name !== 'Mein Kleriker')
+        nameInput.value=String(last.name).slice(0,45);
+    } catch {}
+  }
   $('pet-scanner-open').addEventListener('click', () => {
     const name = nameInput.value.trim();
     if (name.length < 2) {
