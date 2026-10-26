@@ -17,6 +17,7 @@ panel.innerHTML='<div class="eyebrow">NEU · OFFIZIELLE AION-2-DATEN · EU</div>
  '<input id="nc-public-link" type="url" placeholder="https://aion2.plaync.com/en-us/characters/…?region=eu" autocomplete="url"></div>'+
  '<button type="button" id="nc-import">Aus Link importieren</button></div></details>'+
  '<div id="nc-feedback" class="status" role="status" aria-live="polite"></div>'+
+ '<details style="margin-top:14px"><summary style="color:var(--gold);cursor:pointer">Eigener Live-Datenserver (optional)</summary><p class="tiny muted">Wenn ein Live-Datenserver eingerichtet ist, können alle EU-Charaktere geladen werden.</p><input type="url" id="nc-api-base" placeholder="https://dein-server.de"><button type="button" id="nc-api-save">Adresse speichern</button></details>'+
  '<p class="tiny muted" style="margin-top:11px">Das ist zunächst ein <b>serverseitiger Testabruf</b> für den bisher angegebenen EU-Charakter. Es werden gespeicherte echte NCSOFT-Daten geladen, keine Demo. Andere Charaktere brauchen später einen öffentlichen Datenserver. Der Zeitstempel zeigt, wie aktuell die Daten sind.</p>';
 const shugo=$('shugo-import');
 if(shugo)shugo.parentNode.insertBefore(panel,shugo);
