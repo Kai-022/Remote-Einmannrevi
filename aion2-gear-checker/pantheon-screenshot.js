@@ -10,8 +10,8 @@ box.innerHTML='<div class="eyebrow">BETA · LOKALE BILDERKENNUNG</div><h2>📷 P
 '<p class="tip">Klicke im Vorschaubild auf die <b>obere linke Ecke des ersten Items</b>. Du siehst anschließend die eingezeichneten Kacheln und kannst die Abstände korrigieren.</p>'+
 '<canvas id="psc-preview" role="img" aria-label="Screenshot mit auswählbarem Raster" style="display:none;max-width:100%;width:auto;height:auto;cursor:crosshair;border:1px solid #94754c;border-radius:8px;margin:10px 0"></canvas>'+
 '<div class="grid" style="margin:12px 0">'+
-'<div class="field"><label>Start X (Pixel)</label><input id="psc-x" type="number" value="83"></div>'+
-'<div class="field"><label>Start Y (Pixel)</label><input id="psc-y" type="number" value="104"></div>'+
+'<div class="field"><label>Start X (Pixel)</label><input id="psc-x" type="number" value="85"></div>'+
+'<div class="field"><label>Start Y (Pixel)</label><input id="psc-y" type="number" value="136"></div>'+
 '<div class="field"><label>Kachelgröße</label><input id="psc-size" type="number" value="86"></div>'+
 '<div class="field"><label>Abstand waagerecht</label><input id="psc-gap" type="number" value="6"></div>'+
 '<div class="field"><label>Abstand senkrecht</label><input id="psc-gap-y" type="number" value="6"></div>'+
@@ -95,7 +95,17 @@ $('psc-upload').addEventListener('change',async e=>{
  }
  if(imageUrl)URL.revokeObjectURL(imageUrl);
  imageUrl=URL.createObjectURL(file);
- try{picture=await load(imageUrl);if(picture.naturalWidth!==567||picture.naturalHeight!==713){const scale=picture.naturalWidth/567;$('psc-x').value=Math.round(83*scale);$('psc-y').value=Math.round(104*scale);$('psc-size').value=Math.round(86*scale);$('psc-gap').value=Math.round(6*scale);$('psc-gap-y').value=Math.round(6*scale);}drawPreview();$('psc-note').textContent='Bild geladen: '+picture.naturalWidth+' × '+picture.naturalHeight+' Pixel. Klicke in der Vorschau auf das erste Item.'}
+ try{picture=await load(imageUrl);/* Reference calibration: 704 px wide Pantheon screenshot, first tile at (85,136), 86 px tile with 6 px gaps. */
+ const scale=picture.naturalWidth/704;
+ $('psc-x').value=Math.round(85*scale);
+ $('psc-y').value=Math.round(136*scale);
+ $('psc-size').value=Math.max(20,Math.round(86*scale));
+ $('psc-gap').value=Math.max(0,Math.round(6*scale));
+ $('psc-gap-y').value=Math.max(0,Math.round(6*scale));
+ const heightLeft=picture.naturalHeight-Number($('psc-y').value);
+ const pitch=Number($('psc-size').value)+Number($('psc-gap-y').value);
+ const maxRows=Math.max(1,Math.floor((heightLeft+Number($('psc-gap-y').value))/pitch));
+ $('psc-rows').value=Math.min(6,maxRows);drawPreview();$('psc-note').textContent='Bild geladen: '+picture.naturalWidth+' × '+picture.naturalHeight+' Pixel. Klicke in der Vorschau auf das erste Item.'}
  catch{picture=null;$('psc-note').textContent='Bild nicht lesbar.'}
 });
 $('psc-scan').addEventListener('click',async()=>{
