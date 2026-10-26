@@ -1,0 +1,1430 @@
+{
+  "version": 1,
+  "updated": "2026-10-26",
+  "scope": "Kuratierte Auswahl sammelbarer Pantheon-Dekorationen, keine vollständige Item-Datenbank",
+  "sources": [
+    "https://github.com/austinsc/aion2-planner/blob/main/tools/pantheon_base.json",
+    "https://wikily.gg/aion-2/pantheon-decor",
+    "https://shugo.gg/de/items/pantheon"
+  ],
+  "slots": {
+    "colossus": 1,
+    "statue": 4,
+    "artwork": 12
+  },
+  "items": [
+    {
+      "id": "colossus-guardian-lord-nahma",
+      "name": "Guardian Lord Nahma",
+      "kind": "colossus",
+      "grade": "Heroic",
+      "stats": {
+        "Destruction": 55,
+        "Justice": 55,
+        "Time": 55
+      },
+      "where": "Weltboss Wächtergott Nahma · Unterer Reshanta",
+      "faction": "alle",
+      "icon": "./pantheon-icons/colossus-guardian-lord-nahma.webp",
+      "detail": "",
+      "originalGroup": "nahma-colossus"
+    },
+    {
+      "id": "colossus-zikel-s-apparition",
+      "name": "Zikel's Apparition",
+      "kind": "colossus",
+      "grade": "Unique",
+      "stats": {
+        "Destruction": 45,
+        "Justice": 45,
+        "Time": 45
+      },
+      "where": "Albtraum-Shop · Zikels Schemen",
+      "faction": "alle",
+      "icon": "./pantheon-icons/statue.webp",
+      "detail": "",
+      "originalGroup": "zikel-colossus"
+    },
+    {
+      "id": "colossus-incarnated-warding-feather",
+      "name": "Incarnated Warding Feather",
+      "kind": "colossus",
+      "grade": "Rare",
+      "stats": {
+        "Justice": 35,
+        "Time": 35
+      },
+      "where": "Hauptquest · Elyos/Asmodier (Stufe 32–35)",
+      "faction": "elyos",
+      "icon": "./pantheon-icons/statue.webp",
+      "detail": "",
+      "originalGroup": "story-colossus"
+    },
+    {
+      "id": "colossus-warden-santras",
+      "name": "Warden Santras",
+      "kind": "colossus",
+      "grade": "Rare",
+      "stats": {
+        "Justice": 35,
+        "Time": 35
+      },
+      "where": "Hauptquest · Elyos/Asmodier (Stufe 32–35)",
+      "faction": "asmodier",
+      "icon": "./pantheon-icons/statue.webp",
+      "detail": "",
+      "originalGroup": "story-colossus"
+    },
+    {
+      "id": "statue-transcendent-bakarma",
+      "name": "Transcendent Bakarma",
+      "kind": "statue",
+      "grade": "Unique",
+      "stats": {
+        "Death": 12,
+        "Freedom": 12,
+        "Space": 12
+      },
+      "where": "Erfolg · Draupnir-Eroberung 10×",
+      "faction": "alle",
+      "icon": "./pantheon-icons/bakarma.png",
+      "detail": "",
+      "originalGroup": "bakarma"
+    },
+    {
+      "id": "statue-asahr-s-mirror",
+      "name": "Asahr's Mirror",
+      "kind": "statue",
+      "grade": "Epic",
+      "stats": {
+        "Death": 10,
+        "Space": 10
+      },
+      "where": "Vierte Aszensionsquest · Stufe 45",
+      "faction": "alle",
+      "icon": "./pantheon-icons/statue.webp",
+      "detail": "",
+      "originalGroup": "asahr"
+    },
+    {
+      "id": "statue-fortress-guardian-notun",
+      "name": "Fortress Guardian Notun",
+      "kind": "statue",
+      "grade": "Epic",
+      "stats": {
+        "Death": 10,
+        "Space": 10
+      },
+      "where": "Albtraum-Shop · Festenhüter Notun",
+      "faction": "alle",
+      "icon": "./pantheon-icons/statue.webp",
+      "detail": "",
+      "originalGroup": "notun"
+    },
+    {
+      "id": "statue-artifact-of-eternity",
+      "name": "Artifact of Eternity",
+      "kind": "statue",
+      "grade": "Epic",
+      "stats": {
+        "Death": 10,
+        "Freedom": 10
+      },
+      "where": "Dritte Aszensionsquest · Stufe 32",
+      "faction": "alle",
+      "icon": "./pantheon-icons/statue.webp",
+      "detail": "",
+      "originalGroup": "eternity"
+    },
+    {
+      "id": "statue-kibelisk",
+      "name": "Kibelisk",
+      "kind": "statue",
+      "grade": "Epic",
+      "stats": {
+        "Freedom": 10,
+        "Space": 10
+      },
+      "where": "Erfolg · alle Teleportpunkte binden",
+      "faction": "alle",
+      "icon": "./pantheon-icons/statue.webp",
+      "detail": "",
+      "originalGroup": "kibelisk"
+    },
+    {
+      "id": "statue-gerod",
+      "name": "Gerod",
+      "kind": "statue",
+      "grade": "Epic",
+      "stats": {
+        "Freedom": 10,
+        "Space": 10
+      },
+      "where": "Albtraum-Shop",
+      "faction": "alle",
+      "icon": "./pantheon-icons/statue.webp",
+      "detail": "",
+      "originalGroup": "gerod"
+    },
+    {
+      "id": "statue-dream-fragment",
+      "name": "Dream Fragment",
+      "kind": "statue",
+      "grade": "Rare",
+      "stats": {
+        "Death": 8,
+        "Freedom": 8
+      },
+      "where": "Zweite Aszensionsquest · Stufe 22",
+      "faction": "alle",
+      "icon": "./pantheon-icons/statue.webp",
+      "detail": "",
+      "originalGroup": "dream"
+    },
+    {
+      "id": "statue-fafnir-s-poison-blood",
+      "name": "Fafnir's Poison Blood",
+      "kind": "statue",
+      "grade": "Rare",
+      "stats": {
+        "Death": 8,
+        "Freedom": 8
+      },
+      "where": "Albtraum-Shop",
+      "faction": "alle",
+      "icon": "./pantheon-icons/statue.webp",
+      "detail": "",
+      "originalGroup": "fafnir"
+    },
+    {
+      "id": "statue-mirror-of-desire",
+      "name": "Mirror of Desire",
+      "kind": "statue",
+      "grade": "Rare",
+      "stats": {
+        "Freedom": 8,
+        "Space": 8
+      },
+      "where": "Erfolg · Feuertempel-Eroberung 10×",
+      "faction": "alle",
+      "icon": "./pantheon-icons/statue.webp",
+      "detail": "",
+      "originalGroup": "desire"
+    },
+    {
+      "id": "statue-wraith-giselle",
+      "name": "Wraith Giselle",
+      "kind": "statue",
+      "grade": "Rare",
+      "stats": {
+        "Freedom": 8,
+        "Space": 8
+      },
+      "where": "Albtraum-Shop",
+      "faction": "alle",
+      "icon": "./pantheon-icons/statue.webp",
+      "detail": "",
+      "originalGroup": "giselle"
+    },
+    {
+      "id": "statue-teina",
+      "name": "Teina",
+      "kind": "statue",
+      "grade": "Rare",
+      "stats": {
+        "Death": 8,
+        "Space": 8
+      },
+      "where": "Regionale Hauptquest · Verteron/Altgard",
+      "faction": "elyos",
+      "icon": "./pantheon-icons/statue.webp",
+      "detail": "",
+      "originalGroup": "story-statue"
+    },
+    {
+      "id": "statue-grisilla",
+      "name": "Grisilla",
+      "kind": "statue",
+      "grade": "Rare",
+      "stats": {
+        "Death": 8,
+        "Space": 8
+      },
+      "where": "Regionale Hauptquest · Verteron/Altgard",
+      "faction": "asmodier",
+      "icon": "./pantheon-icons/statue.webp",
+      "detail": "",
+      "originalGroup": "story-statue"
+    },
+    {
+      "id": "statue-gatekeeper-pinopi",
+      "name": "Gatekeeper Pinopi",
+      "kind": "statue",
+      "grade": "Rare",
+      "stats": {
+        "Death": 8,
+        "Space": 8
+      },
+      "where": "Albtraum-Shop",
+      "faction": "alle",
+      "icon": "./pantheon-icons/statue.webp",
+      "detail": "",
+      "originalGroup": "nightmare-death-space"
+    },
+    {
+      "id": "statue-furious-feruk",
+      "name": "Furious Feruk",
+      "kind": "statue",
+      "grade": "Rare",
+      "stats": {
+        "Death": 8,
+        "Space": 8
+      },
+      "where": "Albtraum-Shop",
+      "faction": "alle",
+      "icon": "./pantheon-icons/statue.webp",
+      "detail": "",
+      "originalGroup": "nightmare-death-space"
+    },
+    {
+      "id": "statue-sealing-wings",
+      "name": "Sealing Wings",
+      "kind": "statue",
+      "grade": "Rare",
+      "stats": {
+        "Freedom": 8,
+        "Space": 8
+      },
+      "where": "Umwandlung · 140 Statuenfragmente",
+      "faction": "elyos",
+      "icon": "./pantheon-icons/statue.webp",
+      "detail": "",
+      "originalGroup": "wings"
+    },
+    {
+      "id": "statue-glorious-wings",
+      "name": "Glorious Wings",
+      "kind": "statue",
+      "grade": "Rare",
+      "stats": {
+        "Freedom": 8,
+        "Space": 8
+      },
+      "where": "Umwandlung · 140 Statuenfragmente",
+      "faction": "asmodier",
+      "icon": "./pantheon-icons/statue.webp",
+      "detail": "",
+      "originalGroup": "wings"
+    },
+    {
+      "id": "statue-torn-forbidden-bookcase",
+      "name": "Torn Forbidden Bookcase",
+      "kind": "statue",
+      "grade": "Common",
+      "stats": {
+        "Death": 6
+      },
+      "where": "Regionale Hauptquest",
+      "faction": "elyos",
+      "icon": "./pantheon-icons/statue.webp",
+      "detail": "",
+      "originalGroup": "common-statue"
+    },
+    {
+      "id": "statue-urd",
+      "name": "Urd",
+      "kind": "statue",
+      "grade": "Common",
+      "stats": {
+        "Death": 6
+      },
+      "where": "Regionale Hauptquest",
+      "faction": "asmodier",
+      "icon": "./pantheon-icons/statue.webp",
+      "detail": "",
+      "originalGroup": "common-statue"
+    },
+    {
+      "id": "statue-selvis",
+      "name": "Selvis",
+      "kind": "statue",
+      "grade": "Common",
+      "stats": null,
+      "where": "Quest · Details im Spiel prüfen",
+      "faction": "alle",
+      "icon": "./pantheon-icons/statue.webp",
+      "detail": "",
+      "originalGroup": "common-statue"
+    },
+    {
+      "id": "painting-eternal-gartua",
+      "name": "Eternal Gartua",
+      "kind": "artwork",
+      "grade": "Heroic",
+      "stats": {
+        "Wisdom": 5,
+        "Illusion": 5,
+        "Destiny": 5,
+        "Life": 5
+      },
+      "where": "Weltboss Gartua · alternativ Gemäldefragmente",
+      "faction": "elyos",
+      "icon": "./pantheon-icons/artwork.webp",
+      "detail": "",
+      "originalGroup": "gartua"
+    },
+    {
+      "id": "painting-immortal-gartua",
+      "name": "Immortal Gartua",
+      "kind": "artwork",
+      "grade": "Heroic",
+      "stats": {
+        "Wisdom": 5,
+        "Illusion": 5,
+        "Destiny": 5,
+        "Life": 5
+      },
+      "where": "Weltboss Gartua · alternativ Gemäldefragmente",
+      "faction": "asmodier",
+      "icon": "./pantheon-icons/artwork.webp",
+      "detail": "",
+      "originalGroup": "gartua"
+    },
+    {
+      "id": "painting-abyssal-ludra",
+      "name": "Abyssal Ludra",
+      "kind": "artwork",
+      "grade": "Heroic",
+      "stats": {
+        "Wisdom": 5,
+        "Illusion": 5,
+        "Destiny": 5
+      },
+      "where": "Erfolg · Ludra (Verfügbarkeit EU prüfen)",
+      "faction": "alle",
+      "icon": "./pantheon-icons/artwork.webp",
+      "detail": "",
+      "originalGroup": "ludra"
+    },
+    {
+      "id": "painting-guardian-lord-nahma-painting",
+      "name": "Guardian Lord Nahma (Painting)",
+      "kind": "artwork",
+      "grade": "Heroic",
+      "stats": {
+        "Illusion": 5,
+        "Destiny": 5,
+        "Life": 5
+      },
+      "where": "Weltboss Wächtergott Nahma",
+      "faction": "alle",
+      "icon": "./pantheon-icons/artwork.webp",
+      "detail": "",
+      "originalGroup": "nahma-artwork"
+    },
+    {
+      "id": "painting-krao-cave",
+      "name": "Krao Cave",
+      "kind": "artwork",
+      "grade": "Unique",
+      "stats": {
+        "Wisdom": 4,
+        "Illusion": 4,
+        "Destiny": 4
+      },
+      "where": "Eroberung · Dungeon-Endboss",
+      "faction": "alle",
+      "icon": "./pantheon-icons/artwork.webp",
+      "detail": "",
+      "originalGroup": "expedition-destiny"
+    },
+    {
+      "id": "painting-ferocious-horn-den",
+      "name": "Ferocious Horn Den",
+      "kind": "artwork",
+      "grade": "Unique",
+      "stats": {
+        "Wisdom": 4,
+        "Illusion": 4,
+        "Destiny": 4
+      },
+      "where": "Eroberung · Dungeon-Endboss",
+      "faction": "alle",
+      "icon": "./pantheon-icons/artwork.webp",
+      "detail": "",
+      "originalGroup": "expedition-destiny"
+    },
+    {
+      "id": "painting-vakron-sky-island",
+      "name": "Vakron Sky Island",
+      "kind": "artwork",
+      "grade": "Unique",
+      "stats": {
+        "Wisdom": 4,
+        "Illusion": 4,
+        "Life": 4
+      },
+      "where": "Eroberung · Dungeon-Endboss",
+      "faction": "alle",
+      "icon": "./pantheon-icons/artwork.webp",
+      "detail": "",
+      "originalGroup": "expedition-life"
+    },
+    {
+      "id": "painting-draupnir",
+      "name": "Draupnir",
+      "kind": "artwork",
+      "grade": "Unique",
+      "stats": {
+        "Wisdom": 4,
+        "Illusion": 4,
+        "Life": 4
+      },
+      "where": "Eroberung · Dungeon-Endboss",
+      "faction": "alle",
+      "icon": "./pantheon-icons/artwork.webp",
+      "detail": "",
+      "originalGroup": "expedition-life"
+    },
+    {
+      "id": "painting-watcher-kaira",
+      "name": "Watcher Kaira",
+      "kind": "artwork",
+      "grade": "Unique",
+      "stats": {
+        "Wisdom": 4,
+        "Illusion": 4,
+        "Destiny": 4
+      },
+      "where": "Elitegegner/Weltboss · alternativ Gemäldefragmente",
+      "faction": "alle",
+      "icon": "./pantheon-icons/artwork.webp",
+      "detail": "",
+      "originalGroup": "elite-destiny"
+    },
+    {
+      "id": "painting-executor-kaira",
+      "name": "Executor Kaira",
+      "kind": "artwork",
+      "grade": "Unique",
+      "stats": {
+        "Wisdom": 4,
+        "Illusion": 4,
+        "Destiny": 4
+      },
+      "where": "Elitegegner/Weltboss · alternativ Gemäldefragmente",
+      "faction": "alle",
+      "icon": "./pantheon-icons/artwork.webp",
+      "detail": "",
+      "originalGroup": "elite-destiny"
+    },
+    {
+      "id": "painting-sentinel-k-nash",
+      "name": "Sentinel K'nash",
+      "kind": "artwork",
+      "grade": "Unique",
+      "stats": {
+        "Wisdom": 4,
+        "Illusion": 4,
+        "Destiny": 4
+      },
+      "where": "Elitegegner/Weltboss · alternativ Gemäldefragmente",
+      "faction": "elyos",
+      "icon": "./pantheon-icons/artwork.webp",
+      "detail": "",
+      "originalGroup": "elite-destiny"
+    },
+    {
+      "id": "painting-black-tentacle-lawa",
+      "name": "Black Tentacle Lawa",
+      "kind": "artwork",
+      "grade": "Unique",
+      "stats": {
+        "Wisdom": 4,
+        "Illusion": 4,
+        "Destiny": 4
+      },
+      "where": "Elitegegner/Weltboss · alternativ Gemäldefragmente",
+      "faction": "elyos",
+      "icon": "./pantheon-icons/artwork.webp",
+      "detail": "",
+      "originalGroup": "elite-destiny"
+    },
+    {
+      "id": "painting-centurion-demiros",
+      "name": "Centurion Demiros",
+      "kind": "artwork",
+      "grade": "Unique",
+      "stats": {
+        "Wisdom": 4,
+        "Illusion": 4,
+        "Destiny": 4
+      },
+      "where": "Elitegegner/Weltboss · alternativ Gemäldefragmente",
+      "faction": "elyos",
+      "icon": "./pantheon-icons/artwork.webp",
+      "detail": "",
+      "originalGroup": "elite-destiny"
+    },
+    {
+      "id": "painting-forest-warrior-aullamu",
+      "name": "Forest Warrior Aullamu",
+      "kind": "artwork",
+      "grade": "Unique",
+      "stats": {
+        "Wisdom": 4,
+        "Illusion": 4,
+        "Destiny": 4
+      },
+      "where": "Elitegegner/Weltboss · alternativ Gemäldefragmente",
+      "faction": "elyos",
+      "icon": "./pantheon-icons/artwork.webp",
+      "detail": "",
+      "originalGroup": "elite-destiny"
+    },
+    {
+      "id": "painting-drakan-battalion-weapon-guruta",
+      "name": "Drakan Battalion Weapon Guruta",
+      "kind": "artwork",
+      "grade": "Unique",
+      "stats": {
+        "Wisdom": 4,
+        "Illusion": 4,
+        "Destiny": 4
+      },
+      "where": "Elitegegner/Weltboss · alternativ Gemäldefragmente",
+      "faction": "asmodier",
+      "icon": "./pantheon-icons/artwork.webp",
+      "detail": "",
+      "originalGroup": "elite-destiny"
+    },
+    {
+      "id": "painting-sharp-shylak",
+      "name": "Sharp Shylak",
+      "kind": "artwork",
+      "grade": "Unique",
+      "stats": {
+        "Wisdom": 4,
+        "Illusion": 4,
+        "Destiny": 4
+      },
+      "where": "Elitegegner/Weltboss · alternativ Gemäldefragmente",
+      "faction": "asmodier",
+      "icon": "./pantheon-icons/artwork.webp",
+      "detail": "",
+      "originalGroup": "elite-destiny"
+    },
+    {
+      "id": "painting-desecrator-newbold",
+      "name": "Desecrator Newbold",
+      "kind": "artwork",
+      "grade": "Unique",
+      "stats": {
+        "Wisdom": 4,
+        "Illusion": 4,
+        "Destiny": 4
+      },
+      "where": "Elitegegner/Weltboss · alternativ Gemäldefragmente",
+      "faction": "asmodier",
+      "icon": "./pantheon-icons/artwork.webp",
+      "detail": "",
+      "originalGroup": "elite-destiny"
+    },
+    {
+      "id": "painting-divine-ansas",
+      "name": "Divine Ansas",
+      "kind": "artwork",
+      "grade": "Unique",
+      "stats": {
+        "Wisdom": 4,
+        "Illusion": 4,
+        "Life": 4
+      },
+      "where": "Elitegegner · alternativ Gemäldefragmente",
+      "faction": "elyos",
+      "icon": "./pantheon-icons/artwork.webp",
+      "detail": "",
+      "originalGroup": "elite-life"
+    },
+    {
+      "id": "painting-phantasm-kasia",
+      "name": "Phantasm Kasia",
+      "kind": "artwork",
+      "grade": "Unique",
+      "stats": {
+        "Wisdom": 4,
+        "Illusion": 4,
+        "Life": 4
+      },
+      "where": "Elitegegner · alternativ Gemäldefragmente",
+      "faction": "elyos",
+      "icon": "./pantheon-icons/artwork.webp",
+      "detail": "",
+      "originalGroup": "elite-life"
+    },
+    {
+      "id": "painting-argo",
+      "name": "Argo",
+      "kind": "artwork",
+      "grade": "Unique",
+      "stats": {
+        "Illusion": 4,
+        "Destiny": 4,
+        "Life": 4
+      },
+      "where": "Abgrund oder Shugo-Festival-Shop",
+      "faction": "alle",
+      "icon": "./pantheon-icons/artwork.webp",
+      "detail": "",
+      "originalGroup": "pvp-artwork"
+    },
+    {
+      "id": "painting-ardus-shrine",
+      "name": "Ardus Shrine",
+      "kind": "artwork",
+      "grade": "Unique",
+      "stats": {
+        "Illusion": 4,
+        "Destiny": 4,
+        "Life": 4
+      },
+      "where": "Abgrund oder Shugo-Festival-Shop",
+      "faction": "elyos",
+      "icon": "./pantheon-icons/artwork.webp",
+      "detail": "",
+      "originalGroup": "pvp-artwork"
+    },
+    {
+      "id": "painting-impetusium",
+      "name": "Impetusium",
+      "kind": "artwork",
+      "grade": "Unique",
+      "stats": {
+        "Illusion": 4,
+        "Destiny": 4,
+        "Life": 4
+      },
+      "where": "Abgrund oder Shugo-Festival-Shop",
+      "faction": "asmodier",
+      "icon": "./pantheon-icons/artwork.webp",
+      "detail": "",
+      "originalGroup": "pvp-artwork"
+    },
+    {
+      "id": "painting-researcher-setram",
+      "name": "Researcher Setram",
+      "kind": "artwork",
+      "grade": "Unique",
+      "stats": {
+        "Illusion": 4,
+        "Destiny": 4,
+        "Life": 4
+      },
+      "where": "Elitegegner · alternativ Gemäldefragmente",
+      "faction": "elyos",
+      "icon": "./pantheon-icons/artwork.webp",
+      "detail": "",
+      "originalGroup": "elite-dil"
+    },
+    {
+      "id": "painting-specter-archon-axios",
+      "name": "Specter Archon Axios",
+      "kind": "artwork",
+      "grade": "Unique",
+      "stats": {
+        "Illusion": 4,
+        "Destiny": 4,
+        "Life": 4
+      },
+      "where": "Elitegegner · alternativ Gemäldefragmente",
+      "faction": "asmodier",
+      "icon": "./pantheon-icons/artwork.webp",
+      "detail": "",
+      "originalGroup": "elite-dil"
+    },
+    {
+      "id": "painting-executioner-barthien",
+      "name": "Executioner Barthien",
+      "kind": "artwork",
+      "grade": "Unique",
+      "stats": {
+        "Illusion": 4,
+        "Destiny": 4,
+        "Life": 4
+      },
+      "where": "Elitegegner · alternativ Gemäldefragmente",
+      "faction": "asmodier",
+      "icon": "./pantheon-icons/artwork.webp",
+      "detail": "",
+      "originalGroup": "elite-dil"
+    },
+    {
+      "id": "painting-visionary-karuka",
+      "name": "Visionary Karuka",
+      "kind": "artwork",
+      "grade": "Unique",
+      "stats": {
+        "Illusion": 4,
+        "Destiny": 4,
+        "Life": 4
+      },
+      "where": "Elitegegner · alternativ Gemäldefragmente",
+      "faction": "asmodier",
+      "icon": "./pantheon-icons/artwork.webp",
+      "detail": "",
+      "originalGroup": "elite-dil"
+    },
+    {
+      "id": "painting-dark-shadow-vishwada",
+      "name": "Dark Shadow Vishwada",
+      "kind": "artwork",
+      "grade": "Unique",
+      "stats": {
+        "Illusion": 4,
+        "Destiny": 4,
+        "Life": 4
+      },
+      "where": "Elitegegner · alternativ Gemäldefragmente",
+      "faction": "asmodier",
+      "icon": "./pantheon-icons/artwork.webp",
+      "detail": "",
+      "originalGroup": "elite-dil"
+    },
+    {
+      "id": "painting-silent-dartan",
+      "name": "Silent Dartan",
+      "kind": "artwork",
+      "grade": "Unique",
+      "stats": {
+        "Wisdom": 4,
+        "Destiny": 4,
+        "Life": 4
+      },
+      "where": "Feldboss oder Eroberungs-Dungeon",
+      "faction": "alle",
+      "icon": "./pantheon-icons/artwork.webp",
+      "detail": "",
+      "originalGroup": "starter-wdl"
+    },
+    {
+      "id": "painting-soul-ruler-kashapa",
+      "name": "Soul Ruler Kashapa",
+      "kind": "artwork",
+      "grade": "Unique",
+      "stats": {
+        "Wisdom": 4,
+        "Destiny": 4,
+        "Life": 4
+      },
+      "where": "Feldboss oder Eroberungs-Dungeon",
+      "faction": "alle",
+      "icon": "./pantheon-icons/artwork.webp",
+      "detail": "",
+      "originalGroup": "starter-wdl"
+    },
+    {
+      "id": "painting-high-commander-lagta",
+      "name": "High Commander Lagta",
+      "kind": "artwork",
+      "grade": "Unique",
+      "stats": {
+        "Wisdom": 4,
+        "Destiny": 4,
+        "Life": 4
+      },
+      "where": "Feldboss oder Eroberungs-Dungeon",
+      "faction": "alle",
+      "icon": "./pantheon-icons/artwork.webp",
+      "detail": "",
+      "originalGroup": "starter-wdl"
+    },
+    {
+      "id": "painting-executor-tamasa",
+      "name": "Executor Tamasa",
+      "kind": "artwork",
+      "grade": "Unique",
+      "stats": {
+        "Wisdom": 4,
+        "Destiny": 4,
+        "Life": 4
+      },
+      "where": "Feldboss oder Eroberungs-Dungeon",
+      "faction": "alle",
+      "icon": "./pantheon-icons/artwork.webp",
+      "detail": "",
+      "originalGroup": "starter-wdl"
+    },
+    {
+      "id": "painting-urugugu",
+      "name": "Urugugu",
+      "kind": "artwork",
+      "grade": "Unique",
+      "stats": {
+        "Wisdom": 4,
+        "Destiny": 4,
+        "Life": 4
+      },
+      "where": "Feldboss oder Eroberungs-Dungeon",
+      "faction": "alle",
+      "icon": "./pantheon-icons/artwork.webp",
+      "detail": "",
+      "originalGroup": "starter-wdl"
+    },
+    {
+      "id": "painting-fire-temple",
+      "name": "Fire Temple",
+      "kind": "artwork",
+      "grade": "Unique",
+      "stats": {
+        "Wisdom": 4,
+        "Destiny": 4,
+        "Life": 4
+      },
+      "where": "Feldboss oder Eroberungs-Dungeon",
+      "faction": "alle",
+      "icon": "./pantheon-icons/fire-temple.png",
+      "detail": "",
+      "originalGroup": "starter-wdl"
+    },
+    {
+      "id": "painting-chaser-taulo",
+      "name": "Chaser Taulo",
+      "kind": "artwork",
+      "grade": "Epic",
+      "stats": {
+        "Wisdom": 3,
+        "Illusion": 3
+      },
+      "where": "Elitegegner oder Shugo-Festival-Shop",
+      "faction": "elyos",
+      "icon": "./pantheon-icons/artwork.webp",
+      "detail": "",
+      "originalGroup": "epic-wi"
+    },
+    {
+      "id": "painting-harvest-manager-moshav",
+      "name": "Harvest Manager Moshav",
+      "kind": "artwork",
+      "grade": "Epic",
+      "stats": {
+        "Wisdom": 3,
+        "Illusion": 3
+      },
+      "where": "Elitegegner oder Shugo-Festival-Shop",
+      "faction": "elyos",
+      "icon": "./pantheon-icons/artwork.webp",
+      "detail": "",
+      "originalGroup": "epic-wi"
+    },
+    {
+      "id": "painting-scholar-aulla",
+      "name": "Scholar Aulla",
+      "kind": "artwork",
+      "grade": "Epic",
+      "stats": {
+        "Wisdom": 3,
+        "Illusion": 3
+      },
+      "where": "Elitegegner oder Shugo-Festival-Shop",
+      "faction": "elyos",
+      "icon": "./pantheon-icons/artwork.webp",
+      "detail": "",
+      "originalGroup": "epic-wi"
+    },
+    {
+      "id": "painting-cantas-valley",
+      "name": "Cantas Valley",
+      "kind": "artwork",
+      "grade": "Epic",
+      "stats": {
+        "Wisdom": 3,
+        "Illusion": 3
+      },
+      "where": "Elitegegner oder Shugo-Festival-Shop",
+      "faction": "elyos",
+      "icon": "./pantheon-icons/artwork.webp",
+      "detail": "",
+      "originalGroup": "epic-wi"
+    },
+    {
+      "id": "painting-ellun-river-midstream",
+      "name": "Ellun River Midstream",
+      "kind": "artwork",
+      "grade": "Epic",
+      "stats": {
+        "Wisdom": 3,
+        "Illusion": 3
+      },
+      "where": "Elitegegner oder Shugo-Festival-Shop",
+      "faction": "elyos",
+      "icon": "./pantheon-icons/artwork.webp",
+      "detail": "",
+      "originalGroup": "epic-wi"
+    },
+    {
+      "id": "painting-veteran-shujakan",
+      "name": "Veteran Shujakan",
+      "kind": "artwork",
+      "grade": "Epic",
+      "stats": {
+        "Wisdom": 3,
+        "Illusion": 3
+      },
+      "where": "Elitegegner oder Shugo-Festival-Shop",
+      "faction": "asmodier",
+      "icon": "./pantheon-icons/artwork.webp",
+      "detail": "",
+      "originalGroup": "epic-wi"
+    },
+    {
+      "id": "painting-dredgion-crash-site",
+      "name": "Dredgion Crash Site",
+      "kind": "artwork",
+      "grade": "Epic",
+      "stats": {
+        "Wisdom": 3,
+        "Illusion": 3
+      },
+      "where": "Elitegegner oder Shugo-Festival-Shop",
+      "faction": "asmodier",
+      "icon": "./pantheon-icons/artwork.webp",
+      "detail": "",
+      "originalGroup": "epic-wi"
+    },
+    {
+      "id": "painting-quai-campsite",
+      "name": "Quai Campsite",
+      "kind": "artwork",
+      "grade": "Epic",
+      "stats": {
+        "Wisdom": 3,
+        "Illusion": 3
+      },
+      "where": "Elitegegner oder Shugo-Festival-Shop",
+      "faction": "asmodier",
+      "icon": "./pantheon-icons/artwork.webp",
+      "detail": "",
+      "originalGroup": "epic-wi"
+    },
+    {
+      "id": "painting-verteron-fortress-ruins",
+      "name": "Verteron Fortress Ruins",
+      "kind": "artwork",
+      "grade": "Epic",
+      "stats": {
+        "Wisdom": 3,
+        "Destiny": 3
+      },
+      "where": "Elitegegner oder Shugo-Festival-Shop",
+      "faction": "elyos",
+      "icon": "./pantheon-icons/artwork.webp",
+      "detail": "",
+      "originalGroup": "epic-w"
+    },
+    {
+      "id": "painting-deceiver-trid",
+      "name": "Deceiver Trid",
+      "kind": "artwork",
+      "grade": "Epic",
+      "stats": {
+        "Wisdom": 3,
+        "Destiny": 3
+      },
+      "where": "Elitegegner oder Shugo-Festival-Shop",
+      "faction": "asmodier",
+      "icon": "./pantheon-icons/artwork.webp",
+      "detail": "",
+      "originalGroup": "epic-w"
+    },
+    {
+      "id": "painting-blue-wave-kelpina",
+      "name": "Blue Wave Kelpina",
+      "kind": "artwork",
+      "grade": "Epic",
+      "stats": {
+        "Wisdom": 3,
+        "Destiny": 3
+      },
+      "where": "Elitegegner oder Shugo-Festival-Shop",
+      "faction": "asmodier",
+      "icon": "./pantheon-icons/artwork.webp",
+      "detail": "",
+      "originalGroup": "epic-w"
+    },
+    {
+      "id": "painting-sanctum-outpost",
+      "name": "Sanctum Outpost",
+      "kind": "artwork",
+      "grade": "Epic",
+      "stats": {
+        "Wisdom": 3,
+        "Destiny": 3
+      },
+      "where": "Elitegegner oder Shugo-Festival-Shop",
+      "faction": "asmodier",
+      "icon": "./pantheon-icons/artwork.webp",
+      "detail": "",
+      "originalGroup": "epic-w"
+    },
+    {
+      "id": "painting-high-overseer-nutah",
+      "name": "High Overseer Nutah",
+      "kind": "artwork",
+      "grade": "Epic",
+      "stats": {
+        "Wisdom": 3,
+        "Life": 3
+      },
+      "where": "Elitegegner oder Shugo-Festival-Shop",
+      "faction": "asmodier",
+      "icon": "./pantheon-icons/artwork.webp",
+      "detail": "",
+      "originalGroup": "epic-w"
+    },
+    {
+      "id": "painting-special-operations-leader-linx",
+      "name": "Special Operations Leader Linx",
+      "kind": "artwork",
+      "grade": "Epic",
+      "stats": {
+        "Wisdom": 3,
+        "Life": 3
+      },
+      "where": "Elitegegner oder Shugo-Festival-Shop",
+      "faction": "asmodier",
+      "icon": "./pantheon-icons/artwork.webp",
+      "detail": "",
+      "originalGroup": "epic-w"
+    },
+    {
+      "id": "painting-shugo-alchemist",
+      "name": "Shugo Alchemist",
+      "kind": "artwork",
+      "grade": "Epic",
+      "stats": {
+        "Illusion": 3,
+        "Destiny": 3
+      },
+      "where": "Elitegegner, Festival-Shop oder Pass",
+      "faction": "alle",
+      "icon": "./pantheon-icons/artwork.webp",
+      "detail": "",
+      "originalGroup": "epic-i"
+    },
+    {
+      "id": "painting-shulak",
+      "name": "Shulak",
+      "kind": "artwork",
+      "grade": "Epic",
+      "stats": {
+        "Illusion": 3,
+        "Destiny": 3
+      },
+      "where": "Elitegegner, Festival-Shop oder Pass",
+      "faction": "alle",
+      "icon": "./pantheon-icons/artwork.webp",
+      "detail": "",
+      "originalGroup": "epic-i"
+    },
+    {
+      "id": "painting-kusan-the-mad-gladiator",
+      "name": "Kusan the Mad Gladiator",
+      "kind": "artwork",
+      "grade": "Epic",
+      "stats": {
+        "Illusion": 3,
+        "Destiny": 3
+      },
+      "where": "Elitegegner, Festival-Shop oder Pass",
+      "faction": "elyos",
+      "icon": "./pantheon-icons/artwork.webp",
+      "detail": "",
+      "originalGroup": "epic-i"
+    },
+    {
+      "id": "painting-ritualist-garshim",
+      "name": "Ritualist Garshim",
+      "kind": "artwork",
+      "grade": "Epic",
+      "stats": {
+        "Illusion": 3,
+        "Destiny": 3
+      },
+      "where": "Elitegegner, Festival-Shop oder Pass",
+      "faction": "elyos",
+      "icon": "./pantheon-icons/artwork.webp",
+      "detail": "",
+      "originalGroup": "epic-i"
+    },
+    {
+      "id": "painting-pilgrim-s-ridge",
+      "name": "Pilgrim's Ridge",
+      "kind": "artwork",
+      "grade": "Epic",
+      "stats": {
+        "Illusion": 3,
+        "Destiny": 3
+      },
+      "where": "Elitegegner, Festival-Shop oder Pass",
+      "faction": "elyos",
+      "icon": "./pantheon-icons/artwork.webp",
+      "detail": "",
+      "originalGroup": "epic-i"
+    },
+    {
+      "id": "painting-tolbas-forest",
+      "name": "Tolbas Forest",
+      "kind": "artwork",
+      "grade": "Epic",
+      "stats": {
+        "Illusion": 3,
+        "Destiny": 3
+      },
+      "where": "Elitegegner, Festival-Shop oder Pass",
+      "faction": "elyos",
+      "icon": "./pantheon-icons/artwork.webp",
+      "detail": "",
+      "originalGroup": "epic-i"
+    },
+    {
+      "id": "painting-moslan-forest",
+      "name": "Moslan Forest",
+      "kind": "artwork",
+      "grade": "Epic",
+      "stats": {
+        "Illusion": 3,
+        "Destiny": 3
+      },
+      "where": "Elitegegner, Festival-Shop oder Pass",
+      "faction": "asmodier",
+      "icon": "./pantheon-icons/artwork.webp",
+      "detail": "",
+      "originalGroup": "epic-i"
+    },
+    {
+      "id": "painting-calderon-canyon",
+      "name": "Calderon Canyon",
+      "kind": "artwork",
+      "grade": "Epic",
+      "stats": {
+        "Illusion": 3,
+        "Destiny": 3
+      },
+      "where": "Elitegegner, Festival-Shop oder Pass",
+      "faction": "asmodier",
+      "icon": "./pantheon-icons/artwork.webp",
+      "detail": "",
+      "originalGroup": "epic-i"
+    },
+    {
+      "id": "painting-dawn-legion-base",
+      "name": "Dawn Legion Base",
+      "kind": "artwork",
+      "grade": "Epic",
+      "stats": {
+        "Illusion": 3,
+        "Life": 3
+      },
+      "where": "Elitegegner, Festival-Shop oder Pass",
+      "faction": "elyos",
+      "icon": "./pantheon-icons/artwork.webp",
+      "detail": "",
+      "originalGroup": "epic-i"
+    },
+    {
+      "id": "painting-ellun-river-marsh",
+      "name": "Ellun River Marsh",
+      "kind": "artwork",
+      "grade": "Epic",
+      "stats": {
+        "Illusion": 3,
+        "Life": 3
+      },
+      "where": "Elitegegner, Festival-Shop oder Pass",
+      "faction": "elyos",
+      "icon": "./pantheon-icons/artwork.webp",
+      "detail": "",
+      "originalGroup": "epic-i"
+    },
+    {
+      "id": "painting-predator-garsan",
+      "name": "Predator Garsan",
+      "kind": "artwork",
+      "grade": "Epic",
+      "stats": {
+        "Illusion": 3,
+        "Life": 3
+      },
+      "where": "Elitegegner, Festival-Shop oder Pass",
+      "faction": "asmodier",
+      "icon": "./pantheon-icons/artwork.webp",
+      "detail": "",
+      "originalGroup": "epic-i"
+    },
+    {
+      "id": "painting-advisor-resana",
+      "name": "Advisor Resana",
+      "kind": "artwork",
+      "grade": "Epic",
+      "stats": {
+        "Illusion": 3,
+        "Life": 3
+      },
+      "where": "Elitegegner, Festival-Shop oder Pass",
+      "faction": "asmodier",
+      "icon": "./pantheon-icons/artwork.webp",
+      "detail": "",
+      "originalGroup": "epic-i"
+    },
+    {
+      "id": "painting-safe-haven",
+      "name": "Safe Haven",
+      "kind": "artwork",
+      "grade": "Epic",
+      "stats": {
+        "Illusion": 3,
+        "Life": 3
+      },
+      "where": "Elitegegner, Festival-Shop oder Pass",
+      "faction": "asmodier",
+      "icon": "./pantheon-icons/artwork.webp",
+      "detail": "",
+      "originalGroup": "epic-i"
+    },
+    {
+      "id": "painting-nameless-cemetery",
+      "name": "Nameless Cemetery",
+      "kind": "artwork",
+      "grade": "Epic",
+      "stats": {
+        "Illusion": 3,
+        "Life": 3
+      },
+      "where": "Elitegegner, Festival-Shop oder Pass",
+      "faction": "asmodier",
+      "icon": "./pantheon-icons/artwork.webp",
+      "detail": "",
+      "originalGroup": "epic-i"
+    },
+    {
+      "id": "painting-artisan-alchemist",
+      "name": "Artisan Alchemist",
+      "kind": "artwork",
+      "grade": "Rare",
+      "stats": {
+        "Wisdom": 2,
+        "Illusion": 2
+      },
+      "where": "Handwerksquest oder Elitegegner",
+      "faction": "alle",
+      "icon": "./pantheon-icons/artwork.webp",
+      "detail": "",
+      "originalGroup": "starter-rare"
+    },
+    {
+      "id": "painting-berserker-vargor",
+      "name": "Berserker Vargor",
+      "kind": "artwork",
+      "grade": "Rare",
+      "stats": {
+        "Wisdom": 2,
+        "Illusion": 2
+      },
+      "where": "Handwerksquest oder Elitegegner",
+      "faction": "asmodier",
+      "icon": "./pantheon-icons/artwork.webp",
+      "detail": "",
+      "originalGroup": "starter-rare"
+    },
+    {
+      "id": "painting-black-warrior-aed",
+      "name": "Black Warrior Aed",
+      "kind": "artwork",
+      "grade": "Rare",
+      "stats": {
+        "Wisdom": 2,
+        "Illusion": 2
+      },
+      "where": "Handwerksquest oder Elitegegner",
+      "faction": "asmodier",
+      "icon": "./pantheon-icons/artwork.webp",
+      "detail": "",
+      "originalGroup": "starter-rare"
+    },
+    {
+      "id": "painting-artisan-armorsmith",
+      "name": "Artisan Armorsmith",
+      "kind": "artwork",
+      "grade": "Rare",
+      "stats": {
+        "Wisdom": 2,
+        "Destiny": 2
+      },
+      "where": "Handwerksquest oder Elitegegner",
+      "faction": "alle",
+      "icon": "./pantheon-icons/artwork.webp",
+      "detail": "",
+      "originalGroup": "rare-w"
+    },
+    {
+      "id": "painting-artisan-essence-extractor",
+      "name": "Artisan Essence Extractor",
+      "kind": "artwork",
+      "grade": "Rare",
+      "stats": {
+        "Wisdom": 2,
+        "Destiny": 2
+      },
+      "where": "Handwerksquest oder Elitegegner",
+      "faction": "alle",
+      "icon": "./pantheon-icons/artwork.webp",
+      "detail": "",
+      "originalGroup": "rare-w"
+    },
+    {
+      "id": "painting-kernon-of-the-west",
+      "name": "Kernon of the West",
+      "kind": "artwork",
+      "grade": "Rare",
+      "stats": {
+        "Wisdom": 2,
+        "Destiny": 2
+      },
+      "where": "Handwerksquest oder Elitegegner",
+      "faction": "elyos",
+      "icon": "./pantheon-icons/artwork.webp",
+      "detail": "",
+      "originalGroup": "rare-w"
+    },
+    {
+      "id": "painting-blooming-korin",
+      "name": "Blooming Korin",
+      "kind": "artwork",
+      "grade": "Rare",
+      "stats": {
+        "Wisdom": 2,
+        "Life": 2
+      },
+      "where": "Handwerksquest oder Elitegegner",
+      "faction": "elyos",
+      "icon": "./pantheon-icons/artwork.webp",
+      "detail": "",
+      "originalGroup": "rare-w"
+    },
+    {
+      "id": "painting-bodyguard-teegant",
+      "name": "Bodyguard Teegant",
+      "kind": "artwork",
+      "grade": "Rare",
+      "stats": {
+        "Wisdom": 2,
+        "Life": 2
+      },
+      "where": "Handwerksquest oder Elitegegner",
+      "faction": "elyos",
+      "icon": "./pantheon-icons/artwork.webp",
+      "detail": "",
+      "originalGroup": "rare-w"
+    }
+  ]
+}
