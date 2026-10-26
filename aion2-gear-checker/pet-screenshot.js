@@ -235,7 +235,7 @@ function storeCompleteSpecies(name,found,expected=9){
  const expanded=new Set(Array.isArray(state.expanded)?state.expanded:[]);
  expanded.add(name);
  const scanned=state.scanned&&typeof state.scanned==='object'?state.scanned:{};
- scanned[name]={at:new Date().toISOString(),rolls:normalized.map(x=>x.name),slots:expected,method:'window-ocr'};
+ scanned[name]={at:new Date().toISOString(),rolls:normalized.map(x=>x.name),values:normalized.map(x=>x.value),slots:expected,method:'window-ocr'};
  localStorage.setItem(key,JSON.stringify({...state,rolls,details,expanded:[...expanded],scanned}));
  window.dispatchEvent(new Event('aion2:pets-updated'));
  return true;
