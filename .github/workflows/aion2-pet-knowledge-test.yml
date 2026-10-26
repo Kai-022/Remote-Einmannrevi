@@ -5,6 +5,8 @@ on:
       - 'aion2-gear-checker/pet-species.js'
       - 'aion2-gear-checker/pet-species.css'
       - 'aion2-gear-checker/pet-screenshot.js'
+      - 'aion2-gear-checker/pet-vision.js'
+      - 'aion2-gear-checker/tests/pet-vision.mjs'
       - 'aion2-gear-checker/pet-live-capture.js'
       - 'aion2-gear-checker/pet-scanner-start.js'
       - 'aion2-gear-checker/tests/pet-walkthrough.mjs'
@@ -31,3 +33,5 @@ jobs:
           node --check aion2-gear-checker/pet-live-capture.js
           node --check aion2-gear-checker/pet-scanner-start.js
           node aion2-gear-checker/tests/pet-walkthrough.mjs
+          node --check aion2-gear-checker/pet-vision.js
+          node aion2-gear-checker/tests/pet-vision.mjs
