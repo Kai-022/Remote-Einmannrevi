@@ -213,7 +213,7 @@ const oldRender=render;
 render=function(){oldRender();renderPantheon()};
 (async()=>{
  try{
-  const r=await fetch('./pantheon-catalog.json?v=1',{cache:'no-cache'});
+  const r=await fetch('./pantheon-catalog.json?v=2',{cache:'no-cache'});
   if(!r.ok)throw Error('HTTP '+r.status);
   const json=await r.json();
   if(!Array.isArray(json.items)||json.items.length<20)throw Error('Ungültiger Datenbestand');
