@@ -1,0 +1,34 @@
+name: AION 2 Official API Probe
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'aion2-gear-checker/nc-probe.py'
+      - '.github/workflows/aion2-official-probe.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: aion2-official-api-probe
+  cancel-in-progress: true
+
+jobs:
+  check-public-armory:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Query official EU public character endpoints
+        run: python3 aion2-gear-checker/nc-probe.py
+      - name: Save connectivity result
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add aion2-gear-checker/nc-test-result.json
+          if ! git diff --cached --quiet; then
+            git commit -m "Record official EU character endpoint connectivity result"
+            git push
+          fi
