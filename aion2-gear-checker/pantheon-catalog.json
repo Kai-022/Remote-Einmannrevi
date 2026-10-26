@@ -1,5 +1,5 @@
 {
-  "version": 1,
+  "version": 2,
   "updated": "2026-10-26",
   "scope": "Kuratierte Auswahl sammelbarer Pantheon-Dekorationen, keine vollständige Item-Datenbank",
   "sources": [
@@ -503,7 +503,7 @@
       },
       "where": "Eroberung · Dungeon-Endboss",
       "faction": "alle",
-      "icon": "./pantheon-icons/artwork.webp",
+      "icon": "./pantheon-icons/draupnir.webp",
       "detail": "",
       "originalGroup": "expedition-life"
     },
@@ -617,7 +617,7 @@
       },
       "where": "Elitegegner/Weltboss · alternativ Gemäldefragmente",
       "faction": "asmodier",
-      "icon": "./pantheon-icons/artwork.webp",
+      "icon": "./pantheon-icons/drakan-guruta.webp",
       "detail": "",
       "originalGroup": "elite-destiny",
       "nameDe": "Bataillonswaffe Guruta (Drakan)"
@@ -668,7 +668,7 @@
       },
       "where": "Elitegegner · alternativ Gemäldefragmente",
       "faction": "elyos",
-      "icon": "./pantheon-icons/artwork.webp",
+      "icon": "./pantheon-icons/divine-ansas.webp",
       "detail": "",
       "originalGroup": "elite-life",
       "nameDe": "Heiliger Ansas"
@@ -801,7 +801,7 @@
       },
       "where": "Elitegegner · alternativ Gemäldefragmente",
       "faction": "asmodier",
-      "icon": "./pantheon-icons/artwork.webp",
+      "icon": "./pantheon-icons/visionary-karuka.webp",
       "detail": "",
       "originalGroup": "elite-dil",
       "nameDe": "Visionärer Karuka"
@@ -818,7 +818,7 @@
       },
       "where": "Elitegegner · alternativ Gemäldefragmente",
       "faction": "asmodier",
-      "icon": "./pantheon-icons/artwork.webp",
+      "icon": "./pantheon-icons/dark-shadow-vishwada.webp",
       "detail": "",
       "originalGroup": "elite-dil",
       "nameDe": "Dunkelschatten Vishwada"
@@ -899,7 +899,7 @@
       },
       "where": "Feldboss oder Eroberungs-Dungeon",
       "faction": "alle",
-      "icon": "./pantheon-icons/artwork.webp",
+      "icon": "./pantheon-icons/urugugu.webp",
       "detail": "",
       "originalGroup": "starter-wdl"
     },
@@ -946,7 +946,7 @@
       },
       "where": "Elitegegner oder Shugo-Festival-Shop",
       "faction": "elyos",
-      "icon": "./pantheon-icons/artwork.webp",
+      "icon": "./pantheon-icons/harvest-moshav.webp",
       "detail": "",
       "originalGroup": "epic-wi",
       "nameDe": "Ernteaufseher Moshav"
@@ -1007,7 +1007,7 @@
       },
       "where": "Elitegegner oder Shugo-Festival-Shop",
       "faction": "asmodier",
-      "icon": "./pantheon-icons/artwork.webp",
+      "icon": "./pantheon-icons/veteran-shujakan.webp",
       "detail": "",
       "originalGroup": "epic-wi"
     },
@@ -1083,7 +1083,7 @@
       },
       "where": "Elitegegner oder Shugo-Festival-Shop",
       "faction": "asmodier",
-      "icon": "./pantheon-icons/artwork.webp",
+      "icon": "./pantheon-icons/blue-wave-kelpina.webp",
       "detail": "",
       "originalGroup": "epic-w",
       "nameDe": "Blauwelle Kelpina"
