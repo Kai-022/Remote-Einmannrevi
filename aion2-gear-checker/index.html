@@ -53,10 +53,10 @@ const pats=[
 ['Bewegungstempo',/bewegungstempo|movement speed/i],
 ['Mehrfachtreffer',/mehrfachtreffer|multi.?hit/i],
 ['Kritischer Treffer',/kritisch.*treffer|critical hit|crit chance/i],
-['Verdammnis',/verdammnis|doom/i],
-['Glanz der Genesung',/glanz der genesung|healing splendor/i],
+['Verdammnis',/verdammnis|doom|condemnation/i],
+['Glanz der Genesung',/glanz der genesung|healing splendor|radiant recovery/i],
 ['Licht der Heilung',/licht der heilung/i],
-['Macht',/^macht\b|^power\b/i],
+['Macht',/^macht\b|^power\b|^might\b/i],
 ['Vitalität',/vitalit[aä]t|vitality/i],
 ['Präzision',/pr[aä]zision|accuracy|precision/i],
 ['Angriff',/^angriff\b|^attack\b/i],
@@ -153,4 +153,4 @@ $('clear').addEventListener('click',()=>{if(confirm('Wirklich alle Gear-Eingaben
 document.querySelectorAll('[data-tab]').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('[data-tab]').forEach(x=>x.classList.toggle('active',x===b));['gear','upgrades','pets'].forEach(x=>$('tab-'+x).classList.toggle('hidden',x!==b.dataset.tab));}));
 $('copy').addEventListener('click',async()=>{const lines=['AION 2 Kleriker – '+data.name,'Build: '+labelMode(),''].concat(Object.entries(data.gear).map(([s,i])=>s+': +'+i.plus+' '+i.name+' | '+i.rolls.join(', ')));try{await navigator.clipboard.writeText(lines.join('\n'));msg('Ausrüstungsliste kopiert.');}catch{msg('Kopieren ist hier nicht möglich.',true);}});
 pets();msg('Bereit. Starte deinen Charakter oder lade die Demo.');
-</script><script src="./import.js?v=10"></script><script src="./shugo.js?v=6"></script><script src="./gear-detail.js?v=3"></script><script src="./nc-official-import.js?v=1"></script><script src="./shugo-collector.js?v=1"></script><script src="./want-to-buy.js?v=1"></script></body></html>
+</script><script src="./import.js?v=10"></script><script src="./shugo.js?v=6"></script><script src="./gear-detail.js?v=4"></script><script src="./nc-official-import.js?v=1"></script><script src="./shugo-collector.js?v=1"></script><script src="./want-to-buy.js?v=1"></script></body></html>
