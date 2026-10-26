@@ -247,6 +247,41 @@ function analyze(data,opts={}){
    });
   }
  }
+ // A verified long-term EU dungeon target, not a claim that this is cheapest or BiS.
+ const ludraWeapons=[
+  [/cleric|kleriker/i,"Ludra's Fatal Mace"],
+  [/chanter|kantor/i,"Ludra's Heavenbound Staff"],
+  [/assassin/i,"Ludra's Claw"],
+  [/gladiator/i,"Ludra's Blade of Extinction"],
+  [/templar|templer/i,"Ludra's Scale Sword"],
+  [/ranger|jäger|jaeger/i,"Ludra's Fatal Bow"],
+  [/sorcerer|zauberer/i,"Ludra's Abyssal Jade"],
+  [/spiritmaster|beschwörer|beschwoerer/i,"Ludra's Grimoire"]
+ ];
+ const longTerm=ludraWeapons.find(x=>x[0].test(className));
+ const equippedWeapon=gear.Waffe;
+ if(level>=45&&longTerm&&equippedWeapon&&!/ludra/i.test(String(equippedWeapon.name||''))){
+  const target=longTerm[1];
+  const itemLink=/cleric|kleriker/i.test(className)?
+   'https://aion2.gg/database/items/ludra-s-fatal-mace-110720003':links.items;
+  actions.push({
+   id:'farm|ludra|'+String(className).toLowerCase(),category:'farm',type:'farm',
+   itemName:target,title:'Langfristiges Dungeon-Ziel: '+target,
+   summary:'Abyssal Forge: Ludra (Eroberung) · EU-Client: ca. 0,56 % pro Belohnungswürfel für die passende Waffe.',
+   why:'Dies ist eine bekannte hochstufige Dungeon-Waffe für deine Klasse, kein automatisch berechnetes BiS. Farmaufwand, Garantietruhe und Alternativen müssen verglichen werden.',
+   priority:22,impact:'potenziell hoch',effort:'langer Dungeon-Farm',confidence:'guide',cost:null,
+   sourceHint:{name:'Abyssal Forge: Ludra (Conquest)',verified:true,
+    note:'EU-Dropquelle für die Ludra-Waffen; angezeigte Quote gilt pro Belohnungswürfel, nicht pro Bosskill.'},
+   links:[{label:'Zielitem und Dropquellen ansehen',url:itemLink},
+    {label:'EU-Dropquoten vergleichen',url:links.drops},
+    {label:'Günstigere Alternativen vergleichen',url:links.items}],
+   steps:['Item-Level, Klasse und Spielstil mit der aktuellen Waffe vergleichen.',
+    'Im Dungeon Abyssal Forge: Ludra die Belohnungswürfel und die Auswahltruhe prüfen.',
+    'Zeitaufwand und eventuelle günstigere Alternativen vergleichen, bevor du farmst.'],
+   evidence:'EU-Item- und Dropdaten · 24.10.2026'
+  });
+ }
+
  const pantheon=opts.pantheon||{};
  const pieces=Array.isArray(pantheon.items)?pantheon.items:[];
  const owned=new Set(Array.isArray(pantheon.owned)?pantheon.owned:[]);
