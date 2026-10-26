@@ -196,4 +196,40 @@ $('pet-ocr-review').addEventListener('click',e=>{
   status(entries.length+' Talente für '+name+' gespeichert und neu bewertet.');
  }catch(e){status('Speichern nicht möglich: '+e.message,true)}
 });
+
+/* Shared OCR helpers for the optional multi-species walkthrough.
+ * A full, uniquely named nine-slot screen is needed for automatic saving.
+ * Partial or ambiguous reads must be reviewed explicitly. */
+const getPetKey=()=> 'aion2-pets-v2:'+
+ String(data?.sourceRef?.sid||'local')+':'+
+ String(data?.sourceRef?.id||data?.name||'Charakter').normalize('NFKC');
+function speciesFromText(text){
+ const normalized=String(text||'').normalize('NFKC');
+ const matches=species.filter(s=>new RegExp('\\b'+s+'\\b','i').test(normalized));
+ return matches.length===1?matches[0]:null;
+}
+function storeCompleteSpecies(name,found){
+ if(isDemo||!species.includes(name)||!Array.isArray(found)||found.length!==9||
+    found.some(x=>!x||!lexicon.some(([v])=>v===x.name)))return false;
+ const key=getPetKey();
+ const state=JSON.parse(localStorage.getItem(key)||'{}')||{};
+ const rolls=state.rolls&&typeof state.rolls==='object'&&!Array.isArray(state.rolls)?state.rolls:{};
+ const normalized=found.map((x,i)=>({slot:i+1,name:x.name}));
+ for(const x of normalized)rolls[name+'|'+x.slot]=x.name;
+ const expanded=new Set(Array.isArray(state.expanded)?state.expanded:[]);
+ expanded.add(name);
+ const scanned=state.scanned&&typeof state.scanned==='object'?state.scanned:{};
+ scanned[name]={at:new Date().toISOString(),rolls:normalized.map(x=>x.name),method:'window-ocr'};
+ localStorage.setItem(key,JSON.stringify({...state,rolls,expanded:[...expanded],scanned}));
+ window.dispatchEvent(new Event('aion2:pets-updated'));
+ return true;
+}
+window.aionPetOCR={
+ species,loadOCR,extract,speciesFromText,storeCompleteSpecies,getPetKey,
+ review(name,found,raw){
+  if(species.includes(name))$('pet-ocr-species').value=name;
+  drawReview(found||[],raw||'');
+  $('pet-ocr-review').scrollIntoView({behavior:'smooth',block:'start'});
+ }
+};
 })();
