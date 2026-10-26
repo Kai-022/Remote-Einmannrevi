@@ -7,11 +7,14 @@ const box=document.createElement('section');box.id='pan-screenshot';box.classNam
 box.innerHTML='<div class="eyebrow">BETA · LOKALE BILDERKENNUNG</div><h2>📷 Pantheon-Screenshot einlesen</h2>'+
 '<p>Screenshot hochladen, Raster ausschneiden und Items zuordnen. Die Verarbeitung erfolgt lokal im Browser. Weil viele Original-Icons noch fehlen, musst du unsichere Treffer auswählen und bestätigen.</p>'+
 '<input type="file" id="psc-upload" accept="image/png,image/jpeg,image/webp">'+
+'<p class="tip">Klicke im Vorschaubild auf die <b>obere linke Ecke des ersten Items</b>. Du siehst anschließend die eingezeichneten Kacheln und kannst die Abstände korrigieren.</p>'+
+'<canvas id="psc-preview" role="img" aria-label="Screenshot mit auswählbarem Raster" style="display:none;max-width:100%;width:auto;height:auto;cursor:crosshair;border:1px solid #94754c;border-radius:8px;margin:10px 0"></canvas>'+
 '<div class="grid" style="margin:12px 0">'+
 '<div class="field"><label>Start X (Pixel)</label><input id="psc-x" type="number" value="83"></div>'+
 '<div class="field"><label>Start Y (Pixel)</label><input id="psc-y" type="number" value="104"></div>'+
 '<div class="field"><label>Kachelgröße</label><input id="psc-size" type="number" value="86"></div>'+
-'<div class="field"><label>Abstand</label><input id="psc-gap" type="number" value="6"></div>'+
+'<div class="field"><label>Abstand waagerecht</label><input id="psc-gap" type="number" value="6"></div>'+
+'<div class="field"><label>Abstand senkrecht</label><input id="psc-gap-y" type="number" value="6"></div>'+
 '<div class="field"><label>Spalten</label><input id="psc-cols" type="number" value="4"></div>'+
 '<div class="field"><label>Reihen</label><input id="psc-rows" type="number" value="6"></div></div>'+
 '<p class="tip">Für dein Beispielbild sind Position und Raster vorbelegt. Wenn du einen anderen Ausschnitt hochlädst, kannst du sie anpassen.</p>'+
@@ -23,6 +26,37 @@ box.innerHTML='<div class="eyebrow">BETA · LOKALE BILDERKENNUNG</div><h2>📷 P
 const anchor=$('pan-summary');if(anchor)anchor.before(box);else host.append(box);
 let picture=null,imageUrl='',catalog=[],references=[];
 const val=id=>Number($(id).value);
+const preview=$('psc-preview');
+function drawPreview(){
+ if(!picture)return;
+ const scale=Math.min(1,720/picture.naturalWidth,480/picture.naturalHeight);
+ preview.width=Math.max(1,Math.round(picture.naturalWidth*scale));
+ preview.height=Math.max(1,Math.round(picture.naturalHeight*scale));
+ preview.style.display='block';
+ const ctx=preview.getContext('2d');
+ ctx.drawImage(picture,0,0,preview.width,preview.height);
+ const x=val('psc-x'),y=val('psc-y'),size=val('psc-size'),gx=val('psc-gap'),gy=val('psc-gap-y'),
+ cols=Math.min(8,val('psc-cols')),rows=Math.min(18,val('psc-rows'));
+ ctx.lineWidth=2;ctx.strokeStyle='#ffd36c';ctx.fillStyle='#ffda8c';ctx.font='bold 12px sans-serif';
+ for(let r=0;r<rows;r++)for(let c=0;c<cols;c++){
+  const rx=(x+c*(size+gx))*scale,ry=(y+r*(size+gy))*scale,w=size*scale;
+  ctx.strokeRect(rx,ry,w,w);
+  if(r===0&&c===0)ctx.fillText('1',rx+4,ry+14);
+ }
+}
+preview.addEventListener('click',e=>{
+ if(!picture)return;
+ const bounds=preview.getBoundingClientRect();
+ const x=(e.clientX-bounds.left)*preview.width/bounds.width,
+ y=(e.clientY-bounds.top)*preview.height/bounds.height;
+ $('psc-x').value=Math.max(0,Math.round(x*picture.naturalWidth/preview.width));
+ $('psc-y').value=Math.max(0,Math.round(y*picture.naturalHeight/preview.height));
+ drawPreview();
+});
+for(const id of ['psc-x','psc-y','psc-size','psc-gap','psc-gap-y','psc-cols','psc-rows']){
+ $(id).addEventListener('input',drawPreview);
+}
+
 const load=src=>new Promise((resolve,reject)=>{
  const img=new Image();img.onload=()=>resolve(img);img.onerror=reject;img.src=src;
 });
@@ -61,15 +95,15 @@ $('psc-upload').addEventListener('change',async e=>{
  }
  if(imageUrl)URL.revokeObjectURL(imageUrl);
  imageUrl=URL.createObjectURL(file);
- try{picture=await load(imageUrl);$('psc-note').textContent='Bild geladen: '+picture.naturalWidth+' × '+picture.naturalHeight+' Pixel.'}
+ try{picture=await load(imageUrl);if(picture.naturalWidth!==567||picture.naturalHeight!==713){const scale=picture.naturalWidth/567;$('psc-x').value=Math.round(83*scale);$('psc-y').value=Math.round(104*scale);$('psc-size').value=Math.round(86*scale);$('psc-gap').value=Math.round(6*scale);$('psc-gap-y').value=Math.round(6*scale);}drawPreview();$('psc-note').textContent='Bild geladen: '+picture.naturalWidth+' × '+picture.naturalHeight+' Pixel. Klicke in der Vorschau auf das erste Item.'}
  catch{picture=null;$('psc-note').textContent='Bild nicht lesbar.'}
 });
 $('psc-scan').addEventListener('click',async()=>{
  if(!picture){$('psc-note').textContent='Bitte zuerst Screenshot hochladen.';return}
- const x=val('psc-x'),y=val('psc-y'),size=val('psc-size'),gap=val('psc-gap'),cols=val('psc-cols'),rows=val('psc-rows');
- if(![x,y,size,gap,cols,rows].every(Number.isInteger)||x<0||y<0||size<20||size>300||gap<0||gap>150||cols<1||cols>8||rows<1||rows>18||
+ const x=val('psc-x'),y=val('psc-y'),size=val('psc-size'),gap=val('psc-gap'),gapY=val('psc-gap-y'),cols=val('psc-cols'),rows=val('psc-rows');
+ if(![x,y,size,gap,gapY,cols,rows].every(Number.isInteger)||x<0||y<0||size<20||size>300||gap<0||gap>150||gapY<0||gapY>150||cols<1||cols>8||rows<1||rows>18||
  x+cols*size+(cols-1)*gap>picture.naturalWidth||
- y+rows*size+(rows-1)*gap>picture.naturalHeight){
+ y+rows*size+(rows-1)*gapY>picture.naturalHeight){
   $('psc-note').textContent='Raster passt nicht auf Screenshot. Größe, Anzahl oder Startpunkt anpassen.';return;
  }
  $('psc-note').textContent='Vergleiche Kacheln mit vorhandenen Originalbildern …';
@@ -79,7 +113,7 @@ $('psc-scan').addEventListener('click',async()=>{
  let html='',n=0;
  for(let row=0;row<rows;row++)for(let col=0;col<cols;col++){
   const canvas=document.createElement('canvas');canvas.width=canvas.height=size;
-  canvas.getContext('2d').drawImage(picture,x+col*(size+gap),y+row*(size+gap),size,size,0,0,size,size);
+  canvas.getContext('2d').drawImage(picture,x+col*(size+gap),y+row*(size+gapY),size,size,0,0,size,size);
   const sig=feature(canvas);
   const best=references.map(ref=>({item:ref.item,score:compare(sig,ref.data)})).sort((a,b)=>b.score-a.score)[0];
   const suggestion=best&&best.score>.8?'Ähnlich: '+(best.item.nameDe||best.item.name):'Kein eindeutiger Bildvergleich';
