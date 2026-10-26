@@ -61,3 +61,33 @@ def base_query(sid, cid):
     return {"region": "eu", "lang": "en",
             "serverId": sid, "characterId": cid}
 
+
+
+def search_character(sid, name):
+    sid = valid_server(sid)
+    name = name.strip()
+    if not 2 <= len(name) <= 45:
+        raise ValueError("Charaktername muss 2 bis 45 Zeichen haben")
+    data = query_json(SEARCH, {
+        "keyword": name, "region": "eu", "localeInfo": "en-US",
+        "serverId": sid, "page": 1, "size": 100
+    }, ttl=120)
+    found = []
+    for entry in data.get("list", [])[:100]:
+        if not isinstance(entry, dict):
+            continue
+        raw_name = re.sub(r"<[^>]*>", "", str(entry.get("name", "")))
+        clean_name = html.unescape(raw_name).strip()
+        if (clean_name.casefold() != name.casefold() or
+                str(entry.get("serverId")) != str(sid)):
+            continue
+        cid = str(entry.get("characterId", ""))
+        if not re.fullmatch(r"[a-zA-Z0-9_+=/\\-]{8,256}", cid):
+            continue
+        found.append({
+            "name": clean_name, "serverId": sid, "characterId": cid,
+            "className": str(entry.get("className", "")),
+            "level": entry.get("level", 0)
+        })
+    return {"characters": found[:20]}
+
