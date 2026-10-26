@@ -9,6 +9,8 @@ const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&
 const list=$('pet-list');if(!list)return;
 const species=['Cogni','Fera','Natura','Varian','Spezial'];
 const lexicon=[
+ ['Kritischer Widerstand (Rückseitig)',[/krit\.?\s*widerstand.{0,15}r[uü]ckseitig/i,/critical.{0,8}resist/i]],
+ ['Schadensresistenz (Rückseitig)',[/schadensresistenz.{0,12}r[uü]ckseitig/i,/damage resistance.{0,12}rear/i]],
  ['PvE-Schadensverstärkung',[/p\s*v\s*e.{0,6}schaden.{0,10}verst/i,/pve.{0,8}damage.{0,8}(boost|ampl)/i]],
  ['PvE-Schadensresistenz',[/p\s*v\s*e.{0,7}schaden.{0,12}(resist|widerstand)/i,/pve.{0,10}damage.{0,8}resist/i]],
  ['Waffenschadensverstärkung',[/waffen.{0,5}schaden.{0,12}verst/i,/weapon.{0,8}damage.{0,8}(boost|ampl)/i]],
@@ -25,6 +27,7 @@ const lexicon=[
  ['PvE-Verteidigung',[/p\s*v\s*e.{0,6}verteid/i,/pve.{0,6}defen/i]],
  ['Allgemeine Schadensresistenz',[/allgemein.{0,8}schaden.{0,8}resist/i]],
  ['Angriffserhöhung',[/angriffs?erh[oö]hung/i]],
+ ['LP +',[/\bl\s*p\s*\+/i,/\bhp\s*\+/i]],
  ['LP %',[/\bl\s*p\b.{0,10}%/i,/max.{0,5}h\s*p/i,/hp.{0,5}%/i]],
  ['Wucht',[/\bwucht\b/i,/\bsmash\b/i]],
  ['Perfektion',[/\bperfektion\b/i,/\bperfection\b/i]],
@@ -139,16 +142,18 @@ function drawReview(lines,raw){
   return;
  }
  const complete=lines.length===9;
+ const hasMappedSlots=lines.every(l=>Number.isInteger(l.slot)&&l.slot>=1&&l.slot<=9)&&new Set(lines.map(l=>l.slot)).size===lines.length;
  const rows=lines.map((l,i)=>{
-  const options='<option value="">Slot auswählen</option>'+Array.from({length:9},(_,j)=>'<option value="'+(j+1)+'"'+(complete&&i===j?' selected':'')+'>Slot '+(j+1)+'</option>').join('');
+  const options='<option value="">Slot auswählen</option>'+Array.from({length:9},(_,j)=>'<option value="'+(j+1)+'"'+((hasMappedSlots?l.slot===j+1:complete&&i===j)?' selected':'')+'>Slot '+(j+1)+'</option>').join('');
   return '<tr data-ocr-row><td><select data-ocr-slot aria-label="Slot für erkannte Zeile '+(i+1)+'">'+options+'</select></td>'+
    '<td><input data-ocr-roll value="'+esc(l.name)+'" aria-label="Erkannter Wert '+(i+1)+'"></td>'+
+   '<td><input data-ocr-number value="'+esc(l.value||'')+'" aria-label="Zahlenwert Slot '+(i+1)+'" placeholder="z.B. 15" style="max-width:115px"></td>'+
    '<td>'+Math.round(l.confidence||0)+' %</td></tr>';
  }).join('');
  review.innerHTML='<h3 style="margin-top:14px">Erkannte Talente – bitte prüfen</h3>'+
- (complete?'<p class="tip">Neun Talentzeilen erkannt. Die Slotnummern sind anhand der Reihenfolge vorgeschlagen und können korrigiert werden.</p>':
+ (hasMappedSlots?'<p class="tip">Die Slotnummern wurden anhand der rechten Spielliste zugeordnet. Du kannst sie kontrollieren und korrigieren.</p>':complete?'<p class="tip">Neun Talentzeilen erkannt. Die Slotnummern sind anhand der Reihenfolge vorgeschlagen und können korrigiert werden.</p>':
  '<p class="tip" style="color:#ffce8b">Nur '+lines.length+' von 9 Talentzeilen erkannt. Damit keine Werte in die falschen Slots kommen, wähle die Slotnummern für die erkannten Zeilen selbst aus. Leere Slots bleiben unverändert.</p>')+
- '<div style="overflow:auto"><table style="width:100%"><thead><tr><th>Slot auswählen</th><th>Erkannter Wert (korrigierbar)</th><th>OCR</th></tr></thead><tbody>'+rows+'</tbody></table></div>'+
+ '<div style="overflow:auto"><table style="width:100%"><thead><tr><th>Slot auswählen</th><th>Erkannter Wert (korrigierbar)</th><th>Zahl</th><th>OCR</th></tr></thead><tbody>'+rows+'</tbody></table></div>'+
  '<div class="actions"><button type="button" class="primary" id="pet-ocr-apply">Geprüfte Werte übernehmen</button></div>'+
  '<details><summary>Erkannter Rohtext zur Kontrolle</summary><pre style="white-space:pre-wrap;overflow-wrap:anywhere;font-size:12px">'+esc(raw.slice(0,3000))+'</pre></details>';
 }
@@ -161,14 +166,15 @@ $('pet-ocr-read').addEventListener('click',async()=>{
   status('OCR-Bibliothek und Sprachpakete werden geladen …');
   const tesseract=await loadOCR();
   worker=await tesseract.createWorker('deu+eng',1,{logger:m=>{if(m.status==='recognizing text')status('Texterkennung: '+Math.round((m.progress||0)*100)+' %')}});
-  const ret=await worker.recognize(crop);
-  const found=extract(ret.data);
+  const vision=selection?null:await recognizeImage(worker,img);
+  const ret=vision?{data:{text:vision.raw}}:await worker.recognize(crop);
+  const found=vision?vision.found:extract(ret.data);
   // Recognize genus label if it appears in the selected area.
   const normalized=String(ret.data.text||'').toLowerCase();
   const fromText=species.find(s=>new RegExp('\\b'+s.toLowerCase()+'\\b','i').test(normalized));
   if(fromText)$('pet-ocr-species').value=fromText;
   drawReview(found,ret.data.text||'');
-  status(found.length+' von maximal 9 Talentzeilen erkannt. Bitte kontrollieren, dann speichern.',found.length===0);
+  status(found.length+' von maximal 9 Talentzeilen erkannt. '+(vision?'Rechte Werteliste gezielt ausgelesen – Slots vor dem Speichern kontrollieren.':'Bitte kontrollieren, dann speichern.'),found.length===0);
  }catch(e){status('Auslesen fehlgeschlagen: '+String(e.message||e),true)}
  finally{if(worker)try{await worker.terminate()}catch{};b.disabled=false}
 });
@@ -177,7 +183,7 @@ $('pet-ocr-review').addEventListener('click',e=>{
  const name=$('pet-ocr-species').value;
  if(!species.includes(name)||!results.length)return;
  const entries=[...$('pet-ocr-review').querySelectorAll('tr[data-ocr-row]')]
-  .map(row=>({slot:Number(row.querySelector('[data-ocr-slot]').value),roll:row.querySelector('[data-ocr-roll]').value.trim().slice(0,90)}))
+  .map(row=>({slot:Number(row.querySelector('[data-ocr-slot]').value),roll:row.querySelector('[data-ocr-roll]').value.trim().slice(0,90),value:row.querySelector('[data-ocr-number]')?.value.trim().slice(0,24)||''}))
   .filter(x=>x.slot>=1&&x.slot<=9&&x.roll);
  if(new Set(entries.map(x=>x.slot)).size!==entries.length){
   status('Eine Slotnummer ist mehrfach vergeben. Bitte jeden Slot höchstens einmal auswählen.',true);return;
@@ -188,10 +194,11 @@ $('pet-ocr-review').addEventListener('click',e=>{
  try{
   const state=JSON.parse(localStorage.getItem(key)||'{}')||{};
   const rolls=state.rolls&&typeof state.rolls==='object'?state.rolls:{};
-  for(const row of entries)rolls[name+'|'+row.slot]=row.roll;
+  const details=state.details&&typeof state.details==='object'?state.details:{};
+  for(const row of entries){rolls[name+'|'+row.slot]=row.roll;details[name+'|'+row.slot]={name:row.roll,value:row.value};}
   const expanded=new Set(Array.isArray(state.expanded)?state.expanded:[]);
   expanded.add(name);
-  localStorage.setItem(key,JSON.stringify({...state,rolls,expanded:[...expanded]}));
+  localStorage.setItem(key,JSON.stringify({...state,rolls,details,expanded:[...expanded]}));
   window.dispatchEvent(new Event('aion2:pets-updated'));
   status(entries.length+' Talente für '+name+' gespeichert und neu bewertet.');
  }catch(e){status('Speichern nicht möglich: '+e.message,true)}
@@ -221,18 +228,41 @@ function storeCompleteSpecies(name,found,expected=9){
  const key=getPetKey();
  const state=JSON.parse(localStorage.getItem(key)||'{}')||{};
  const rolls=state.rolls&&typeof state.rolls==='object'&&!Array.isArray(state.rolls)?state.rolls:{};
- const normalized=found.map((x,i)=>({slot:i+1,name:x.name}));
- for(const x of normalized)rolls[name+'|'+x.slot]=x.name;
+ const normalized=found.map((x,i)=>({slot:Number.isInteger(x.slot)?x.slot:i+1,name:x.name,value:x.value||''}));
+ if(new Set(normalized.map(x=>x.slot)).size!==found.length||normalized.some(x=>x.slot<1||x.slot>9))return false;
+ const details=state.details&&typeof state.details==='object'?state.details:{};
+ for(const x of normalized){rolls[name+'|'+x.slot]=x.name;details[name+'|'+x.slot]={name:x.name,value:x.value};}
  const expanded=new Set(Array.isArray(state.expanded)?state.expanded:[]);
  expanded.add(name);
  const scanned=state.scanned&&typeof state.scanned==='object'?state.scanned:{};
  scanned[name]={at:new Date().toISOString(),rolls:normalized.map(x=>x.name),slots:expected,method:'window-ocr'};
- localStorage.setItem(key,JSON.stringify({...state,rolls,expanded:[...expanded],scanned}));
+ localStorage.setItem(key,JSON.stringify({...state,rolls,details,expanded:[...expanded],scanned}));
  window.dispatchEvent(new Event('aion2:pets-updated'));
  return true;
 }
+function readNumber(text){
+ const clean=String(text||'').replace(/\s+/g,' ');
+ const match=clean.match(/(?:\s|\+)(\d{1,5}(?:[.,]\d{1,3})?\s*%?)\s*$/);
+ return match?match[1].replace(/\s+/g,''):'';
+}
+async function recognizeImage(worker,source){
+ const scene=window.aionPetVision?.findPanel(source);
+ if(!scene)return null;
+ const result=await worker.recognize(scene.canvas,{}, {text:true,blocks:true});
+ const lines=window.aionPetVision.readComposite(result.data,scene.rowHeight);
+ const found=[];
+ const seen=new Set();
+ for(const row of lines){
+  const name=analyze(row.text);
+  if(!name||seen.has(row.slot))continue;
+  seen.add(row.slot);
+  found.push({...row,name,value:readNumber(row.text)});
+ }
+ found.sort((a,b)=>a.slot-b.slot);
+ return {found,raw:result.data.text||'',active:scene.active,expected:9,vision:true};
+}
 window.aionPetOCR={
- species,loadOCR,extract,speciesFromText,unlockedSlotsFromText,storeCompleteSpecies,getPetKey,
+ species,loadOCR,extract,speciesFromText,unlockedSlotsFromText,storeCompleteSpecies,getPetKey,recognizeImage,
  review(name,found,raw){
   if(species.includes(name))$('pet-ocr-species').value=name;
   drawReview(found||[],raw||'');
