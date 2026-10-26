@@ -102,3 +102,67 @@ function panelFor(node){
   (effects.length?effects.map(x=>'<div class="gear-roll" style="margin-top:5px">'+esc(x)+'</div>').join(''):
   '<div class="tip">Für diesen Knoten liegen keine zusätzlichen Effekte vor.</div>')+'</div></div>';
 }
+function renderBoards(){
+ portrait();
+ const meta=data?.characterExtras||{},boards=meta.boards||{},list=Array.isArray(meta.daevanion)?meta.daevanion:[];
+ const ids=Object.keys(boards).filter(id=>Array.isArray(boards[id]?.nodes)&&boards[id].nodes.length);
+ const root=$('aion-board-content');if(!root)return;
+ if(!ids.length){
+  selected=null;
+  root.innerHTML='<div class="empty">Für diesen Charakter sind noch keine Daevanion-Boarddaten importiert. Der offizielle NCSOFT-Import lädt diese bei verfügbaren öffentlichen Daten.</div>';
+  return;
+ }
+ if(!ids.includes(selected))selected=ids[0];
+ const definition=list.find(x=>String(x.id)===selected)||{};
+ const board=boards[selected];
+ const nodes=board.nodes;
+ const indices=new Map();
+ nodes.forEach((n,i)=>{if(n.row>=1&&n.row<=15&&n.col>=1&&n.col<=15)indices.set(n.row+':'+n.col,i)});
+ let matrix='';
+ for(let row=1;row<=15;row++)for(let col=1;col<=15;col++){
+  const index=indices.get(row+':'+col);
+  matrix+=tile(index==null?null:nodes[index],index);
+ }
+ const currentOpened=nodes.filter(n=>n.open&&n.type!=='None').length;
+ const total=definition.total||nodes.filter(n=>n.type!=='None').length;
+ const opened=definition.opened??currentOpened;
+ const tabs='<div class="aion-board-tabs">'+ids.map(id=>{
+  const m=list.find(x=>String(x.id)===id)||{},b=boards[id];
+  const opened=m.opened??b.nodes.filter(n=>n.open&&n.type!=='None').length;
+  const total=m.total||b.nodes.filter(n=>n.type!=='None').length;
+  const fraction=total?Math.round(100*opened/total):0;
+  return '<button type="button" class="aion-board-select'+(id===selected?' active':'')+
+   '" data-board="'+esc(id)+'">'+image(m.icon,44)+
+   '<span><strong>'+esc(m.name||'Board '+id)+'</strong><small>'+opened+' / '+total+' Knoten</small>'+
+   '<div class="aion-board-progress"><span style="width:'+Math.min(100,Math.max(0,fraction))+'%"></span></div></span></button>';
+ }).join('')+'</div>';
+ const stats=(board.stats||[]).map(x=>'<li>'+esc(x)+'</li>').join('');
+ const skills=(board.skills||[]).map(x=>'<li>'+esc(x)+'</li>').join('');
+ const summary='<details style="margin-top:14px"><summary style="color:#e8c687;cursor:pointer">Alle freigeschalteten Board-Effekte anzeigen</summary>'+
+  '<div class="grid" style="margin-top:10px"><div class="card"><strong>Attribut-Boni</strong>'+
+  (stats?'<ul>'+stats+'</ul>':'<p class="tip">Keine erfasst</p>')+'</div>'+
+  '<div class="card"><strong>Skill-Boni</strong>'+(skills?'<ul>'+skills+'</ul>':'<p class="tip">Keine erfasst</p>')+'</div></div></details>';
+ root.innerHTML=tabs+'<div class="slothead" style="margin:12px 0"><strong>'+esc(definition.name||'Daevanion-Board')+
+ '</strong><span class="pill">'+opened+' / '+total+' freigeschaltet</span></div>'+
+ '<div class="aion-board-legend"><span><i class="aion-board-dot" style="background:#34704f"></i>Freigeschaltet</span>'+
+ '<span><i class="aion-board-dot" style="background:#2b364b"></i>Gesperrt</span>'+
+ '<span><i class="aion-board-dot" style="background:#b28b50"></i>Skill-Knoten</span></div>'+
+ '<div class="aion-board-scroll"><div class="aion-board-grid">'+matrix+'</div></div>'+
+ '<div id="aion-board-node-detail" aria-live="polite"><div class="tip" style="margin-top:12px">Klicke einen Knoten an, um seine Werte anzusehen.</div></div>'+summary;
+}
+$('aion-board-content').addEventListener('click',e=>{
+ const board=e.target.closest('[data-board]');
+ if(board){
+  selected=board.dataset.board;renderBoards();return;
+ }
+ const button=e.target.closest('[data-node]');
+ if(button){
+  const board=data?.characterExtras?.boards?.[selected];
+  const node=board?.nodes?.[Number(button.dataset.node)];
+  panelFor(node);
+ }
+});
+const previous=render;
+render=function(){previous();renderBoards()};
+renderBoards();
+})();
