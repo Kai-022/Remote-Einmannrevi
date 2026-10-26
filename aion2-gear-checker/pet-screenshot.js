@@ -208,8 +208,15 @@ function speciesFromText(text){
  const matches=species.filter(s=>new RegExp('\\b'+s+'\\b','i').test(normalized));
  return matches.length===1?matches[0]:null;
 }
-function storeCompleteSpecies(name,found){
- if(isDemo||!species.includes(name)||!Array.isArray(found)||found.length!==9||
+function unlockedSlotsFromText(text){
+ const t=String(text||'');
+ // The screenshot displays the genus level. Only currently unlocked lines are required.
+ const match=t.match(/(?:Genus|Spezies|Insight|Kenntnis|Verständnis|이해도)?[^\r\n]{0,35}\b(?:Lv\.?|Level|Stufe)\s*[:.]?\s*(10|[1-9])\b/i);
+ return match?Math.min(9,Math.max(1,Number(match[1]))):null;
+}
+function storeCompleteSpecies(name,found,expected=9){
+ if(isDemo||!species.includes(name)||!Number.isInteger(expected)||
+    expected<1||expected>9||!Array.isArray(found)||found.length!==expected||
     found.some(x=>!x||!lexicon.some(([v])=>v===x.name)))return false;
  const key=getPetKey();
  const state=JSON.parse(localStorage.getItem(key)||'{}')||{};
@@ -219,13 +226,13 @@ function storeCompleteSpecies(name,found){
  const expanded=new Set(Array.isArray(state.expanded)?state.expanded:[]);
  expanded.add(name);
  const scanned=state.scanned&&typeof state.scanned==='object'?state.scanned:{};
- scanned[name]={at:new Date().toISOString(),rolls:normalized.map(x=>x.name),method:'window-ocr'};
+ scanned[name]={at:new Date().toISOString(),rolls:normalized.map(x=>x.name),slots:expected,method:'window-ocr'};
  localStorage.setItem(key,JSON.stringify({...state,rolls,expanded:[...expanded],scanned}));
  window.dispatchEvent(new Event('aion2:pets-updated'));
  return true;
 }
 window.aionPetOCR={
- species,loadOCR,extract,speciesFromText,storeCompleteSpecies,getPetKey,
+ species,loadOCR,extract,speciesFromText,unlockedSlotsFromText,storeCompleteSpecies,getPetKey,
  review(name,found,raw){
   if(species.includes(name))$('pet-ocr-species').value=name;
   drawReview(found||[],raw||'');
