@@ -1,0 +1,31 @@
+{
+  "checkedAt": "2026-10-26T10:58:13+00:00",
+  "region": "eu",
+  "serverId": "1305",
+  "source": "official NCSoft public character web endpoints",
+  "info": {
+    "ok": true,
+    "http": 200,
+    "topLevelFields": [
+      "profile",
+      "stat",
+      "title",
+      "ranking",
+      "daevanion"
+    ],
+    "hasProfile": true,
+    "hasClassName": true
+  },
+  "equipment": {
+    "ok": true,
+    "http": 200,
+    "topLevelFields": [
+      "equipment",
+      "petwing",
+      "skill"
+    ],
+    "gearCount": 25,
+    "hasSkillData": true
+  },
+  "note": "A positive result confirms server-side accessibility, not browser CORS or unrestricted use."
+}
