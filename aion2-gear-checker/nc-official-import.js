@@ -9,19 +9,19 @@ const esc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&
 const panel=document.createElement('section');
 panel.className='panel';
 panel.id='nc-official-import';
-panel.innerHTML='<div class="eyebrow">NEU · OFFIZIELLE AION-2-DATEN · EU</div>'+
- '<h2>✧ Charakter über EU-Server importieren</h2>'+
- '<p>Wähle deinen EU-Server und gib deinen Charakternamen ein.</p>'+
- '<div class="grid"><div class="field"><label for="nc-server-select">EU-Server</label><select id="nc-server-select"></select></div><div class="field"><label for="nc-character-name">Charaktername</label><input id="nc-character-name" value="Taty" autocomplete="off"></div></div>'+ '<div class="actions"><button type="button" class="primary" id="nc-import-name">✧ Charakter importieren</button></div>'+
- '<details style="margin-top:15px"><summary style="color:var(--gold);cursor:pointer">Alternativ: Offiziellen Charakterlink einfügen</summary><div class="grid" style="align-items:end"><div class="field"><label for="nc-public-link">Offizieller AION-2-Charakterlink</label>'+
- '<input id="nc-public-link" type="url" placeholder="https://aion2.plaync.com/en-us/characters/…?region=eu" autocomplete="url"></div>'+
- '<button type="button" id="nc-import">Aus Link importieren</button></div></details>'+
+panel.innerHTML=
+ '<div class="eyebrow">AION 2 · EU · CHARAKTERIMPORT</div>'+
+ '<h2>✧ Deinen Charakter importieren</h2>'+
+ '<p>Wähle deinen EU-Server und gib deinen Charakternamen ein. Gear, Skills und Daevanion-Boards werden zusammen geladen.</p>'+
+ '<div class="grid" style="align-items:end">'+
+ '<div class="field"><label for="nc-server-select">EU-Server</label><select id="nc-server-select" required>'+
+ '<option value="">Server auswählen …</option></select></div>'+
+ '<div class="field"><label for="nc-character-name">Charaktername</label>'+
+ '<input id="nc-character-name" type="text" placeholder="Name im Spiel" maxlength="45" autocomplete="off" required></div></div>'+
+ '<div class="actions"><button type="button" class="primary" id="nc-import-name">✧ Charakter importieren</button></div>'+
  '<div id="nc-feedback" class="status" role="status" aria-live="polite"></div>'+
- '<details style="margin-top:14px"><summary style="color:var(--gold);cursor:pointer">Eigener Live-Datenserver (optional)</summary><p class="tiny muted">Wenn ein Live-Datenserver eingerichtet ist, können alle EU-Charaktere geladen werden.</p><input type="url" id="nc-api-base" placeholder="https://dein-server.de"><button type="button" id="nc-api-save">Adresse speichern</button></details>'+
- '<p class="tiny muted" style="margin-top:11px">Das ist zunächst ein <b>serverseitiger Testabruf</b> für den bisher angegebenen EU-Charakter. Es werden gespeicherte echte NCSOFT-Daten geladen, keine Demo. Andere Charaktere brauchen später einen öffentlichen Datenserver. Der Zeitstempel zeigt, wie aktuell die Daten sind.</p>';
-const shugo=$('shugo-import');
-if(shugo)shugo.parentNode.insertBefore(panel,shugo);
-else document.querySelector('.hero')?.after(panel);
+ '<p class="tiny muted" style="margin-top:11px">Aktuell kann ohne verbundenen Live-Datenserver nur der vorhandene Testcharakter Taty auf Yustiel geladen werden. Für andere öffentliche EU-Charaktere ist ein Datenserver nötig.</p>';
+document.querySelector('.hero')?.after(panel);
 const status=$('nc-feedback');
 const euElyos='Siel|Nezekan|Vaizel|Kaisinel|Yustiel|Ariel|Fregion|Meslamtaeda|Hithanya|Nania|Tahavatha|Luteros|Phernos|Daminu|Kasaka|Bakarma|Tsenka|Kochi|Ishtar|Tiamat|Gauss|Lamuatan|Nathara'.split('|');
 const euAsmo='Israphel|Zikel|Triniel|Lumiel|Marchutan|Azphel|Ereshkigal|Beritra|Nemon|Hadala|Ludra|Ulgorn|Munin|Odar|Zemurru|Kromede|Quai|Baba|Fafnir|Indnath|Agnita|Atiel|Tassin'.split('|');
@@ -32,22 +32,18 @@ for(const [label,arr,first] of [['Elyos',euElyos,1301],['Asmodier',euAsmo,2301]]
  arr.forEach((name,i)=>{const option=document.createElement('option');option.value=String(first+i);option.textContent=name+' ('+label+')';group.append(option)});
  selectedServer.append(group);
 }
-selectedServer.value='1305';
+selectedServer.value='';
 
 function note(s,error=false){status.textContent=s;status.classList.toggle('error',error);}
-const apiInput=$('nc-api-base');
-try{apiInput.value=localStorage.getItem('aion2_live_api')||''}catch{}
 function apiOrigin(){
- const value=apiInput.value.trim();if(!value)return '';
+ let value='';
+ try{value=localStorage.getItem('aion2_live_api')||''}catch{}
+ if(!value)return '';
  const url=new URL(value);
  if(url.protocol!=='https:'||url.username||url.password||url.search||url.hash||url.pathname!=='/')
-  throw Error('Bitte nur die HTTPS-Grundadresse des Datenservers eintragen.');
+  throw Error('Die gespeicherte Datenserver-Adresse ist ungültig.');
  return url.origin;
 }
-$('nc-api-save').onclick=()=>{
- try{const addr=apiOrigin();localStorage.setItem('aion2_live_api',addr);note(addr?'Datenserver gespeichert.':'Datenserver entfernt.')}
- catch(e){note(e.message,true)}
-};
 function parseOfficialLink(input) {
  let url;
  try{url=new URL(input.trim());}catch{throw Error('Bitte den vollständigen offiziellen Charakterlink einfügen.');}
@@ -141,39 +137,12 @@ const useData=(d,ref)=>{
    ' Skills geladen. Datenstand: '+displayDate+'. Für neue Spielstände muss die Serverabfrage erneut laufen.');
  $('dash').scrollIntoView({behavior:'smooth',block:'start'});
 };
-$('nc-import').addEventListener('click',async()=>{
- const btn=$('nc-import');btn.disabled=true;
- try{
-  const ref=parseOfficialLink($('nc-public-link').value);
-  const api=apiOrigin();
-  if(api){
-   note('Lade aktuelle Daten vom EU-Datenserver …');
-   const url=new URL('/api/character',api);
-   url.search=new URLSearchParams(ref).toString();
-   const response=await fetch(url,{mode:'cors',signal:AbortSignal.timeout(60000)});
-   const d=await response.json();
-   if(!response.ok)throw Error(d.error||'Datenserver konnte den Charakter nicht laden.');
-   if(String(d.serverId)!==ref.serverId||d.characterId!==ref.characterId)
-    throw Error('Server lieferte einen anderen Charakter.');
-   useData(d,ref);
-   return;
-  }
-  note('Prüfe offiziellen NCSOFT-Datensatz …');
-  const r=await fetch('./nc-character-snapshot.json?t='+Date.now(),{method:'GET',cache:'no-store'});
-  if(!r.ok)throw Error('Testdatensatz noch nicht veröffentlicht (HTTP '+r.status+').');
-  const d=await r.json();
-  if(d.version!==1||d.region!=='eu'||d.serverId!==ref.serverId||d.characterId!==ref.characterId)
-   throw Error('Für diesen Charakter liegt noch kein vorbereiteter Datensatz vor. Der Test gilt nur für den bekannten EU-Charakter; andere IDs brauchen einen Datenserver.');
-  useData(d,ref);
- }catch(e){note('Import nicht möglich: '+String(e.message||e),true);}
- finally{btn.disabled=false;}
-});
 $('nc-import-name').addEventListener('click',async()=>{
  const btn=$('nc-import-name');btn.disabled=true;
  try{
   const serverId=$('nc-server-select').value;
   const name=$('nc-character-name').value.trim();
-  if(!serverId||name.length<2)throw Error('Bitte Server und Charakternamen eingeben.');
+  if(!serverId||name.length<2)throw Error('Bitte einen EU-Server auswählen und den Charakternamen eingeben.');
   note('Lade öffentliche Charakterdaten …');
   const api=apiOrigin();
   if(api){
@@ -185,7 +154,7 @@ $('nc-import-name').addEventListener('click',async()=>{
    if(!response.ok)throw Error(answer.error||'Charaktersuche fehlgeschlagen.');
    const same=(answer.characters||[]).filter(x=>
     String(x.serverId)===serverId&&String(x.name).trim().toLowerCase()===name.toLowerCase());
-   if(same.length!==1)throw Error(same.length?'Mehrere Treffer: bitte den offiziellen Profil-Link verwenden.':'Charakter auf diesem Server nicht gefunden.');
+   if(same.length!==1)throw Error(same.length?'Mehrere Treffer auf diesem Server gefunden. Bitte die Charaktersuche später erneut versuchen.':'Charakter auf diesem Server nicht gefunden.');
    const id=same[0].characterId;
    const url=new URL('/api/character',api);
    url.search=new URLSearchParams({serverId,characterId:id}).toString();
@@ -208,5 +177,5 @@ $('nc-import-name').addEventListener('click',async()=>{
  }catch(e){note('Import nicht möglich: '+e.message,true)}
  finally{btn.disabled=false}
 });
-window.aionNC={useData,parseOfficialLink};
+window.aionNC={useData};
 })();
