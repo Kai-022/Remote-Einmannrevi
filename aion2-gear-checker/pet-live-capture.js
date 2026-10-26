@@ -23,6 +23,7 @@ section.innerHTML=
  '<button type="button" id="pet-live-scan" disabled>Einzelbild prüfen</button>'+
  '<button type="button" id="pet-live-stop" disabled>Freigabe beenden</button></div>'+
  '<div id="pet-live-status" role="status" aria-live="polite" style="margin:12px 0;font-size:13px">Noch nicht gestartet.</div>'+
+ '<details id="pet-icon-mapping" style="margin:10px 0;border:1px solid #69778a;border-radius:8px;padding:9px"><summary>Einmalig: Die fünf Pet-Symbole von oben nach unten zuordnen</summary><p class="tip">Links im Spiel stehen fünf Symbole ohne Pet-Namen. Bitte die Zuordnung bestätigen, damit keine Werte beim falschen Pet landen.</p><div id="pet-icon-map-fields" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px"></div><button type="button" id="pet-icon-map-save" style="margin-top:9px">Zuordnung bestätigen</button></details>'+
  '<div id="pet-live-progress" role="group" aria-label="Fortschritt der fünf Pet-Spezies" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(135px,1fr));gap:8px;margin-top:12px"></div>'+
  '<p id="pet-live-result" class="tip" aria-live="polite"></p>'+
  '<details style="margin-top:12px"><summary>Hinweise und Fehlerbehebung</summary>'+
@@ -32,6 +33,20 @@ const start=$('pet-live-start'),pause=$('pet-live-pause'),single=$('pet-live-sca
 const video=document.createElement('video');
 video.muted=true;video.playsInline=true;video.autoplay=true;
 let stream=null,worker=null,watching=false,processing=false,opening=false,generation=0,timer=null,seenText='',lastError='',reviewQueue=new Map();
+const mapKey='aion2-pet-icon-order-v1';
+let confirmedMap=null;
+try{const saved=JSON.parse(localStorage.getItem(mapKey)||'null');if(Array.isArray(saved)&&saved.length===5&&new Set(saved).size===5&&saved.every(x=>species.includes(x)))confirmedMap=saved;}catch{}
+const fields=$('pet-icon-map-fields');
+fields.innerHTML=species.map((s,i)=>'<label style="font-size:12px">Symbol '+(i+1)+' (oben nach unten)<select data-map-index="'+i+'" style="padding:7px;margin-top:5px">'+species.map(v=>'<option value="'+esc(v)+'"'+(v===(confirmedMap?.[i]||s)?' selected':'')+'>'+esc(v)+'</option>').join('')+'</select></label>').join('');
+$('pet-icon-map-save').addEventListener('click',()=>{
+ const vals=[...fields.querySelectorAll('select')].map(x=>x.value);
+ if(vals.length!==5||new Set(vals).size!==5){status('Bitte jedes Pet nur einem Symbol zuordnen.',true);return;}
+ confirmedMap=vals;
+ try{localStorage.setItem(mapKey,JSON.stringify(vals))}catch{}
+ $('pet-icon-mapping').open=false;
+ status('Pet-Reihenfolge bestätigt. Jetzt können erkannte Symbole automatisch zugeordnet werden.');
+ drawProgress();
+});
 function status(s,error=false){message.textContent=s;message.style.color=error?'#ffaeb7':'#d6e0eb';}
 function active(){return !!stream&&stream.getVideoTracks().some(t=>t.readyState==='live');}
 function controls(){
@@ -56,11 +71,12 @@ function drawProgress(){
   const border=success?'#388c68':pending?'#b99a53':'#485767';
   const bg=success?'#173e30':pending?'#463a22':'#121c2c';
   const words=success?'🟢 '+marks[name].rolls.length+'/'+(marks[name].slots||9)+' erkannt':pending?'🟡 Bitte prüfen':'⚪ Noch offen';
-  const rows=success?'<details style="margin-top:5px"><summary style="font-size:11px">Werte anzeigen</summary><div style="font-size:11px;line-height:1.65">'+marks[name].rolls.map((roll,i)=>esc(String(i+1)+'. '+roll)).join('<br>')+'</div></details>':'';
+  const rows=success?'<details style="margin-top:5px"><summary style="font-size:11px">Werte anzeigen</summary><div style="font-size:11px;line-height:1.65">'+marks[name].rolls.map((roll,i)=>esc(String(i+1)+'. '+roll+' '+(marks[name].values?.[i]||''))).join('<br>')+'</div></details>':
+   pending?'<div style="font-size:11px;line-height:1.6;margin-top:5px">'+reviewQueue.get(name).lines.map(l=>'<div style="color:#81d6ac">✓ Slot '+esc(l.slot||'?')+': '+esc(l.name)+(l.value?' '+esc(l.value):'')+'</div>').join('')+'</div>':'';
   const btn=pending?'<button type="button" data-pet-review="'+esc(name)+'" style="width:100%;margin-top:5px;padding:6px">Prüfen</button>':'';
   return '<div style="border:1px solid '+border+';border-radius:9px;padding:9px;background:'+bg+'"><b>'+esc(name)+'</b><div style="font-size:12px">'+words+'</div>'+rows+btn+'</div>';
  }).join('');
- result.textContent=count+' von 5 Spezies vollständig erkannt. Grün bedeutet „ausgelesen“, nicht automatisch „bester Talentwert“. Die vorhandenen roten/gelben/grünen BiS-Bewertungen stehen darunter.';
+ result.textContent=count+' von 5 Spezies vollständig erkannt. Grün bedeutet „ausgelesen“, nicht „bester Talentwert“. '+(!confirmedMap?'Bitte die Symbol-Reihenfolge einmalig bestätigen.':'Die BiS-Wertungen stehen darunter.');
 }
 section.addEventListener('click',e=>{
  const btn=e.target.closest('[data-pet-review]');if(!btn)return;
@@ -121,24 +137,27 @@ async function runAuto(){
   const frame=frameCanvas();
   const runningWorker=await ensureWorker();
   if(token!==generation||!watching)return;
-  const response=await runningWorker.recognize(frame);
+  const focused=await api.recognizeImage(runningWorker,frame);
+  const response=focused?null:await runningWorker.recognize(frame);
   if(token!==generation||!watching)return;
-  const raw=String(response.data?.text||'');
-  const genus=api.speciesFromText(raw);
-  const lines=api.extract(response.data||{});
-  const expected=api.unlockedSlotsFromText(raw);
-  const hash=genus+'|'+lines.map(x=>x.name).join('|')+'|'+raw.replace(/\s+/g,' ').slice(0,80);
+  const raw=focused?focused.raw:String(response.data?.text||'');
+  const textGenus=api.speciesFromText(raw);
+  const mappedGenus=focused?.active&&confirmedMap?confirmedMap[focused.active-1]:null;
+  const genus=textGenus&&mappedGenus&&textGenus!==mappedGenus?null:(textGenus||mappedGenus);
+  const lines=focused?focused.found:api.extract(response.data||{});
+  const expected=focused?9:api.unlockedSlotsFromText(raw);
+  const hash=(focused?.active||'?')+'|'+genus+'|'+lines.map(x=>x.slot+':'+x.name+':'+(x.value||'')).join('|');
   if(hash===seenText){status('Fensterfreigabe aktiv – auf die nächste Pet-Ansicht warten …');return}
   seenText=hash;
   if(!lines.length){status('Noch keine Talente sichtbar. Öffne im Spiel die Spezieskenntnisse und halte die Ansicht kurz ruhig.');return}
   if(!genus){
    reviewQueue.set('unassigned',{lines,raw});
-   status(lines.length+' Talentzeilen erfasst, aber die Spezies ist im Bild nicht eindeutig. Bitte einen einzelnen Pet-Reiter einblenden oder später manuell zuordnen.');
+   status(lines.length+' Werte erkannt'+(focused?.active?' (Symbol '+focused.active+')':'')+', aber die Spezies ist nicht sicher zugeordnet. Bitte erst die Symbol-Reihenfolge bestätigen oder manuell prüfen.');
    // Include explicit manual fallback without automatically guessing a genus.
    result.innerHTML='Unzugeordnet: '+lines.length+' Wert(e). <button type="button" data-pet-review="unassigned" style="padding:5px;margin-left:6px">Manuell zuordnen</button>';
    return;
   }
-  if(!expected||lines.length!==expected || avgConfidence(lines)<55){
+  if(!expected||lines.length!==expected || avgConfidence(lines)<48){
    reviewQueue.set(genus,{lines,raw});
    status(genus+': '+lines.length+'/'+(expected||'?')+' freigeschaltete Talentwerte erkannt. Bitte etwas länger anzeigen oder später prüfen.');
    drawProgress();return;
