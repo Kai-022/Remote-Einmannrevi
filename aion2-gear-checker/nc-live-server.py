@@ -187,13 +187,15 @@ class Handler(BaseHTTPRequestHandler):
         ip = self.client_address[0]
         now = time.monotonic()
         with LOCK:
-            last = VISITS.get(ip, 0)
-            if now - last >= 3:
-                VISITS[ip] = now
+            visits = [t for t in VISITS.get(ip, []) if now - t < 60]
+            blocked = len(visits) >= 6
+            if not blocked:
+                visits.append(now)
+            VISITS[ip] = visits
             if len(VISITS) > 500:
                 VISITS.clear()
-        if now - last < 3:
-            return self.send_json(429, {"error": "Bitte kurz warten und erneut versuchen"})
+        if blocked:
+            return self.send_json(429, {"error": "Anfrage-Limit erreicht. Bitte kurz warten."})
         if not WORKERS.acquire(blocking=False):
             return self.send_json(503, {"error": "Server ausgelastet"})
         try:
