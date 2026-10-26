@@ -22,6 +22,10 @@ assert(scene,'cyan progress header and slot grid found');
 assert.equal(scene.slots,9);
 assert.equal(scene.active,5,'fifth sidebar icon selected');
 assert(scene.barLeft>=820&&scene.barLeft<=840);
+assert(scene.textLeft<=scene.barLeft-6,
+  'the OCR crop must include short left-aligned labels and full first letters');
+assert(scene.textRight>=scene.barLeft+150,
+  'the OCR crop must retain numerical values at the far right');
 assert(scene.barY>=107&&scene.barY<=110);
 const out=api.readComposite({lines:[
  {text:'1: Zusatzangriffskraft 15',bbox:{y0:5},confidence:90},
