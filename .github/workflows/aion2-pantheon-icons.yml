@@ -1,0 +1,30 @@
+name: AION 2 Cache Pantheon Artwork
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'aion2-gear-checker/cache-pantheon-art.py'
+      - '.github/workflows/aion2-pantheon-icons.yml'
+permissions:
+  contents: write
+concurrency:
+  group: aion2-pantheon-art-cache
+  cancel-in-progress: false
+jobs:
+  cache-pantheon-art:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download AION 2 Pantheon art
+        run: python3 aion2-gear-checker/cache-pantheon-art.py
+      - name: Commit verified artwork
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add aion2-gear-checker/pantheon-icons
+          if ! git diff --cached --quiet; then
+            git commit -m "Cache original AION 2 Pantheon artworks and statues"
+            git pull --rebase origin main
+            git push
+          fi
