@@ -1,0 +1,10 @@
+# Only publish the browser frontend and cached public game artwork.
+# The API script is deployed separately as the Worker entrypoint.
+_worker.js
+_routes.json
+wrangler.jsonc
+*.py
+*.md
+Dockerfile
+tests/
+*.log
