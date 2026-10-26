@@ -35,7 +35,7 @@ css.textContent=`
 .aion-node.on{background:#254d3a;border-color:#78d9ac;box-shadow:inset 0 0 0 1px #47976e}
 .aion-node.special{border-color:#c49e59}
 .aion-node.on.special{border-color:#ebca78}
-.aion-node img{width:100%;height:100%;object-fit:contain}
+.aion-node img{width:100%;height:100%;object-fit:contain}.aion-node-fallback{font-size:20px;color:#e4c48a}.aion-node img:not([src]){display:none}
 .aion-node .tick{position:absolute;bottom:-2px;right:0;font:bold 11px system-ui;color:#abf5cb;text-shadow:0 1px 3px #000}
 .aion-node-detail{margin-top:14px;padding:14px;border:1px solid #45516a;border-radius:10px;background:#182335}
 .aion-board-legend{display:flex;flex-wrap:wrap;gap:14px;margin:12px 0;color:#b9c4d1;font-size:12px}
@@ -99,9 +99,14 @@ function tile(n,index){
  if(!n||n.type==='None')return '<div class="aion-node filler" aria-hidden="true"></div>';
  const on=!!n.open,special=n.type==='SkillLevel'||n.grade==='Legend';
  const title=esc((n.name||n.type||'Knoten')+(on?' · Freigeschaltet':' · Nicht freigeschaltet'));
+ const effect=(n.effects||[]).join(' ');
+ const skill=n.type==='SkillLevel'||n.type==='Skill'||/skill|fähigkeit|fertigkeit/i.test(n.type+' '+n.name);
+ const fallback=skill?'✦':(n.type==='Stat'?'◆':'◇');
+ const iconMarkup=image(n.icon,29);
+ const art=iconMarkup||'<span class="aion-node-fallback">'+fallback+'</span>';
  return '<button type="button" class="aion-node '+(on?'on':'off')+(special?' special':'')+
  '" data-node="'+index+'" title="'+title+'" aria-label="'+title+'">'+
- image(n.icon,29)+(on?'<span class="tick">✓</span>':'')+'</button>';
+ art+(on?'<span class="tick">✓</span>':'')+'</button>';
 }
 function panelFor(node){
  const root=$('aion-board-node-detail');if(!root||!node)return;
