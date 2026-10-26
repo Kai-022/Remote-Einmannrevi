@@ -11,6 +11,17 @@ const image=(url,size=30,extra='')=>{
    'style="width:'+size+'px;height:'+size+'px;object-fit:contain;flex-shrink:0" '+extra+'>';
  }catch{return ''}
 };
+const plan=[
+ {label:'Solo-DPS',terms:['Verdammnis','Rache der Erde','Donnerschlag','Heilige Aura','Strafe der Erde','Schadensverstärkung','Kritischer Schadens','Mehrfachtreffer','Angriffskraft','Segen des Gebieters']},
+ {label:'Gruppen-PvE',terms:['Verdammnis','Glanz der Genesung','Licht der Heilung','Heilige Aura','Rache der Erde','Abklingzeit','Kampftempo','Schadensverstärkung','Segen des Gebieters']}
+];
+let buildMode='none';
+function priority(n){
+ const mode=plan.find(x=>x.label===buildMode);
+ if(!mode||!n||n.type==='None')return false;
+ const text=[n.name,...(n.effects||[])].join(' ').toLocaleLowerCase('de-DE');
+ return mode.terms.some(t=>text.includes(t.toLocaleLowerCase('de-DE')));
+}
 const css=document.createElement('style');
 css.textContent=`
 .tabs{flex-wrap:wrap!important;overflow:visible!important;row-gap:0!important}
@@ -34,7 +45,7 @@ css.textContent=`
 .aion-node.off{filter:saturate(.44);opacity:.62}
 .aion-node.on{background:#254d3a;border-color:#78d9ac;box-shadow:inset 0 0 0 1px #47976e}
 .aion-node.special{border-color:#c49e59}
-.aion-node.on.special{border-color:#ebca78}
+.aion-node.on.special{border-color:#ebca78}.aion-node.priority{outline:2px solid #e3b15b;outline-offset:-2px;box-shadow:0 0 8px #dfac4c88}.aion-board-builds{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}.aion-board-builds button{padding:9px 12px;border:1px solid #68768a;border-radius:7px;background:#1a293a;color:#eee}.aion-board-builds button.active{border-color:#f0bd68;color:#ffd88e;background:#40321e}
 .aion-node img{width:100%;height:100%;object-fit:contain}.aion-node-fallback{font-size:20px;color:#e4c48a}.aion-node img:not([src]){display:none}
 .aion-node .tick{position:absolute;bottom:-2px;right:0;font:bold 11px system-ui;color:#abf5cb;text-shadow:0 1px 3px #000}
 .aion-node-detail{margin-top:14px;padding:14px;border:1px solid #45516a;border-radius:10px;background:#182335}
@@ -97,14 +108,14 @@ function portrait(){
 }
 function tile(n,index){
  if(!n||n.type==='None')return '<div class="aion-node filler" aria-hidden="true"></div>';
- const on=!!n.open,special=n.type==='SkillLevel'||n.grade==='Legend';
+ const on=!!n.open,special=n.type==='SkillLevel'||n.grade==='Legend',recommended=priority(n);
  const title=esc((n.name||n.type||'Knoten')+(on?' · Freigeschaltet':' · Nicht freigeschaltet'));
  const effect=(n.effects||[]).join(' ');
  const skill=n.type==='SkillLevel'||n.type==='Skill'||/skill|fähigkeit|fertigkeit/i.test(n.type+' '+n.name);
  const fallback=skill?'✦':(n.type==='Stat'?'◆':'◇');
  const iconMarkup=image(n.icon,29);
  const art=iconMarkup||'<span class="aion-node-fallback">'+fallback+'</span>';
- return '<button type="button" class="aion-node '+(on?'on':'off')+(special?' special':'')+
+ return '<button type="button" class="aion-node '+(on?'on':'off')+(special?' special':'')+(recommended?' priority':'')+
  '" data-node="'+index+'" title="'+title+'" aria-label="'+title+'">'+
  art+(on?'<span class="tick">✓</span>':'')+'</button>';
 }
@@ -205,7 +216,10 @@ function renderBoards(){
   '<div class="grid" style="margin-top:10px"><div class="card"><strong>Attribut-Boni</strong>'+
   (stats?'<ul>'+stats+'</ul>':'<p class="tip">Keine erfasst</p>')+'</div>'+
   '<div class="card"><strong>Skill-Boni</strong>'+(skills?'<ul>'+skills+'</ul>':'<p class="tip">Keine erfasst</p>')+'</div></div></details>';
- root.innerHTML=tabs+'<div class="slothead" style="margin:12px 0"><strong>'+esc(definition.name||'Daevanion-Board')+
+ const buildControls='<div class="aion-board-builds"><button data-build="none" class="'+(buildMode==='none'?'active':'')+'">Meine Skillung</button>'+
+ plan.map(x=>'<button data-build="'+esc(x.label)+'" class="'+(buildMode===x.label?'active':'')+'">'+esc(x.label)+'</button>').join('')+'</div>'+
+ '<p class="tip">Goldene Umrandung = empfohlener Zielknoten (keine automatisch berechnete günstigste Route). Empfehlungen nach öffentlich verfügbaren Kleriker-Guides; kein garantierter Max-DPS-Nachweis.</p>';
+ root.innerHTML=buildControls+tabs+'<div class="slothead" style="margin:12px 0"><strong>'+esc(definition.name||'Daevanion-Board')+
  '</strong><span class="pill">'+opened+' / '+total+' freigeschaltet</span></div>'+
  '<div class="aion-board-legend"><span><i class="aion-board-dot" style="background:#34704f"></i>Freigeschaltet</span>'+
  '<span><i class="aion-board-dot" style="background:#2b364b"></i>Gesperrt</span>'+
@@ -223,6 +237,8 @@ $('aion-board-content').addEventListener('click',async e=>{
   catch(error){if(status)status.textContent=String(error.message||error);reload.disabled=false;}
   return;
  }
+ const preset=e.target.closest('[data-build]');
+ if(preset){buildMode=preset.dataset.build;renderBoards();return;}
  const board=e.target.closest('[data-board]');
  if(board){
   selected=board.dataset.board;renderBoards();return;
