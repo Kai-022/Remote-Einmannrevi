@@ -1,0 +1,24 @@
+name: AION 2 Cloudflare Import Test
+on:
+  push:
+    paths:
+      - 'aion2-gear-checker/_worker.js'
+      - 'aion2-gear-checker/_routes.json'
+      - 'aion2-gear-checker/tests/cloudflare-worker.mjs'
+      - '.github/workflows/aion2-cloudflare-worker-test.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  worker-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate Cloudflare Worker syntax
+        run: node --check --input-type=module < aion2-gear-checker/_worker.js
+      - name: Mock EU lookup and full character import
+        run: node aion2-gear-checker/tests/cloudflare-worker.mjs
