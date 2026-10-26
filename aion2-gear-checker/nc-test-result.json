@@ -1,5 +1,5 @@
 {
-  "checkedAt": "2026-10-26T11:00:37+00:00",
+  "checkedAt": "2026-10-26T11:12:47+00:00",
   "region": "eu",
   "serverId": "1305",
   "source": "official NCSoft public character web endpoints",
@@ -26,6 +26,23 @@
     ],
     "gearCount": 25,
     "hasSkillData": true
+  },
+  "search": {
+    "ok": true,
+    "http": 200,
+    "matches": 2,
+    "exactMatch": false,
+    "fields": [
+      "characterId",
+      "name",
+      "race",
+      "pcId",
+      "level",
+      "serverId",
+      "serverName",
+      "profileImageUrl",
+      "region"
+    ]
   },
   "note": "A positive result confirms server-side accessibility, not browser CORS or unrestricted use."
 }
