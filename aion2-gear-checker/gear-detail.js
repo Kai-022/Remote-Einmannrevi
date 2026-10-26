@@ -98,13 +98,31 @@ skillPanel.innerHTML='<h2>✦ Fähigkeiten, Stigmen und Daevanion</h2>'+
 document.getElementById('tab-upgrades')?.append(skillPanel);
 function displaySkills(){
  const meta=data?.characterExtras||{};
- const groups=[['Fähigkeiten',meta.skills],['Stigmen',meta.stigmas],['Daevanion',meta.daevanion]];
- const rows=groups.map(([name,items])=>'<div class="card" style="margin:12px 0"><strong>'+esc(name)+'</strong>'+
- (Array.isArray(items)&&items.length?items.map(i=>'<div class="gear-roll" style="margin-top:7px"><span class="gear-roll-name">'+esc(i.name)+'</span><span>'+esc(i.level||'')+'</span></div>').join(''):'<div class="tip">Noch keine verlässlichen '+esc(name)+'-Daten importiert.</div>')+'</div>').join('');
- const companions=(meta.pet||meta.wing)?'<div class="card" style="margin:12px 0"><strong>Begleiter und Schwingen</strong>'+
-   (meta.pet?'<div class="gear-roll" style="margin-top:8px"><span class="gear-roll-name">Pet: '+esc(meta.pet.name)+'</span><span>Level '+esc(meta.pet.level||'?')+'</span></div>':'')+
-   (meta.wing?'<div class="gear-roll" style="margin-top:8px"><span class="gear-roll-name">Schwingen: '+esc(meta.wing.name)+'</span><span>+'+esc(meta.wing.enchantLevel||0)+'</span></div>':'')+'</div>':'';
- const root=document.getElementById('character-skills-display');if(root)root.innerHTML=rows+companions;
+ const groups=[
+  ['Aktive Fähigkeiten',meta.skills],
+  ['Passive Fähigkeiten',meta.passives],
+  ['DP-Fähigkeiten',meta.dpSkills],
+  ['Stigmen (separat)',meta.stigmas],
+  ['Daevanion-Übersicht',meta.daevanion]
+ ];
+ const rows=groups.map(([name,items])=>{
+  const arr=Array.isArray(items)?items:[];
+  return '<div class="card" style="margin:13px 0"><div class="slothead"><strong>'+esc(name)+'</strong>'+
+   '<span class="pill">'+arr.length+'</span></div>'+
+   (arr.length?'<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:8px;margin-top:10px">'+
+    arr.map(i=>'<div class="gear-roll" style="align-items:center">'+cdnImage(i.icon,35)+
+      '<div class="gear-roll-name"><strong style="display:block">'+esc(i.name)+'</strong>'+
+      '<small style="color:var(--muted)">'+esc(i.level||'')+
+       (i.equipped?' · Ausgerüstet':'')+'</small></div></div>').join('')+'</div>':
+   '<div class="tip">Keine separat erfassten Daten vorhanden.</div>')+'</div>';
+ }).join('');
+ const companions=(meta.pet||meta.wing)?'<div class="card" style="margin:13px 0"><strong>Begleiter und Schwingen</strong>'+
+  (meta.pet?'<div class="gear-roll" style="margin-top:8px">'+cdnImage(meta.pet.icon,52)+
+   '<span class="gear-roll-name">Pet: '+esc(meta.pet.name)+'</span><span>Stufe '+esc(meta.pet.level??'?')+'</span></div>':'')+
+  (meta.wing?'<div class="gear-roll" style="margin-top:8px">'+cdnImage(meta.wing.icon,52)+
+   '<span class="gear-roll-name">Schwingen: '+esc(meta.wing.name)+'</span><span>+'+esc(meta.wing.enchantLevel||0)+'</span></div>':'')+'</div>':'';
+ const root=document.getElementById('character-skills-display');
+ if(root)root.innerHTML=rows+companions;
 }
 const originalRender=render;
 render=function(){originalRender();displaySkills()};
