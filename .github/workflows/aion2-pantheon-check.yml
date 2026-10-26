@@ -1,0 +1,24 @@
+name: AION 2 Pantheon Collection Test
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'aion2-gear-checker/pantheon.js'
+      - 'aion2-gear-checker/pantheon-catalog.json'
+      - 'aion2-gear-checker/index.html'
+      - 'aion2-gear-checker/tests/pantheon.mjs'
+      - 'aion2-gear-checker/pantheon-icons/**'
+      - '.github/workflows/aion2-pantheon-check.yml'
+permissions:
+  contents: read
+jobs:
+  verify-pantheon:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate Pantheon catalog, artwork and local character UI
+        run: node aion2-gear-checker/tests/pantheon.mjs
