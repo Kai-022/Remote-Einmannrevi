@@ -69,24 +69,8 @@ function openGear(slot){
  section('Zusätzliche Werte / Seelenbindung',souls,'Das Profil liefert bisher nur die Ausrüstungsliste. Erst ein ausgelesener Item-Tooltip liefert diese Werte.')+
  section('Manasteine',stones)+
  section('Götterstein',god?[[god.name,god.description||'','',god.icon]]:[])+
- '<details style="margin-top:18px"><summary style="cursor:pointer;color:#e8c687">Detaillierte Werte vom Shugo-Item einfügen</summary>'+
- '<p class="tip">Auf Shugo.GG das Item anklicken, die Werte aus dem geöffneten Fenster kopieren und hier einfügen. Das ist nötig, wenn der automatische Profilabruf die Tooltip-Werte nicht liefert.</p>'+
- '<textarea id="gear-tooltip-text" rows="6" style="width:100%" placeholder="BASISWERTE&#10;Angriffskraft 398&#10;ZUSÄTZLICHE WERTE (5/10)&#10;Schadensverstärkung +6.7%"></textarea>'+
- '<button type="button" id="gear-tooltip-save" style="margin-top:7px">Detailwerte übernehmen</button></details>'+
  '<div class="actions"><button type="button" id="gear-detail-edit">Werte bearbeiten</button></div>';
  panel.querySelector('#gear-detail-close').onclick=()=>panel.close();
- panel.querySelector('#gear-tooltip-save').onclick=()=>{
-  const raw=panel.querySelector('#gear-tooltip-text').value;
-  if(!raw.trim())return;
-  const parsed=parseTooltip(raw);
-  if(!(parsed.rolls.length||parsed.basics.length||parsed.manaStones.length||parsed.godStone||parsed.soulRate)){
-    alert('Keine Werte erkannt. Bitte den Text aus dem geöffneten Shugo-Item-Fenster kopieren.');
-    return;
-  }
-  item.details={...item.details,basics:parsed.basics,manaStones:parsed.manaStones,godStone:parsed.godStone,soulRate:parsed.soulRate};
-  if(parsed.rolls.length)item.rolls=parsed.rolls;
-  store();render();panel.close();openGear(slot);
- };
  panel.querySelector('#gear-detail-edit').onclick=()=>{panel.close();const target=document.getElementById('slot');if(target){target.value=slot;fillEdit();document.getElementById('editform')?.scrollIntoView({behavior:'smooth'});}};
  if(typeof panel.showModal==='function')panel.showModal();else panel.setAttribute('open','');
 }
