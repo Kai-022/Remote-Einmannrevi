@@ -7,7 +7,7 @@ import vm from 'node:vm';
 const root=new URL('../',import.meta.url);
 const catalog=JSON.parse(await readFile(new URL('../pantheon-catalog.json',import.meta.url),'utf8'));
 const paths=new Set(),types={artwork:0,statue:0,colossus:0};
-assert.equal(catalog.version,1);
+assert.equal(catalog.version,2);
 assert.equal(catalog.slots.artwork,12);
 assert.equal(catalog.slots.statue,4);
 assert.equal(catalog.slots.colossus,1);
