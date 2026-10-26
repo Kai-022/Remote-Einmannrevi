@@ -36,7 +36,7 @@ def main():
                 raise ValueError("unexpected image size")
             if filename.endswith(".webp") and (content[:4] != b"RIFF" or content[8:12] != b"WEBP"):
                 raise ValueError("invalid WEBP header")
-            if filename.endswith(".png") and content[:8] != b"\\x89PNG\\r\\n\\x1a\\n":
+            if filename.endswith(".png") and content[:8].hex() != "89504e470d0a1a0a":
                 raise ValueError("invalid PNG header")
             path.write_bytes(content)
             print("saved", filename, len(content))
