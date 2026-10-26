@@ -5,7 +5,7 @@ const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&
 const host=$('tab-pantheon');if(!host)return;
 const box=document.createElement('section');box.id='pan-screenshot';box.className='panel';
 box.innerHTML='<div class="eyebrow">BETA · LOKALE BILDERKENNUNG</div><h2>📷 Pantheon-Screenshot einlesen</h2>'+
-'<p>Screenshot hochladen, Raster ausschneiden und Items zuordnen. Die Verarbeitung erfolgt lokal im Browser. Weil viele Original-Icons noch fehlen, musst du unsichere Treffer auswählen und bestätigen.</p>'+
+'<p>Screenshot hochladen, Raster ausschneiden und Items zuordnen. Die Verarbeitung erfolgt lokal im Browser. Weil viele Original-Icons noch fehlen, musst du unsichere Treffer auswählen und bestätigen. Bestätigte Kacheln dienen lokal als Vorlagen für spätere Scans.</p>'+
 '<input type="file" id="psc-upload" accept="image/png,image/jpeg,image/webp">'+
 '<p class="tip">Die automatische Rastererkennung schätzt die Kachelposition aus dem Bild. Falls die Rahmen nicht stimmen, klicke auf die <b>obere linke Ecke des ersten Items</b>. Du siehst anschließend die eingezeichneten Kacheln und kannst die Abstände korrigieren.</p>'+
 '<canvas id="psc-preview" role="img" aria-label="Screenshot mit auswählbarem Raster" style="display:none;max-width:100%;width:auto;height:auto;cursor:crosshair;border:1px solid #94754c;border-radius:8px;margin:10px 0"></canvas>'+
@@ -25,6 +25,8 @@ box.innerHTML='<div class="eyebrow">BETA · LOKALE BILDERKENNUNG</div><h2>📷 P
 '<p class="tip">„E“-Markierungen sind aktuell nicht zuverlässig automatisch erkennbar. Markiere „aufgestellt“ nur bei Items, bei denen du es im Spiel bestätigen kannst.</p>';
 const anchor=$('pan-summary');if(anchor)anchor.before(box);else host.append(box);
 let picture=null,imageUrl='',catalog=[],references=[];
+const learnedKey='aion2-pantheon-icon-templates-v1';
+let learned=[];try{learned=JSON.parse(localStorage.getItem(learnedKey)||'[]');if(!Array.isArray(learned))learned=[];}catch{learned=[];}
 const val=id=>Number($(id).value);
 const preview=$('psc-preview');
 function drawPreview(){
@@ -144,6 +146,7 @@ async function getCatalog(){
   icons.get(path).push(item);
  }
  references=[];
+ for(const entry of learned){if(Array.isArray(entry.data)&&entry.data.length===144){const item=catalog.find(i=>i.id===entry.id);if(item)references.push({item,data:entry.data,learned:true});}}
  for(const [path,items] of icons){
   if(items.length!==1)continue;
   try{const img=await load(path);references.push({item:items[0],data:feature(img)});}catch{}
@@ -189,16 +192,19 @@ $('psc-scan').addEventListener('click',async()=>{
   const canvas=document.createElement('canvas');canvas.width=canvas.height=size;
   canvas.getContext('2d').drawImage(picture,x+col*(size+gap),y+row*(size+gapY),size,size,0,0,size,size);
   const sig=feature(canvas);
-  const best=references.map(ref=>({item:ref.item,score:compare(sig,ref.data)})).sort((a,b)=>b.score-a.score)[0];
-  const suggestion=best&&best.score>.8?'Ähnlich: '+(best.item.nameDe||best.item.name):'Kein eindeutiger Bildvergleich';
+  const matches=references.map(ref=>({item:ref.item,score:compare(sig,ref.data),learned:!!ref.learned})).sort((a,b)=>b.score-a.score);
+  const best=matches[0],runner=matches.find(m=>m.item.id!==best?.item.id);
+  const confident=!!best&&best.learned&&best.score>.92&&(!runner||best.score-runner.score>.07);
+  const suggestion=confident?'Wiedererkannt: '+(best.item.nameDe||best.item.name):best&&best.score>.5?'Möglicher Treffer: '+(best.item.nameDe||best.item.name)+' (prüfen)':'Name nicht sicher erkannt';
+  const choices='<option value="">Nicht erkannt / auswählen</option>'+items.map(item=>'<option value="'+esc(item.id)+'"'+(confident&&best.item.id===item.id?' selected':'')+'>'+esc(item.nameDe||item.name)+'</option>').join('');
   html+='<article class="card" style="padding:10px"><img style="width:85px;height:85px;object-fit:contain;display:block;margin:auto" src="'+canvas.toDataURL()+'" alt="Item '+(n+1)+'">'+
   '<small>Kachel '+(++n)+' · '+esc(suggestion)+'</small>'+
   '<label style="display:block;font-size:12px;margin-top:7px">Bestätigtes Item</label>'+
-  '<select data-psc-item style="font-size:12px;padding:8px">'+options+'</select>'+
+  '<select data-psc-item style="font-size:12px;padding:8px">'+choices+'</select>'+
   '<label style="display:block;font-size:12px;margin-top:9px"><input style="width:auto" type="checkbox" data-psc-placed> Aufgestellt</label></article>';
  }
  $('psc-result').innerHTML=html;$('psc-save').disabled=false;
- $('psc-note').textContent=n+' Bildkacheln ausgeschnitten. '+references.length+' eindeutige Vorlagen verfügbar. Itemnamen bitte bestätigen.';
+ $('psc-note').textContent=n+' Bildkacheln ausgeschnitten. '+references.length+' Vorlagen verfügbar ('+references.filter(r=>r.learned).length+' selbst angelernt). Unsichere Namen bitte bestätigen.';
 });
 $('psc-save').addEventListener('click',()=>{
  const key='aion2-pantheon-v1:'+String(data?.sourceRef?.sid||'lokal')+':'+String(data?.sourceRef?.id||data?.name||'EU-Charakter').normalize('NFKC');
@@ -209,6 +215,7 @@ $('psc-save').addEventListener('click',()=>{
  for(const node of $('psc-result').querySelectorAll('article')){
   const id=node.querySelector('[data-psc-item]')?.value;
   if(!catalog.some(i=>i.id===id))continue;
+  const im=node.querySelector('img');if(im){try{const signature=feature(im);learned=learned.filter(t=>t.id!==id);learned.push({id,data:signature});}catch{}}
   owned.add(id);selected++;
   if(node.querySelector('[data-psc-placed]')?.checked)placed.add(id);
  }
@@ -219,7 +226,7 @@ $('psc-save').addEventListener('click',()=>{
   $('psc-note').textContent='Zu viele aufgestellte Stücke: maximal 12 Gemälde, 4 Statuen und 1 Koloss.';return;
  }
  if(!confirm(selected+' ausgewählte Gegenstände lokal in deiner Pantheon-Sammlung speichern?'))return;
- try{localStorage.setItem(key,JSON.stringify({...old,owned:[...owned],placed:[...placed]}));
+ try{localStorage.setItem(key,JSON.stringify({...old,owned:[...owned],placed:[...placed]}));localStorage.setItem(learnedKey,JSON.stringify(learned.slice(-150)));
  $('psc-note').textContent='Gespeichert – aktualisiere die Seite, um deine Pantheon-Liste zu sehen.';
  window.location.reload();
  }catch{$('psc-note').textContent='Speichern fehlgeschlagen.'}
