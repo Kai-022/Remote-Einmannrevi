@@ -4,6 +4,10 @@ on:
     paths:
       - 'aion2-gear-checker/pet-species.js'
       - 'aion2-gear-checker/pet-species.css'
+      - 'aion2-gear-checker/pet-screenshot.js'
+      - 'aion2-gear-checker/pet-live-capture.js'
+      - 'aion2-gear-checker/pet-scanner-start.js'
+      - 'aion2-gear-checker/tests/pet-walkthrough.mjs'
       - 'aion2-gear-checker/tests/pet-species.mjs'
       - 'aion2-gear-checker/index.html'
       - '.github/workflows/aion2-pet-knowledge-test.yml'
@@ -23,3 +27,7 @@ jobs:
         run: |
           node --check aion2-gear-checker/pet-species.js
           node aion2-gear-checker/tests/pet-species.mjs
+          node --check aion2-gear-checker/pet-screenshot.js
+          node --check aion2-gear-checker/pet-live-capture.js
+          node --check aion2-gear-checker/pet-scanner-start.js
+          node aion2-gear-checker/tests/pet-walkthrough.mjs
