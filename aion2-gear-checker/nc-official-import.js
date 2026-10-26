@@ -35,6 +35,19 @@ for(const [label,arr,first] of [['Elyos',euElyos,1301],['Asmodier',euAsmo,2301]]
 selectedServer.value='1305';
 
 function note(s,error=false){status.textContent=s;status.classList.toggle('error',error);}
+const apiInput=$('nc-api-base');
+try{apiInput.value=localStorage.getItem('aion2_live_api')||''}catch{}
+function apiOrigin(){
+ const value=apiInput.value.trim();if(!value)return '';
+ const url=new URL(value);
+ if(url.protocol!=='https:'||url.username||url.password||url.search||url.hash||url.pathname!=='/')
+  throw Error('Bitte nur die HTTPS-Grundadresse des Datenservers eintragen.');
+ return url.origin;
+}
+$('nc-api-save').onclick=()=>{
+ try{const addr=apiOrigin();localStorage.setItem('aion2_live_api',addr);note(addr?'Datenserver gespeichert.':'Datenserver entfernt.')}
+ catch(e){note(e.message,true)}
+};
 function parseOfficialLink(input) {
  let url;
  try{url=new URL(input.trim());}catch{throw Error('Bitte den vollständigen offiziellen Charakterlink einfügen.');}
