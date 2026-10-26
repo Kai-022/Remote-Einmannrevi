@@ -58,6 +58,30 @@ def check(endpoint):
         return {"ok": False, "http": None, "reason": error.__class__.__name__}
 
 
+
+def check_search():
+    query = urllib.parse.urlencode({
+        "keyword": "Taty", "serverId": SERVER_ID, "region": "eu",
+        "localeInfo": "en-US", "page": 1, "size": 30
+    })
+    req = urllib.request.Request(
+        "https://api-search.plaync.com/aion2global/search/v2/character?" + query,
+        headers={"Accept":"application/json","User-Agent":"Mozilla/5.0"},
+        method="GET"
+    )
+    try:
+        with urllib.request.urlopen(req, timeout=14) as response:
+            data=json.loads(response.read(1_000_000))
+            rows=data.get("list") or []
+            correct=[r for r in rows if r.get("serverId")==int(SERVER_ID) and
+                     str(r.get("name","")).replace("<em>","").replace("</em>","").casefold()=="taty"]
+            return {"ok":True,"http":response.status,"matches":len(rows),"exactMatch":bool(correct),
+                    "fields":list(rows[0])[:20] if rows else []}
+    except urllib.error.HTTPError as e:
+        return {"ok":False,"http":e.code}
+    except Exception as e:
+        return {"ok":False,"reason":type(e).__name__}
+
 def main():
     summary = {
         "checkedAt": dt.datetime.now(dt.timezone.utc).isoformat(timespec="seconds"),
@@ -66,6 +90,7 @@ def main():
         "source": "official NCSoft public character web endpoints",
         "info": check("info"),
         "equipment": check("equipment"),
+        "search": check_search(),
         "note": "A positive result confirms server-side accessibility, not browser CORS or unrestricted use."
     }
     os.makedirs(os.path.dirname(OUTPUT), exist_ok=True)
