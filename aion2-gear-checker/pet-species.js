@@ -63,7 +63,7 @@ function slotCard(spec,slot){
 }
 function show(){
  load();
- list.innerHTML='<div class="ps-info">Die öffentlich verfügbaren NCSOFT-Charakterdaten liefern aktuell <b>keine einzelnen Spezieskenntnis-Rolls</b>. Trage deshalb den gewürfelten Wert pro Slot ein. Nicht erfasste Slots bleiben neutral statt fälschlich rot.</div>'+
+ list.innerHTML='<div class="ps-info">Die öffentlich verfügbaren NCSOFT-Charakterdaten liefern aktuell <b>keine einzelnen Spezieskenntnis-Rolls</b>. Nutze den Screenshot-Import oberhalb oder korrigiere bei Bedarf einzelne Slots. Nicht erfasste Slots bleiben neutral statt fälschlich rot.</div>'+
  '<div class="ps-legend"><span>🟢 Bester Zielwert</span><span>🟡 Gute Alternative</span><span>🔴 Anderer Wert</span><span>⚪ Unbekannt</span></div>'+
  specs.map(spec=>{
   const counts={good:0,alt:0,bad:0,unknown:0};
@@ -94,6 +94,7 @@ list.addEventListener('toggle',e=>{
  if(details.open)expanded.add(name);else expanded.delete(name);
  save();
 },true);
+window.addEventListener('aion2:pets-updated',()=>{current='';show()});
 const previous=render;
 render=function(){previous();show()};
 show();
