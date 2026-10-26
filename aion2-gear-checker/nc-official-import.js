@@ -10,8 +10,8 @@ const panel=document.createElement('section');
 panel.className='panel';
 panel.id='nc-official-import';
 panel.innerHTML='<div class="eyebrow">NEU · OFFIZIELLE AION-2-DATEN · EU</div>'+
- '<h2>✧ AION 2 – offizieller Charakterimport (Test)</h2>'+
- '<p>Füge deinen offiziellen Charakterlink ein. Wir prüfen das zwischengespeicherte Ergebnis des erfolgreichen NCSOFT-Tests: Gear mit Zusatzwerten, Skills, Stigmen und Daevanion.</p>'+
+ '<h2>✧ Charakter über EU-Server importieren</h2>'+
+ '<p>Wähle deinen EU-Server und gib deinen Charakternamen ein.</p>'+
  '<div class="grid"><div class="field"><label for="nc-server-select">EU-Server</label><select id="nc-server-select"></select></div><div class="field"><label for="nc-character-name">Charaktername</label><input id="nc-character-name" value="Taty" autocomplete="off"></div></div>'+ '<div class="grid" style="align-items:end"><div class="field"><label for="nc-public-link">Offizieller AION-2-Charakterlink</label>'+
  '<input id="nc-public-link" type="url" placeholder="https://aion2.plaync.com/en-us/characters/…?region=eu" autocomplete="url"></div>'+
  '<button type="button" class="primary" id="nc-import">Offizielles Gear importieren</button></div>'+
