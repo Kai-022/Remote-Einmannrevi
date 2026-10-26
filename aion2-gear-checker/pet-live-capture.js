@@ -119,7 +119,8 @@ async function ensureWorker(){
 function frameCanvas(){
  if(!active()||!video.videoWidth||!video.videoHeight||video.readyState<2)
    throw Error('Das Spiel-Fenster liefert noch kein Bild.');
- const scale=Math.min(1,1600/video.videoWidth,1050/video.videoHeight);
+ // Keep 1080p source text at native size; severe downscaling ruins OCR on small HUD labels.
+ const scale=Math.min(1,2200/video.videoWidth,1400/video.videoHeight);
  const c=document.createElement('canvas');
  c.width=Math.max(1,Math.round(video.videoWidth*scale));
  c.height=Math.max(1,Math.round(video.videoHeight*scale));
