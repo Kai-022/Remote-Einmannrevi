@@ -116,7 +116,13 @@ const useData=(d,ref)=>{
  data={name:displayName,mode:$('mode')?.value||'hybrid',gear,
   source:'NCSOFT – serverseitiger Testabruf',sourceRef:{sid:ref.serverId,id:ref.characterId},
   sourceUrl:d.profileUrl,importedAt:d.generatedAt,
-  characterExtras:{skills:group('Active'),passives:group('Passive'),dpSkills:group('Dp'),stigmas:[],
+  characterExtras:{profile:{name:displayName,className:String(info.className||''),
+      level:Number(info.characterLevel||0),combatPower:Number(info.combatPower||0),
+      icon:String(info.profileImage||'')},
+    stats:(d.info?.stat?.statList||[]).slice(0,80).map(x=>({
+      name:String(x.name||x.type||''),value:String(x.value??'')
+    })),
+    skills:group('Active'),passives:group('Passive'),dpSkills:group('Dp'),stigmas:[],
     daevanion:av,boards:Object.fromEntries(Object.entries(d.daevanionBoards||{}).map(([id,board])=>[
       id,{nodes:(Array.isArray(board?.nodeList)?board.nodeList:[]).slice(0,225).map(n=>({
         id:n.nodeId,row:Number(n.row),col:Number(n.col),name:String(n.name||''),type:String(n.type||''),
