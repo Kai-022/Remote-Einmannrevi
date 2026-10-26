@@ -152,3 +152,67 @@ def get_character(sid, cid):
         "source": "NCSOFT public EU character endpoints"
     }
 
+
+
+VISITS = {}
+WORKERS = threading.BoundedSemaphore(2)
+
+
+class Handler(BaseHTTPRequestHandler):
+    def log_message(self, fmt, *args):
+        pass  # avoid logging character IDs and usernames
+
+    def send_json(self, status, data):
+        body = json.dumps(data, ensure_ascii=False).encode("utf-8")
+        self.send_response(status)
+        self.send_header("Content-Type", "application/json; charset=utf-8")
+        self.send_header("Content-Length", str(len(body)))
+        self.send_header("Cache-Control", "no-store")
+        self.send_header("X-Content-Type-Options", "nosniff")
+        if self.headers.get("Origin") == ALLOWED_ORIGIN:
+            self.send_header("Access-Control-Allow-Origin", ALLOWED_ORIGIN)
+            self.send_header("Vary", "Origin")
+        self.end_headers()
+        self.wfile.write(body)
+
+    def do_GET(self):
+        path = urllib.parse.urlsplit(self.path)
+        if path.path == "/health":
+            return self.send_json(200, {"ok": True, "region": "eu"})
+        if path.path not in ("/api/search", "/api/character"):
+            return self.send_json(404, {"error": "Unbekannte Route"})
+        params = urllib.parse.parse_qs(path.query, keep_blank_values=False)
+        if len(path.query) > 1200:
+            return self.send_json(400, {"error": "Anfrage zu lang"})
+        ip = self.client_address[0]
+        now = time.monotonic()
+        with LOCK:
+            last = VISITS.get(ip, 0)
+            if now - last >= 3:
+                VISITS[ip] = now
+            if len(VISITS) > 500:
+                VISITS.clear()
+        if now - last < 3:
+            return self.send_json(429, {"error": "Bitte kurz warten und erneut versuchen"})
+        if not WORKERS.acquire(blocking=False):
+            return self.send_json(503, {"error": "Server ausgelastet"})
+        try:
+            sid = (params.get("serverId") or [""])[0]
+            if path.path == "/api/search":
+                name = (params.get("name") or [""])[0]
+                result = search_character(sid, name)
+            else:
+                cid = (params.get("characterId") or [""])[0]
+                result = get_character(sid, cid)
+            return self.send_json(200, result)
+        except ValueError as err:
+            return self.send_json(400, {"error": str(err)})
+        except Exception:
+            return self.send_json(502, {"error": "NCSOFT ist momentan nicht erreichbar"})
+        finally:
+            WORKERS.release()
+
+
+if __name__ == "__main__":
+    print(f"AION EU API at http://{HOST}:{PORT} (TLS reverse proxy required for public use)")
+    ThreadingHTTPServer((HOST, PORT), Handler).serve_forever()
