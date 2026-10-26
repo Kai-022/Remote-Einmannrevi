@@ -71,7 +71,7 @@ function openGear(slot){
   }
   item.details={...item.details,basics:parsed.basics,manaStones:parsed.manaStones,godStone:parsed.godStone,soulRate:parsed.soulRate};
   if(parsed.rolls.length)item.rolls=parsed.rolls;
-  store();render();openGear(slot);
+  store();render();panel.close();openGear(slot);
  };
  panel.querySelector('#gear-detail-edit').onclick=()=>{panel.close();const target=document.getElementById('slot');if(target){target.value=slot;fillEdit();document.getElementById('editform')?.scrollIntoView({behavior:'smooth'});}};
  if(typeof panel.showModal==='function')panel.showModal();else panel.setAttribute('open','');
