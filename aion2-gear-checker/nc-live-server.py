@@ -91,3 +91,64 @@ def search_character(sid, name):
         })
     return {"characters": found[:20]}
 
+
+
+def get_character(sid, cid):
+    sid = valid_server(sid)
+    if not re.fullmatch(r"[a-zA-Z0-9_+=/\\-]{8,256}", cid):
+        raise ValueError("Ungültige Charakter-ID")
+    base = base_query(sid, cid)
+    info = query_json(SITE + "info", base)
+    equipment = query_json(SITE + "equipment", base)
+    profile = info.get("profile", {})
+    if not isinstance(profile, dict) or not profile.get("characterName"):
+        raise ValueError("Charakter wurde nicht gefunden")
+    if str(profile.get("serverId", sid)) != str(sid):
+        raise ValueError("Server des Charakters stimmt nicht überein")
+    equipment_block = equipment.get("equipment", {})
+    slots = equipment_block.get("equipmentList", []) if isinstance(equipment_block, dict) else []
+    if not isinstance(slots, list) or len(slots) > 80:
+        raise ValueError("Ungültige Ausrüstungsliste")
+    items = {}
+    errors = []
+    for slot in slots:
+        if not isinstance(slot, dict):
+            continue
+        try:
+            item_id = int(slot["id"])
+            position = int(slot["slotPos"])
+            enchant = int(slot.get("enchantLevel") or 0)
+            exceed = int(slot.get("exceedLevel") or 0)
+            if not (0 < item_id < 2**54 and 0 <= position < 1000 and
+                    0 <= enchant <= 100 and 0 <= exceed <= 100):
+                continue
+            detail = query_json(SITE + "equipment/item", {
+                **base, "id": item_id, "slotPos": position,
+                "enchantLevel": enchant, "exceedLevel": exceed
+            })
+            items[str(position)] = detail
+        except (KeyError, ValueError, OSError, TimeoutError) as exc:
+            errors.append({"slotPos": slot.get("slotPos"), "reason": type(exc).__name__})
+    boards = {}
+    daevanion = info.get("daevanion", {})
+    board_list = daevanion.get("boardList", []) if isinstance(daevanion, dict) else []
+    for board in board_list[:5]:
+        try:
+            bid = int(board.get("id", 0))
+            if not 1 <= bid <= 10000:
+                continue
+            boards[str(bid)] = query_json(SITE + "daevanion/detail", {
+                **base, "boardId": bid
+            })
+        except (ValueError, OSError, TimeoutError):
+            continue
+    return {
+        "version": 1, "generatedAt": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+        "profileUrl": "https://aion2.plaync.com/en-us/characters/" + str(sid) +
+        "/" + urllib.parse.quote(cid, safe="") + "?region=eu",
+        "region": "eu", "serverId": str(sid), "characterId": cid,
+        "info": info, "equipment": equipment, "items": items,
+        "daevanionBoards": boards, "itemErrors": errors,
+        "source": "NCSOFT public EU character endpoints"
+    }
+
