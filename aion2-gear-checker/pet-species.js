@@ -33,7 +33,7 @@ function load(){
 }
 function save(){
  if(isDemo)return;
- try{localStorage.setItem(current,JSON.stringify({rolls,expanded:[...expanded]}))}catch{}
+ try{const old=JSON.parse(localStorage.getItem(current)||'{}')||{};localStorage.setItem(current,JSON.stringify({...old,rolls,expanded:[...expanded]}))}catch{}
 }
 function getOptions(spec,slot){
  const pair=slot===4?[spec[1],spec[2]]:slot===7?[spec[3],'Situative Resistenz']:common[slot];
