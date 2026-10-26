@@ -92,8 +92,8 @@ const useData=(d,ref)=>{
     itemId:i.id,slotPos:i.slotPos},
    details:{
     basics:mains.map(x=>({name:String(x.name||x.id||''),value:String(x.value??'')+(x.extra&&x.extra!=='0'?' (+'+x.extra+')':'')})),
-    manaStones:stones.map(x=>({name:String(x.name||''),value:String(x.value??'')})),
-    godStone:gods[0]?{name:String(gods[0].name||''),description:String(gods[0].desc||'')}:null,
+    manaStones:stones.map(x=>({name:String(x.name||''),value:String(x.value??''),icon:String(x.icon||''),grade:String(x.grade||'')})),
+    godStone:gods[0]?{name:String(gods[0].name||''),description:String(gods[0].desc||''),icon:String(gods[0].icon||''),grade:String(gods[0].grade||'')}:null,
     soulRate:detail.soulBindRate?(String(detail.soulBindRate)+' %'):null
    }
   };
@@ -103,18 +103,28 @@ const useData=(d,ref)=>{
  if(Object.keys(data?.gear||{}).length&&!confirm('Vorhandenes Gear durch die '+count+' offiziellen Ausrüstungsgegenstände ersetzen?'))return;
  const rawSkills=Array.isArray(extra.skillList)?extra.skillList:[];
  const group=(cat)=>rawSkills.filter(i=>i&&i.category===cat).map(i=>({
-  name:String(i.name||''),level:i.skillLevel?'Stufe '+i.skillLevel:'Nicht erlernt'
+  name:String(i.name||''),level:i.skillLevel?'Stufe '+i.skillLevel:'Nicht erlernt',
+  icon:String(i.icon||''),category:String(i.category||''),equipped:!!i.equip,acquired:!!i.acquired
  }));
  const boards=d.info?.daevanion?.boardList||[];
  const av=Array.isArray(boards)?boards.map(b=>({
-  name:String(b.name||''),level:(b.openNodeCount||0)+' / '+(b.totalNodeCount||'?')+' Knoten'
+  name:String(b.name||''),level:(b.openNodeCount||0)+' / '+(b.totalNodeCount||'?')+' Knoten',
+ id:String(b.id||''),icon:String(b.icon||''),opened:Number(b.openNodeCount||0),total:Number(b.totalNodeCount||0)
  })):[];
  const petwing=d.equipment?.petwing||{};
  const displayName=String(info.characterName||'EU-Charakter').slice(0,45);
  data={name:displayName,mode:$('mode')?.value||'hybrid',gear,
   source:'NCSOFT – serverseitiger Testabruf',sourceRef:{sid:ref.serverId,id:ref.characterId},
   sourceUrl:d.profileUrl,importedAt:d.generatedAt,
-  characterExtras:{skills:[...group('Active'),...group('Passive')],stigmas:group('Dp'),daevanion:av,
+  characterExtras:{skills:group('Active'),passives:group('Passive'),dpSkills:group('Dp'),stigmas:[],
+    daevanion:av,boards:Object.fromEntries(Object.entries(d.daevanionBoards||{}).map(([id,board])=>[
+      id,{nodes:(Array.isArray(board?.nodeList)?board.nodeList:[]).slice(0,225).map(n=>({
+        id:n.nodeId,row:Number(n.row),col:Number(n.col),name:String(n.name||''),type:String(n.type||''),
+        grade:String(n.grade||''),open:!!n.open,icon:String(n.icon||''),
+        effects:(Array.isArray(n.effectList)?n.effectList:[]).slice(0,8).map(e=>String(e.desc||''))
+      })),stats:(board?.openStatEffectList||[]).slice(0,120).map(x=>String(x.desc||'')),
+      skills:(board?.openSkillEffectList||[]).slice(0,120).map(x=>String(x.desc||''))}
+    ])),
     pet:petwing.pet||null,wing:petwing.wing||null}};
  isDemo=false;$('charname').value=displayName;$('dash').classList.remove('hidden');
  $('type').textContent='NCSOFT · ÖFFENTLICHE PROFILDATEN';
