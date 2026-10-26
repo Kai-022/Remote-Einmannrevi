@@ -113,4 +113,5 @@ $('nc-import').addEventListener('click',async()=>{
  }catch(e){note('Import nicht möglich: '+String(e.message||e),true);}
  finally{btn.disabled=false;}
 });
+window.aionNC={useData,parseOfficialLink};
 })();
