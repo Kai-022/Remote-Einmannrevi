@@ -1,0 +1,17 @@
+{
+  "syntax": true,
+  "searchCount": 2,
+  "firstResults": [
+    {
+      "serverId": "1305",
+      "name": "Taty",
+      "hasCharacterId": true
+    },
+    {
+      "serverId": "1305",
+      "name": "Tatya",
+      "hasCharacterId": true
+    }
+  ],
+  "exactMatches": 0
+}
