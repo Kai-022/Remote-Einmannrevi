@@ -2,12 +2,20 @@
 (()=>{
 'use strict';
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const cdnImage=(url,size=37)=>{
+ try{
+  const u=new URL(String(url||''));
+  if(u.protocol!=='https:'||u.hostname!=='assets.playnccdn.com')return '';
+  return '<img src="'+esc(u.href)+'" alt="" loading="lazy" referrerpolicy="no-referrer" '+
+   'style="width:'+size+'px;height:'+size+'px;object-fit:contain;border-radius:6px;flex-shrink:0;background:#1d2736" />';
+ }catch{return ''}
+};
 const panel=document.createElement('dialog');panel.id='gear-detail-dialog';panel.style.cssText='max-width:min(650px,96vw);width:96vw;max-height:88vh;overflow:auto;border:1px solid #5c6981;border-radius:14px;background:#131c2a;color:#edf1f8;padding:20px;box-shadow:0 20px 80px #000b';
 document.body.append(panel);
 panel.addEventListener('click',e=>{if(e.target===panel)panel.close()});
 const body=()=>document.getElementById('gear-list');
 const section=(heading,arr,sourceLabel)=>'<section style="margin:18px 0"><div class="eyebrow">'+esc(heading)+'</div>'+
- (arr.length?arr.map(([k,v,cls])=>'<div class="gear-roll '+esc(cls||'mid')+'" style="margin-top:7px"><span class="gear-roll-name">'+esc(k)+'</span><strong>'+esc(v)+'</strong></div>').join(''):
+ (arr.length?arr.map(([k,v,cls,img])=>'<div class="gear-roll '+esc(cls||'mid')+'" style="margin-top:7px">'+cdnImage(img,27)+'<span class="gear-roll-name">'+esc(k)+'</span><strong>'+esc(v)+'</strong></div>').join(''):
  '<div class="tip">Nicht in den importierten Daten enthalten. '+esc(sourceLabel||'')+'</div>')+'</section>';
 function parseTooltip(input){
  const lines=String(input||'').replace(/\r/g,'').split('\n').map(v=>v.trim()).filter(Boolean);
@@ -45,18 +53,18 @@ function openGear(slot){
  const detail=item.details||{};
  const basics=(detail.basics||[]).map(x=>[x.name,x.value]);
  const souls=(item.rolls||[]).map(x=>{const r=rating(slot,x);return [x,r.text,r.style]});
- const stones=(detail.manaStones||[]).map(x=>[x.name,x.value||'']);
+ const stones=(detail.manaStones||[]).map(x=>[x.name,x.value||'','',x.icon]);
  const god=(detail.godStone||null);
  const grade=item.importDetail?.grade||'';
  const breakthrough=item.importDetail?.breakthrough;
  panel.innerHTML='<button type="button" id="gear-detail-close" style="float:right">✕</button>'+
- '<div class="eyebrow">'+esc(slot)+'</div><h2 style="margin:9px 0">+'+esc(item.plus||0)+' '+esc(item.name||'Unbekannt')+'</h2>'+
+ '<div class="eyebrow">'+esc(slot)+'</div><div style="display:flex;align-items:center;gap:13px;margin:9px 0">'+cdnImage(item.iconUrl||item.importDetail?.iconUrl,68)+'<h2 style="margin:0">+'+esc(item.plus||0)+' '+esc(item.name||'Unbekannt')+'</h2></div>'+
  '<div class="tip">'+esc(grade)+(breakthrough!=null?' · ◆'+esc(breakthrough):'')+'</div>'+
  section('Basiswerte',basics,'Shugo zeigt diese meist erst beim Öffnen des Items.')+
  (detail.soulRate!=null?'<div class="tip">Seelenbindungsrate: '+esc(detail.soulRate)+'</div>':'')+
  section('Zusätzliche Werte / Seelenbindung',souls,'Das Profil liefert bisher nur die Ausrüstungsliste. Erst ein ausgelesener Item-Tooltip liefert diese Werte.')+
  section('Manasteine',stones)+
- section('Götterstein',god?[[god.name,god.description||'']]:[])+
+ section('Götterstein',god?[[god.name,god.description||'','',god.icon]]:[])+
  '<details style="margin-top:18px"><summary style="cursor:pointer;color:#e8c687">Detaillierte Werte vom Shugo-Item einfügen</summary>'+
  '<p class="tip">Auf Shugo.GG das Item anklicken, die Werte aus dem geöffneten Fenster kopieren und hier einfügen. Das ist nötig, wenn der automatische Profilabruf die Tooltip-Werte nicht liefert.</p>'+
  '<textarea id="gear-tooltip-text" rows="6" style="width:100%" placeholder="BASISWERTE&#10;Angriffskraft 398&#10;ZUSÄTZLICHE WERTE (5/10)&#10;Schadensverstärkung +6.7%"></textarea>'+
