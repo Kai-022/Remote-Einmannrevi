@@ -6,7 +6,7 @@
 (()=>{
 'use strict';
 const cv=document.createElement('canvas');
-function toCanvas(source,max=1800){
+function toCanvas(source,max=2200){
  const w=source.videoWidth||source.naturalWidth||source.width||0;
  const h=source.videoHeight||source.naturalHeight||source.height||0;
  if(!w||!h)return null;
