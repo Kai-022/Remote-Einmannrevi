@@ -38,6 +38,8 @@ function parseTooltip(input){
  result.manaStones=result.manaStones.slice(0,8);
  return result;
 }
+window.aionProfileExtras=window.aionProfileExtras||{};
+window.aionProfileExtras.parseTooltip=parseTooltip;
 function openGear(slot){
  const item=data?.gear?.[slot];if(!item)return;
  const detail=item.details||{};
@@ -96,8 +98,7 @@ function displaySkills(){
 const originalRender=render;
 render=function(){originalRender();displaySkills()};
 displaySkills();
-window.aionProfileExtras={
- parse(text){
+window.aionProfileExtras.parse=function(text){
   const lines=String(text||'').split(/\r?\n/).map(x=>x.trim());
   const labels={skills:/^(?:#{1,4}\s*)?(?:Skills|Fähigkeiten|Fertigkeiten)$/i,stigmas:/^(?:#{1,4}\s*)?(?:Stigmas|Stigmen)$/i,daevanion:/^(?:#{1,4}\s*)?(?:Daevanion)$/i};
   const sections={skills:[],stigmas:[],daevanion:[]};let mode=null;
@@ -114,6 +115,5 @@ window.aionProfileExtras={
   }
   for(const k of Object.keys(sections))sections[k]=sections[k].slice(0,70);
   return sections;
- }
 };
 })();
