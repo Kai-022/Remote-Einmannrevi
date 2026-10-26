@@ -21,7 +21,7 @@ const common={
 };
 const list=$('pet-list');
 if(!list)return;
-let current='',rolls={},expanded=new Set(['Cogni']);
+let current='',rolls={},details={},expanded=new Set(['Cogni']);
 function storageKey(){return 'aion2-pets-v2:'+String(data?.sourceRef?.sid||'local')+':'+String(data?.sourceRef?.id||data?.name||'Charakter').normalize('NFKC')}
 function load(){
  const key=storageKey();
@@ -29,11 +29,12 @@ function load(){
  current=key;let state={};
  try{state=JSON.parse(localStorage.getItem(key)||'{}')||{}}catch{}
  rolls=state.rolls&&typeof state.rolls==='object'&&!Array.isArray(state.rolls)?state.rolls:{};
+ details=state.details&&typeof state.details==='object'&&!Array.isArray(state.details)?state.details:{};
  expanded=new Set(Array.isArray(state.expanded)?state.expanded:['Cogni']);
 }
 function save(){
  if(isDemo)return;
- try{const old=JSON.parse(localStorage.getItem(current)||'{}')||{};localStorage.setItem(current,JSON.stringify({...old,rolls,expanded:[...expanded]}))}catch{}
+ try{const old=JSON.parse(localStorage.getItem(current)||'{}')||{};localStorage.setItem(current,JSON.stringify({...old,rolls,details,expanded:[...expanded]}))}catch{}
 }
 function getOptions(spec,slot){
  const pair=slot===4?[spec[1],spec[2]]:slot===7?[spec[3],'Situative Resistenz']:common[slot];
@@ -46,7 +47,7 @@ function status(spec,slot){
 }
 function slotCard(spec,slot){
  const itemId=spec[0]+'|'+slot,opts=getOptions(spec,slot),actual=String(rolls[itemId]||'');
- const result=status(spec,slot);
+ const result=status(spec,slot),numeric=details[itemId]?.value||'';
  const indicators={unknown:'⚪ Nicht erfasst',good:'🟢 BiS',alt:'🟡 Alternative',bad:'🔴 Neu prüfen'};
  const known=[opts.best,...opts.alts];
  return '<div class="ps-cell '+result+'"><div class="ps-title"><span>Slot '+slot+(slot===4?' · Offensiv':slot===7?' · Defensiv':'')+'</span>'+
@@ -57,6 +58,7 @@ function slotCard(spec,slot){
  known.map(v=>'<option value="'+safe(v)+'"'+(v===actual?' selected':'')+'>'+safe(v)+'</option>').join('')+
  '<option value="__other__"'+(actual&&!known.includes(actual)?' selected':'')+'>Anderer Wert (nicht empfohlen)</option></select>'+
  (actual&&!known.includes(actual)?'<div class="ps-tip">Eingetragen: '+safe(actual)+'</div>':'')+
+ (numeric?'<div class="ps-tip" style="color:#8fe2b8"><b>Ausgelesene Zahl:</b> '+safe(numeric)+'</div>':'')+
  '<div class="ps-tip"><b>BiS:</b> '+safe(opts.best)+'</div>'+
  '<div class="ps-tip"><b>Alternative:</b> '+safe(opts.alts.join(' oder ')||'Nicht hinterlegt')+'</div>'+
  '</div>';
@@ -82,6 +84,7 @@ list.addEventListener('change',e=>{
  const spec=specs.find(x=>x[0]===select.dataset.species),n=Number(select.dataset.slot);
  if(!spec||!Number.isInteger(n)||n<1||n>9)return;
  const id=spec[0]+'|'+n;
+ delete details[id];
  if(select.value==='__other__')rolls[id]='Anderer Wert';
  else if(select.value)rolls[id]=String(select.value).slice(0,80);
  else delete rolls[id];
