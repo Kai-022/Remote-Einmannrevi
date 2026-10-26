@@ -23,6 +23,15 @@ else document.querySelector('.hero')?.after(panel);
 const status=$('nc-feedback');
 const euElyos='Siel|Nezekan|Vaizel|Kaisinel|Yustiel|Ariel|Fregion|Meslamtaeda|Hithanya|Nania|Tahavatha|Luteros|Phernos|Daminu|Kasaka|Bakarma|Tsenka|Kochi|Ishtar|Tiamat|Gauss|Lamuatan|Nathara'.split('|');
 const euAsmo='Israphel|Zikel|Triniel|Lumiel|Marchutan|Azphel|Ereshkigal|Beritra|Nemon|Hadala|Ludra|Ulgorn|Munin|Odar|Zemurru|Kromede|Quai|Baba|Fafnir|Indnath|Agnita|Atiel|Tassin'.split('|');
+
+const selectedServer=$('nc-server-select');
+for(const [label,arr,first] of [['Elyos',euElyos,1301],['Asmodier',euAsmo,2301]]){
+ const group=document.createElement('optgroup');group.label=label;
+ arr.forEach((name,i)=>{const option=document.createElement('option');option.value=String(first+i);option.textContent=name+' ('+label+')';group.append(option)});
+ selectedServer.append(group);
+}
+selectedServer.value='1305';
+
 function note(s,error=false){status.textContent=s;status.classList.toggle('error',error);}
 function parseOfficialLink(input) {
  let url;
