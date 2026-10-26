@@ -27,7 +27,8 @@
       "faction": "alle",
       "icon": "./pantheon-icons/colossus-guardian-lord-nahma.webp",
       "detail": "",
-      "originalGroup": "nahma-colossus"
+      "originalGroup": "nahma-colossus",
+      "nameDe": "Wächtergott Nahma"
     },
     {
       "id": "colossus-zikel-s-apparition",
@@ -43,7 +44,8 @@
       "faction": "alle",
       "icon": "./pantheon-icons/statue.webp",
       "detail": "",
-      "originalGroup": "zikel-colossus"
+      "originalGroup": "zikel-colossus",
+      "nameDe": "Zikels Schemen"
     },
     {
       "id": "colossus-incarnated-warding-feather",
@@ -58,7 +60,8 @@
       "faction": "elyos",
       "icon": "./pantheon-icons/statue.webp",
       "detail": "",
-      "originalGroup": "story-colossus"
+      "originalGroup": "story-colossus",
+      "nameDe": "Manifestierte Schwinge der Behütung"
     },
     {
       "id": "colossus-warden-santras",
@@ -73,7 +76,8 @@
       "faction": "asmodier",
       "icon": "./pantheon-icons/statue.webp",
       "detail": "",
-      "originalGroup": "story-colossus"
+      "originalGroup": "story-colossus",
+      "nameDe": "Gefängniswärter Santras"
     },
     {
       "id": "statue-transcendent-bakarma",
@@ -89,7 +93,8 @@
       "faction": "alle",
       "icon": "./pantheon-icons/bakarma.png",
       "detail": "",
-      "originalGroup": "bakarma"
+      "originalGroup": "bakarma",
+      "nameDe": "Transzendierter Bakarma"
     },
     {
       "id": "statue-asahr-s-mirror",
@@ -104,7 +109,8 @@
       "faction": "alle",
       "icon": "./pantheon-icons/statue.webp",
       "detail": "",
-      "originalGroup": "asahr"
+      "originalGroup": "asahr",
+      "nameDe": "Asahrs Spiegel"
     },
     {
       "id": "statue-fortress-guardian-notun",
@@ -119,7 +125,8 @@
       "faction": "alle",
       "icon": "./pantheon-icons/statue.webp",
       "detail": "",
-      "originalGroup": "notun"
+      "originalGroup": "notun",
+      "nameDe": "Festenhüter Notun"
     },
     {
       "id": "statue-artifact-of-eternity",
@@ -134,7 +141,8 @@
       "faction": "alle",
       "icon": "./pantheon-icons/statue.webp",
       "detail": "",
-      "originalGroup": "eternity"
+      "originalGroup": "eternity",
+      "nameDe": "Artefakt der Ewigkeit"
     },
     {
       "id": "statue-kibelisk",
@@ -179,7 +187,8 @@
       "faction": "alle",
       "icon": "./pantheon-icons/statue.webp",
       "detail": "",
-      "originalGroup": "dream"
+      "originalGroup": "dream",
+      "nameDe": "Traumfragment"
     },
     {
       "id": "statue-fafnir-s-poison-blood",
@@ -194,7 +203,8 @@
       "faction": "alle",
       "icon": "./pantheon-icons/statue.webp",
       "detail": "",
-      "originalGroup": "fafnir"
+      "originalGroup": "fafnir",
+      "nameDe": "Fafnirs Giftblut"
     },
     {
       "id": "statue-mirror-of-desire",
@@ -209,7 +219,8 @@
       "faction": "alle",
       "icon": "./pantheon-icons/statue.webp",
       "detail": "",
-      "originalGroup": "desire"
+      "originalGroup": "desire",
+      "nameDe": "Spiegel der Gier"
     },
     {
       "id": "statue-wraith-giselle",
@@ -224,7 +235,8 @@
       "faction": "alle",
       "icon": "./pantheon-icons/statue.webp",
       "detail": "",
-      "originalGroup": "giselle"
+      "originalGroup": "giselle",
+      "nameDe": "Geist Giselle"
     },
     {
       "id": "statue-teina",
@@ -269,7 +281,8 @@
       "faction": "alle",
       "icon": "./pantheon-icons/statue.webp",
       "detail": "",
-      "originalGroup": "nightmare-death-space"
+      "originalGroup": "nightmare-death-space",
+      "nameDe": "Torwächter Pinopi"
     },
     {
       "id": "statue-furious-feruk",
@@ -284,7 +297,8 @@
       "faction": "alle",
       "icon": "./pantheon-icons/statue.webp",
       "detail": "",
-      "originalGroup": "nightmare-death-space"
+      "originalGroup": "nightmare-death-space",
+      "nameDe": "Rasender Feruk"
     },
     {
       "id": "statue-sealing-wings",
@@ -299,7 +313,8 @@
       "faction": "elyos",
       "icon": "./pantheon-icons/statue.webp",
       "detail": "",
-      "originalGroup": "wings"
+      "originalGroup": "wings",
+      "nameDe": "Siegelflügel"
     },
     {
       "id": "statue-glorious-wings",
@@ -314,7 +329,8 @@
       "faction": "asmodier",
       "icon": "./pantheon-icons/statue.webp",
       "detail": "",
-      "originalGroup": "wings"
+      "originalGroup": "wings",
+      "nameDe": "Glorreiche Flügel"
     },
     {
       "id": "statue-torn-forbidden-bookcase",
@@ -328,7 +344,8 @@
       "faction": "elyos",
       "icon": "./pantheon-icons/statue.webp",
       "detail": "",
-      "originalGroup": "common-statue"
+      "originalGroup": "common-statue",
+      "nameDe": "Rissiges Bannbücherregal"
     },
     {
       "id": "statue-urd",
@@ -371,7 +388,8 @@
       "faction": "elyos",
       "icon": "./pantheon-icons/artwork.webp",
       "detail": "",
-      "originalGroup": "gartua"
+      "originalGroup": "gartua",
+      "nameDe": "Ewiger Gartua"
     },
     {
       "id": "painting-immortal-gartua",
@@ -388,7 +406,8 @@
       "faction": "asmodier",
       "icon": "./pantheon-icons/artwork.webp",
       "detail": "",
-      "originalGroup": "gartua"
+      "originalGroup": "gartua",
+      "nameDe": "Unsterblicher Gartua"
     },
     {
       "id": "painting-abyssal-ludra",
@@ -404,7 +423,8 @@
       "faction": "alle",
       "icon": "./pantheon-icons/artwork.webp",
       "detail": "",
-      "originalGroup": "ludra"
+      "originalGroup": "ludra",
+      "nameDe": "Ludra des Abgrunds"
     },
     {
       "id": "painting-guardian-lord-nahma-painting",
@@ -420,7 +440,8 @@
       "faction": "alle",
       "icon": "./pantheon-icons/artwork.webp",
       "detail": "",
-      "originalGroup": "nahma-artwork"
+      "originalGroup": "nahma-artwork",
+      "nameDe": "Wächtergott Nahma"
     },
     {
       "id": "painting-krao-cave",
@@ -532,7 +553,8 @@
       "faction": "elyos",
       "icon": "./pantheon-icons/artwork.webp",
       "detail": "",
-      "originalGroup": "elite-destiny"
+      "originalGroup": "elite-destiny",
+      "nameDe": "Überwachungswaffe K'nash"
     },
     {
       "id": "painting-black-tentacle-lawa",
@@ -548,7 +570,8 @@
       "faction": "elyos",
       "icon": "./pantheon-icons/artwork.webp",
       "detail": "",
-      "originalGroup": "elite-destiny"
+      "originalGroup": "elite-destiny",
+      "nameDe": "Schwarztentakel Lawa"
     },
     {
       "id": "painting-centurion-demiros",
@@ -596,7 +619,8 @@
       "faction": "asmodier",
       "icon": "./pantheon-icons/artwork.webp",
       "detail": "",
-      "originalGroup": "elite-destiny"
+      "originalGroup": "elite-destiny",
+      "nameDe": "Bataillonswaffe Guruta (Drakan)"
     },
     {
       "id": "painting-sharp-shylak",
@@ -612,7 +636,8 @@
       "faction": "asmodier",
       "icon": "./pantheon-icons/artwork.webp",
       "detail": "",
-      "originalGroup": "elite-destiny"
+      "originalGroup": "elite-destiny",
+      "nameDe": "Scharfer Shylak"
     },
     {
       "id": "painting-desecrator-newbold",
@@ -628,7 +653,8 @@
       "faction": "asmodier",
       "icon": "./pantheon-icons/artwork.webp",
       "detail": "",
-      "originalGroup": "elite-destiny"
+      "originalGroup": "elite-destiny",
+      "nameDe": "Schänder Newbold"
     },
     {
       "id": "painting-divine-ansas",
@@ -644,7 +670,8 @@
       "faction": "elyos",
       "icon": "./pantheon-icons/artwork.webp",
       "detail": "",
-      "originalGroup": "elite-life"
+      "originalGroup": "elite-life",
+      "nameDe": "Heiliger Ansas"
     },
     {
       "id": "painting-phantasm-kasia",
@@ -660,7 +687,8 @@
       "faction": "elyos",
       "icon": "./pantheon-icons/artwork.webp",
       "detail": "",
-      "originalGroup": "elite-life"
+      "originalGroup": "elite-life",
+      "nameDe": "Traumtrug Kasia"
     },
     {
       "id": "painting-argo",
@@ -724,7 +752,8 @@
       "faction": "elyos",
       "icon": "./pantheon-icons/artwork.webp",
       "detail": "",
-      "originalGroup": "elite-dil"
+      "originalGroup": "elite-dil",
+      "nameDe": "Forscher Setram"
     },
     {
       "id": "painting-specter-archon-axios",
@@ -740,7 +769,8 @@
       "faction": "asmodier",
       "icon": "./pantheon-icons/artwork.webp",
       "detail": "",
-      "originalGroup": "elite-dil"
+      "originalGroup": "elite-dil",
+      "nameDe": "Schattenarchon Axios"
     },
     {
       "id": "painting-executioner-barthien",
@@ -756,7 +786,8 @@
       "faction": "asmodier",
       "icon": "./pantheon-icons/artwork.webp",
       "detail": "",
-      "originalGroup": "elite-dil"
+      "originalGroup": "elite-dil",
+      "nameDe": "Henker Barthien"
     },
     {
       "id": "painting-visionary-karuka",
@@ -772,7 +803,8 @@
       "faction": "asmodier",
       "icon": "./pantheon-icons/artwork.webp",
       "detail": "",
-      "originalGroup": "elite-dil"
+      "originalGroup": "elite-dil",
+      "nameDe": "Visionärer Karuka"
     },
     {
       "id": "painting-dark-shadow-vishwada",
@@ -788,7 +820,8 @@
       "faction": "asmodier",
       "icon": "./pantheon-icons/artwork.webp",
       "detail": "",
-      "originalGroup": "elite-dil"
+      "originalGroup": "elite-dil",
+      "nameDe": "Dunkelschatten Vishwada"
     },
     {
       "id": "painting-silent-dartan",
@@ -884,7 +917,8 @@
       "faction": "alle",
       "icon": "./pantheon-icons/fire-temple.png",
       "detail": "",
-      "originalGroup": "starter-wdl"
+      "originalGroup": "starter-wdl",
+      "nameDe": "Feuertempel"
     },
     {
       "id": "painting-chaser-taulo",
@@ -914,7 +948,8 @@
       "faction": "elyos",
       "icon": "./pantheon-icons/artwork.webp",
       "detail": "",
-      "originalGroup": "epic-wi"
+      "originalGroup": "epic-wi",
+      "nameDe": "Ernteaufseher Moshav"
     },
     {
       "id": "painting-scholar-aulla",
@@ -1034,7 +1069,8 @@
       "faction": "asmodier",
       "icon": "./pantheon-icons/artwork.webp",
       "detail": "",
-      "originalGroup": "epic-w"
+      "originalGroup": "epic-w",
+      "nameDe": "Täuscherin Trid"
     },
     {
       "id": "painting-blue-wave-kelpina",
@@ -1049,7 +1085,8 @@
       "faction": "asmodier",
       "icon": "./pantheon-icons/artwork.webp",
       "detail": "",
-      "originalGroup": "epic-w"
+      "originalGroup": "epic-w",
+      "nameDe": "Blauwelle Kelpina"
     },
     {
       "id": "painting-sanctum-outpost",
@@ -1079,7 +1116,8 @@
       "faction": "asmodier",
       "icon": "./pantheon-icons/artwork.webp",
       "detail": "",
-      "originalGroup": "epic-w"
+      "originalGroup": "epic-w",
+      "nameDe": "Hauptaufseher Nutah"
     },
     {
       "id": "painting-special-operations-leader-linx",
@@ -1094,7 +1132,8 @@
       "faction": "asmodier",
       "icon": "./pantheon-icons/artwork.webp",
       "detail": "",
-      "originalGroup": "epic-w"
+      "originalGroup": "epic-w",
+      "nameDe": "Sondereinsatzhauptmann Linx"
     },
     {
       "id": "painting-shugo-alchemist",
@@ -1259,7 +1298,8 @@
       "faction": "asmodier",
       "icon": "./pantheon-icons/artwork.webp",
       "detail": "",
-      "originalGroup": "epic-i"
+      "originalGroup": "epic-i",
+      "nameDe": "Verschlinger Garsan"
     },
     {
       "id": "painting-advisor-resana",
@@ -1274,7 +1314,8 @@
       "faction": "asmodier",
       "icon": "./pantheon-icons/artwork.webp",
       "detail": "",
-      "originalGroup": "epic-i"
+      "originalGroup": "epic-i",
+      "nameDe": "Berater Resana"
     },
     {
       "id": "painting-safe-haven",
@@ -1349,7 +1390,8 @@
       "faction": "asmodier",
       "icon": "./pantheon-icons/artwork.webp",
       "detail": "",
-      "originalGroup": "starter-rare"
+      "originalGroup": "starter-rare",
+      "nameDe": "Dunkelkrieger Aed"
     },
     {
       "id": "painting-artisan-armorsmith",
@@ -1394,7 +1436,8 @@
       "faction": "elyos",
       "icon": "./pantheon-icons/artwork.webp",
       "detail": "",
-      "originalGroup": "rare-w"
+      "originalGroup": "rare-w",
+      "nameDe": "Kernon des Westens"
     },
     {
       "id": "painting-blooming-korin",
@@ -1409,7 +1452,8 @@
       "faction": "elyos",
       "icon": "./pantheon-icons/artwork.webp",
       "detail": "",
-      "originalGroup": "rare-w"
+      "originalGroup": "rare-w",
+      "nameDe": "Blühender Korin"
     },
     {
       "id": "painting-bodyguard-teegant",
@@ -1424,7 +1468,8 @@
       "faction": "elyos",
       "icon": "./pantheon-icons/artwork.webp",
       "detail": "",
-      "originalGroup": "rare-w"
+      "originalGroup": "rare-w",
+      "nameDe": "Leibgardist Teegant"
     }
   ]
 }
