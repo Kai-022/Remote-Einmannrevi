@@ -6,6 +6,7 @@ on:
       - 'aion2-gear-checker/upgrade-advisor-core.js'
       - 'aion2-gear-checker/upgrade-advisor.js'
       - 'aion2-gear-checker/tests/upgrade-advisor.mjs'
+      - 'aion2-gear-checker/tests/upgrade-advisor-ui.mjs'
       - 'aion2-gear-checker/index.html'
       - '.github/workflows/aion2-upgrade-advisor-test.yml'
 permissions:
@@ -24,4 +25,6 @@ jobs:
           node --check aion2-gear-checker/upgrade-advisor-core.js
           node --check aion2-gear-checker/upgrade-advisor.js
       - name: Test EU profile upgrade recommendations
-        run: node aion2-gear-checker/tests/upgrade-advisor.mjs
+        run: |
+          node aion2-gear-checker/tests/upgrade-advisor.mjs
+          node aion2-gear-checker/tests/upgrade-advisor-ui.mjs
