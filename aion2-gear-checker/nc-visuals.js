@@ -11,6 +11,22 @@ const image=(url,size=30,extra='')=>{
    'style="width:'+size+'px;height:'+size+'px;object-fit:contain;flex-shrink:0" '+extra+'>';
  }catch{return ''}
 };
+// Official skill IDs from NCSOFT public profile. Artwork is stored locally in nc-icons/skills.
+const skillIdByName={"earth s retribution":"17010000","judgment thunder":"17040000","debilitating mark":"17080000","divine aura":"17150000","chain of torment":"17070000","lightning strike scattershot":"17370000","light of regeneration":"17090000","condemnation":"17350000","healing light":"17100000","radiant recovery":"17120000","bolt":"17060000","defiance":"17240000","warm benediction":"17710000","empyrean lords benediction":"17720000","empyrean lord s grace":"17730000","healing enhancement":"17740000","immortal veil":"17750000","heal block":"17760000","prayer of concentration":"17770000","earth s grace":"17780000","survival willpower":"17790000","radiant benediction":"17800000","power burst":"17280000","absolution":"17290000","benevolence":"17160000","prayer of amplification":"17430000","summon resurrection":"17390000","earth punishment":"17400000","salvation":"17270000","root":"17190000","light of protection":"17410000","yustiel s power":"17420000","voice of doom":"17300000","assault mark":"17700000","noble aura":"17440000"};
+const normalizeSkill=v=>String(v||'').trim().toLowerCase().replace(/[’‘]/g,"'").replace(/[^a-z0-9]+/g,' ');
+const iconForSkill=name=>{
+ const clean=String(name||'').replace(/^Skill Level Up\s*-\s*/i,'').replace(/\s*\+\s*\d+\s*$/,'');
+ const id=skillIdByName[normalizeSkill(clean)];
+ return id?'./nc-icons/skills/'+id+'.webp':'';
+};
+window.aionOfficialSkillIcon=iconForSkill;
+const nodeSkillName=n=>{
+ const effect=(n.effects||[]).find(v=>/\+\s*\d+\s*$/.test(v));
+ return String(effect||n.name||'').replace(/^Skill Level Up\s*-\s*/i,'').replace(/\s*\+\s*\d+\s*$/,'');
+};
+const nodeFrame=n=>['common','rare','legend','unique','start'].includes(String(n?.grade||'').toLowerCase())?
+ String(n.grade).toLowerCase():(n?.type==='Start'?'start':'common');
+const smallArt=(src,cls='')=>src?'<img src="'+esc(src)+'" class="'+cls+'" alt="" loading="lazy" decoding="async">':'';
 const plan=[
  {label:'Solo-DPS',terms:['Verdammnis','Rache der Erde','Donnerschlag','Heilige Aura','Strafe der Erde','Schadensverstärkung','Kritischer Schadens','Mehrfachtreffer','Angriffskraft','Segen des Gebieters']},
  {label:'Gruppen-PvE',terms:['Verdammnis','Glanz der Genesung','Licht der Heilung','Heilige Aura','Rache der Erde','Abklingzeit','Kampftempo','Schadensverstärkung','Segen des Gebieters']}
@@ -46,11 +62,15 @@ css.textContent=`
 .aion-node.on{background:#254d3a;border-color:#78d9ac;box-shadow:inset 0 0 0 1px #47976e}
 .aion-node.special{border-color:#c49e59}
 .aion-node.on.special{border-color:#ebca78}.aion-node.priority{outline:2px solid #e3b15b;outline-offset:-2px;box-shadow:0 0 8px #dfac4c88}.aion-board-builds{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}.aion-board-builds button{padding:9px 12px;border:1px solid #68768a;border-radius:7px;background:#1a293a;color:#eee}.aion-board-builds button.active{border-color:#f0bd68;color:#ffd88e;background:#40321e}
-.aion-node img{width:100%;height:100%;object-fit:contain}.aion-node-fallback{font-size:20px;color:#e4c48a}.aion-node img:not([src]){display:none}
+.aion-node.with-art{background-repeat:no-repeat;background-position:center;background-size:100% 100%;border-color:transparent}
+.aion-node img.aion-node-skill{width:76%;height:76%;object-fit:cover;border-radius:4px;filter:none;position:relative;z-index:1;box-shadow:0 0 0 1px #0009}
+.aion-node.with-art .tick{z-index:2;background:#16432fd9;border-radius:2px;line-height:12px}.aion-node-fallback{font-size:20px;color:#e4c48a}.aion-node img:not([src]){display:none}
 .aion-node .tick{position:absolute;bottom:-2px;right:0;font:bold 11px system-ui;color:#abf5cb;text-shadow:0 1px 3px #000}
 .aion-node-detail{margin-top:14px;padding:14px;border:1px solid #45516a;border-radius:10px;background:#182335}
 .aion-board-legend{display:flex;flex-wrap:wrap;gap:14px;margin:12px 0;color:#b9c4d1;font-size:12px}
 .aion-board-dot{width:11px;height:11px;display:inline-block;border-radius:3px;margin-right:5px}
+.aion-node-skill-detail{width:48px;height:48px;object-fit:cover;border-radius:8px}
+.aion-board-header-icon{width:44px;height:44px;object-fit:contain}
 .aion-profile-pic{width:56px;height:56px;object-fit:cover;border-radius:12px;border:1px solid #b58d54}
 @media(max-width:600px){.aion-board-grid{justify-content:start}.aion-board-select{flex-basis:140px}}
 `;
@@ -110,19 +130,20 @@ function tile(n,index){
  if(!n||n.type==='None')return '<div class="aion-node filler" aria-hidden="true"></div>';
  const on=!!n.open,special=n.type==='SkillLevel'||n.grade==='Legend',recommended=priority(n);
  const title=esc((n.name||n.type||'Knoten')+(on?' · Freigeschaltet':' · Nicht freigeschaltet'));
- const effect=(n.effects||[]).join(' ');
- const skill=n.type==='SkillLevel'||n.type==='Skill'||/skill|fähigkeit|fertigkeit/i.test(n.type+' '+n.name);
- const fallback=skill?'✦':(n.type==='Stat'?'◆':'◇');
- const iconMarkup=image(n.icon,29);
- const art=iconMarkup||'<span class="aion-node-fallback">'+fallback+'</span>';
- return '<button type="button" class="aion-node '+(on?'on':'off')+(special?' special':'')+(recommended?' priority':'')+
- '" data-node="'+index+'" title="'+title+'" aria-label="'+title+'">'+
- art+(on?'<span class="tick">✓</span>':'')+'</button>';
+ const isSkill=n.type==='SkillLevel',src=isSkill?iconForSkill(nodeSkillName(n)):'';
+ const frame='./nc-icons/frames/'+nodeFrame(n)+'.png';
+ const fallback=n.type==='Start'?'★':(isSkill?'✦':'');
+ const art=smallArt(src,'aion-node-skill')||(fallback?'<span class="aion-node-fallback">'+fallback+'</span>':'');
+ return '<button type="button" class="aion-node with-art '+(on?'on':'off')+
+  (special?' special':'')+(recommended?' priority':'')+
+  '" style="background-image:url(\''+frame+'\')" data-node="'+index+
+  '" title="'+title+'" aria-label="'+title+'">'+art+
+  (on?'<span class="tick">✓</span>':'')+'</button>';
 }
 function panelFor(node){
  const root=$('aion-board-node-detail');if(!root||!node)return;
  const effects=Array.isArray(node.effects)?node.effects:[];
- root.innerHTML='<div class="aion-node-detail"><div style="display:flex;gap:12px;align-items:center">'+image(node.icon,47)+
+ root.innerHTML='<div class="aion-node-detail"><div style="display:flex;gap:12px;align-items:center">'+smallArt(iconForSkill(nodeSkillName(node)),'aion-node-skill-detail')+
   '<div><strong>'+esc(node.name||'Knoten')+'</strong>'+
   '<div class="tip">'+esc(node.grade||node.type||'')+' · '+
    (node.open?'✓ Freigeschaltet':'○ Noch gesperrt')+'</div></div></div>'+
@@ -206,7 +227,7 @@ function renderBoards(){
   const total=m.total||b.nodes.filter(n=>n.type!=='None').length;
   const fraction=total?Math.round(100*opened/total):0;
   return '<button type="button" class="aion-board-select'+(id===selected?' active':'')+
-   '" data-board="'+esc(id)+'">'+image(m.icon,44)+
+   '" data-board="'+esc(id)+'">'+smallArt('./nc-icons/frames/start.png','aion-board-header-icon')+
    '<span><strong>'+esc(m.name||'Board '+id)+'</strong><small>'+opened+' / '+total+' Knoten</small>'+
    '<div class="aion-board-progress"><span style="width:'+Math.min(100,Math.max(0,fraction))+'%"></span></div></span></button>';
  }).join('')+'</div>';
