@@ -114,6 +114,45 @@ function panelFor(node){
   (effects.length?effects.map(x=>'<div class="gear-roll" style="margin-top:5px">'+esc(x)+'</div>').join(''):
   '<div class="tip">Für diesen Knoten liegen keine zusätzlichen Effekte vor.</div>')+'</div></div>';
 }
+async function loadMissingBoards(){
+ const ref=data?.sourceRef;
+ if(!ref?.sid||!ref?.id)throw Error('Bitte zuerst deinen Charakter über den offiziellen NCSOFT-Import laden.');
+ const response=await fetch('./nc-character-snapshot.json?t='+Date.now(),{cache:'no-store'});
+ if(!response.ok)throw Error('Der gespeicherte NCSOFT-Testdatensatz konnte nicht geladen werden.');
+ const d=await response.json();
+ if(String(d.serverId)!==String(ref.sid)||String(d.characterId)!==String(ref.id))
+  throw Error('Für deinen Charakter ist hier noch kein Board-Datensatz gespeichert. Nutze den offiziellen Live-Import mit deinem Server.');
+ const original=d.daevanionBoards||{},list=d.info?.daevanion?.boardList||[];
+ const boards={};
+ for(const [id,board] of Object.entries(original)){
+  boards[id]={
+   nodes:(Array.isArray(board.nodeList)?board.nodeList:[]).slice(0,225).map(n=>({
+    id:n.nodeId,row:Number(n.row),col:Number(n.col),name:String(n.name||''),
+    type:String(n.type||''),grade:String(n.grade||''),open:!!n.open,
+    icon:String(n.icon||''),effects:(Array.isArray(n.effectList)?n.effectList:[]).map(e=>String(e.desc||''))
+   })),
+   stats:(board.openStatEffectList||[]).map(v=>String(v.desc||'')),
+   skills:(board.openSkillEffectList||[]).map(v=>String(v.desc||''))
+  };
+ }
+ const count=Object.keys(boards).length;
+ if(!count)throw Error('Die offiziellen Profildaten enthalten keine Daevanion-Tafeln.');
+ data.characterExtras=data.characterExtras||{};
+ data.characterExtras.boards=boards;
+ data.characterExtras.daevanion=list.map(b=>({
+  id:String(b.id),name:String(b.name||''),icon:String(b.icon||''),
+  opened:Number(b.openNodeCount||0),total:Number(b.totalNodeCount||0),
+  level:(b.openNodeCount||0)+' / '+(b.totalNodeCount||'?')+' Knoten'
+ }));
+ const p=d.info?.profile||{};
+ data.characterExtras.profile=data.characterExtras.profile||{
+  name:String(p.characterName||''),className:String(p.className||''),
+  level:Number(p.characterLevel||0),combatPower:Number(p.combatPower||0),
+  icon:String(p.profileImage||'')
+ };
+ store();render();
+ return count;
+}
 function renderBoards(){
  portrait();
  const indicator=$('aion-board-indicator');
@@ -126,7 +165,9 @@ function renderBoards(){
  const root=$('aion-board-content');if(!root)return;
  if(!ids.length){
   selected=null;
-  root.innerHTML='<div class="empty">Für diesen Charakter sind noch keine Daevanion-Boarddaten importiert. Der offizielle NCSOFT-Import lädt diese bei verfügbaren öffentlichen Daten.</div>';
+  root.innerHTML='<div class="empty">Für diesen Charakter sind noch keine Daevanion-Boarddaten geladen. Öffne den offiziellen NCSOFT-Import oder lade bei einem bereits importierten Charakter die Tafeln nach.</div>'+
+   '<button type="button" class="primary" id="aion-recover-boards" style="margin-top:12px">◆ Board-Daten nachladen</button>'+
+   '<div id="aion-recover-status" class="tip" role="status"></div>';
   return;
  }
  if(!ids.includes(selected))selected=ids[0];
@@ -167,7 +208,16 @@ function renderBoards(){
  '<div class="aion-board-scroll"><div class="aion-board-grid">'+matrix+'</div></div>'+
  '<div id="aion-board-node-detail" aria-live="polite"><div class="tip" style="margin-top:12px">Klicke einen Knoten an, um seine Werte anzusehen.</div></div>'+summary;
 }
-$('aion-board-content').addEventListener('click',e=>{
+$('aion-board-content').addEventListener('click',async e=>{
+ const reload=e.target.closest('#aion-recover-boards');
+ if(reload){
+  reload.disabled=true;
+  const status=$('aion-recover-status');
+  if(status)status.textContent='Prüfe gespeicherte NCSOFT-Daten …';
+  try{const count=await loadMissingBoards();if(status)status.textContent=count+' Tafeln geladen.';}
+  catch(error){if(status)status.textContent=String(error.message||error);reload.disabled=false;}
+  return;
+ }
  const board=e.target.closest('[data-board]');
  if(board){
   selected=board.dataset.board;renderBoards();return;
