@@ -21,6 +21,8 @@ const shugo=$('shugo-import');
 if(shugo)shugo.parentNode.insertBefore(panel,shugo);
 else document.querySelector('.hero')?.after(panel);
 const status=$('nc-feedback');
+const euElyos='Siel|Nezekan|Vaizel|Kaisinel|Yustiel|Ariel|Fregion|Meslamtaeda|Hithanya|Nania|Tahavatha|Luteros|Phernos|Daminu|Kasaka|Bakarma|Tsenka|Kochi|Ishtar|Tiamat|Gauss|Lamuatan|Nathara'.split('|');
+const euAsmo='Israphel|Zikel|Triniel|Lumiel|Marchutan|Azphel|Ereshkigal|Beritra|Nemon|Hadala|Ludra|Ulgorn|Munin|Odar|Zemurru|Kromede|Quai|Baba|Fafnir|Indnath|Agnita|Atiel|Tassin'.split('|');
 function note(s,error=false){status.textContent=s;status.classList.toggle('error',error);}
 function parseOfficialLink(input) {
  let url;
