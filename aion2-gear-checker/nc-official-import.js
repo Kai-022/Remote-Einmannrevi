@@ -20,7 +20,7 @@ panel.innerHTML=
  '<input id="nc-character-name" type="text" placeholder="Name im Spiel" maxlength="45" autocomplete="off" required></div></div>'+
  '<div class="actions"><button type="button" class="primary" id="nc-import-name">✧ Charakter importieren</button></div>'+
  '<div id="nc-feedback" class="status" role="status" aria-live="polite"></div>'+
- '<p class="tiny muted" style="margin-top:11px">Aktuell kann ohne verbundenen Live-Datenserver nur der vorhandene Testcharakter Taty auf Yustiel geladen werden. Für andere öffentliche EU-Charaktere ist ein Datenserver nötig.</p>';
+ '<p class="tiny muted" id="nc-api-hint" style="margin-top:11px">Auf GitHub Pages ist der Testcharakter verfügbar. Auf Cloudflare Pages ermöglicht die Live-Schnittstelle den Import weiterer öffentlicher EU-Charaktere.</p>';
 document.querySelector('.hero')?.after(panel);
 const status=$('nc-feedback');
 const euElyos='Siel|Nezekan|Vaizel|Kaisinel|Yustiel|Ariel|Fregion|Meslamtaeda|Hithanya|Nania|Tahavatha|Luteros|Phernos|Daminu|Kasaka|Bakarma|Tsenka|Kochi|Ishtar|Tiamat|Gauss|Lamuatan|Nathara'.split('|');
@@ -36,6 +36,11 @@ selectedServer.value='';
 
 function note(s,error=false){status.textContent=s;status.classList.toggle('error',error);}
 function apiOrigin(){
+ // On Cloudflare Pages, the site and the read-only Worker share one domain.
+ const loc=window.location;
+ if((loc.protocol==='https:'&&!loc.hostname.endsWith('.github.io'))||
+    (loc.protocol==='http:'&&['localhost','127.0.0.1'].includes(loc.hostname)))
+   return loc.origin;
  let value='';
  try{value=localStorage.getItem('aion2_live_api')||''}catch{}
  if(!value)return '';
@@ -43,6 +48,20 @@ function apiOrigin(){
  if(url.protocol!=='https:'||url.username||url.password||url.search||url.hash||url.pathname!=='/')
   throw Error('Die gespeicherte Datenserver-Adresse ist ungültig.');
  return url.origin;
+}
+async function liveJSON(url,ms){
+ let response;
+ try{
+  response=await fetch(url,{mode:'cors',cache:'no-store',signal:AbortSignal.timeout(ms)});
+ }catch{
+  throw Error('Keine Verbindung zum EU-Datenserver. Prüfe die Cloudflare-Pages-Veröffentlichung.');
+ }
+ if(!(response.headers.get('content-type')||'').includes('application/json'))
+  throw Error('Die Cloudflare-API ist hier noch nicht aktiviert. Verbinde das Pages-Projekt mit GitHub.');
+ const body=await response.json().catch(()=>null);
+ if(!response.ok)throw Error(body?.error||'Datenserver: HTTP '+response.status);
+ if(!body||typeof body!=='object')throw Error('Der Datenserver hat kein gültiges Ergebnis geliefert.');
+ return body;
 }
 function parseOfficialLink(input) {
  let url;
@@ -149,18 +168,15 @@ $('nc-import-name').addEventListener('click',async()=>{
    note('Suche '+name+' auf dem ausgewählten Server …');
    const u=new URL('/api/search',api);
    u.search=new URLSearchParams({serverId,name}).toString();
-   const response=await fetch(u,{mode:'cors',signal:AbortSignal.timeout(20000)});
-   const answer=await response.json();
-   if(!response.ok)throw Error(answer.error||'Charaktersuche fehlgeschlagen.');
+   const answer=await liveJSON(u,20000);
    const same=(answer.characters||[]).filter(x=>
     String(x.serverId)===serverId&&String(x.name).trim().toLowerCase()===name.toLowerCase());
    if(same.length!==1)throw Error(same.length?'Mehrere Treffer auf diesem Server gefunden. Bitte die Charaktersuche später erneut versuchen.':'Charakter auf diesem Server nicht gefunden.');
    const id=same[0].characterId;
    const url=new URL('/api/character',api);
    url.search=new URLSearchParams({serverId,characterId:id}).toString();
-   const full=await fetch(url,{mode:'cors',signal:AbortSignal.timeout(60000)});
-   const result=await full.json();
-   if(!full.ok)throw Error(result.error||'Ausrüstungsabruf fehlgeschlagen.');
+   note('Charakter gefunden. Lade Gear, Skills und Daevanion-Boards …');
+   const result=await liveJSON(url,85000);
    if(String(result.serverId)!==serverId||String(result.characterId)!==id||
       String(result.info?.profile?.characterName||'').toLowerCase()!==name.toLowerCase())
      throw Error('Datenserver lieferte nicht den ausgewählten Charakter.');
@@ -176,6 +192,19 @@ $('nc-import-name').addEventListener('click',async()=>{
   useData(d,{serverId,characterId:d.characterId});
  }catch(e){note('Import nicht möglich: '+e.message,true)}
  finally{btn.disabled=false}
+});
+if(apiOrigin()===window.location.origin){
+ const hint=document.getElementById('nc-api-hint');
+ if(hint){
+  hint.textContent='Prüfe Cloudflare-Live-Import …';
+  fetch('/api/health',{cache:'no-store',signal:AbortSignal.timeout(8000)})
+   .then(async r=>r.ok?await r.json():null)
+   .then(result=>{hint.textContent=result?.ok?'Live-Import aktiv · Alle öffentlich auffindbaren EU-Charaktere können gesucht werden.':'Cloudflare-Datenserver noch nicht erreichbar.';})
+   .catch(()=>{hint.textContent='Cloudflare-Datenserver noch nicht erreichbar.';});
+ }
+}
+$('nc-character-name').addEventListener('keydown',event=>{
+ if(event.key==='Enter'){event.preventDefault();$('nc-import-name').click();}
 });
 window.aionNC={useData};
 })();
