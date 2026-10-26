@@ -94,7 +94,7 @@ list.addEventListener('toggle',e=>{
  if(details.open)expanded.add(name);else expanded.delete(name);
  save();
 },true);
-window.addEventListener('aion2:pets-updated',()=>{current='';show()});
+if(typeof window!=='undefined')window.addEventListener('aion2:pets-updated',()=>{current='';show()});
 const previous=render;
 render=function(){previous();show()};
 show();
