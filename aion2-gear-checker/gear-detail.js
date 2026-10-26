@@ -3,8 +3,12 @@
 'use strict';
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const cdnImage=(url,size=37)=>{
+ const value=String(url||'');
+ if(/^\.\/nc-icons\/skills\/[0-9]{8}\.webp$/.test(value))
+  return '<img src="'+esc(value)+'" alt="" loading="lazy" decoding="async" '+
+   'style="width:'+size+'px;height:'+size+'px;object-fit:contain;border-radius:6px;flex-shrink:0;background:#1d2736" />';
  try{
-  const u=new URL(String(url||''));
+  const u=new URL(value);
   if(u.protocol!=='https:'||u.hostname!=='assets.playnccdn.com')return '';
   return '<img src="'+esc(u.href)+'" alt="" loading="lazy" referrerpolicy="no-referrer" '+
    'style="width:'+size+'px;height:'+size+'px;object-fit:contain;border-radius:6px;flex-shrink:0;background:#1d2736" />';
@@ -110,7 +114,7 @@ function displaySkills(){
   return '<div class="card" style="margin:13px 0"><div class="slothead"><strong>'+esc(name)+'</strong>'+
    '<span class="pill">'+arr.length+'</span></div>'+
    (arr.length?'<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:8px;margin-top:10px">'+
-    arr.map(i=>'<div class="gear-roll" style="align-items:center">'+cdnImage(i.icon,35)+
+    arr.map(i=>'<div class="gear-roll" style="align-items:center">'+cdnImage((window.aionOfficialSkillIcon?.(i.name))||i.icon,35)+
       '<div class="gear-roll-name"><strong style="display:block">'+esc(i.name)+'</strong>'+
       '<small style="color:var(--muted)">'+esc(i.level||'')+
        (i.equipped?' · Ausgerüstet':'')+'</small></div></div>').join('')+'</div>':
