@@ -69,6 +69,7 @@ assert(!before.done||before.done.length===0);
 const task=sandbox.window.AionAdvisorCore.analyze(sandbox.data,{role:'dps'}).actions[0];
 list.listeners.click?.[0]({target:{closest:q=>q==='[data-adv-done]'?{dataset:{advDone:task.id}}:null}});
 assert(JSON.parse(storage.get('aion2-advisor-v1:1305:test-123')).done.includes(task.id),'done must persist per character');
+byId.get('adv-hide-done').listeners.change?.[0]({target:{value:'all'}});
 byId.get('adv-reset-price').listeners.change?.[0]({target:{value:'25000'}});
 assert(byId.get('adv-list').innerHTML.includes('375.000'),'one reroll total must update when reset material price supplied');
 list.listeners.change?.[0]({target:{closest:q=>q==='[data-adv-price]'?{dataset:{advPrice:'Waffe'},value:'340000'}:null}});
