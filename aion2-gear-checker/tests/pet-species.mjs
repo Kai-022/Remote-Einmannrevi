@@ -20,21 +20,30 @@ const ctx={data,isDemo:false,render:()=>{},document:{
 vm.runInNewContext(src,ctx,{timeout:2500});
 assert.equal((list.innerHTML.match(/class="ps-group"/g)||[]).length,5);
 assert.equal((list.innerHTML.match(/class="ps-cell unknown"/g)||[]).length,45);
-assert(list.innerHTML.includes('BiS:'));
-const input=(species,slot,value)=>list.listeners.change[0]({
- target:{closest:()=>({dataset:{species,slot:String(slot)},value})}
+assert(list.innerHTML.includes('Empfohlen:'));
+assert(!html.includes('src="./pet-live-capture.js'), 'broken live capture must be disabled');
+assert(html.includes('pet-scanner-start.js?v='));
+assert(list.innerHTML.includes('Zahlenwert (optional)'));
+const input=(species,slot,value,kind='select')=>list.listeners.change[0]({
+ target:{closest:()=>({dataset:{species,slot:String(slot)},value,
+   matches:query=>kind==='select'?query==='select':kind==='manual'?query==='[data-manual-roll]':query==='[data-roll-number]'
+ }) }
 });
 input('Cogni',4,'PvE-Schadensverstärkung');
 assert((list.innerHTML.match(/class="ps-cell good"/g)||[]).length===1);
 input('Fera',4,'Waffenschadensverstärkung');
 assert((list.innerHTML.match(/class="ps-cell alt"/g)||[]).length===1);
 input('Natura',4,'__other__');
+input('Natura',4,'Schadensresistenz (Rückseitig)','manual');
+input('Natura',4,'0,6 %','number');
 assert((list.innerHTML.match(/class="ps-cell bad"/g)||[]).length===1);
 assert.equal((list.innerHTML.match(/class="ps-cell unknown"/g)||[]).length,42);
 const saved=JSON.parse(storage.get('aion2-pets-v2:1305:123'));
 assert.equal(saved.rolls['Cogni|4'],'PvE-Schadensverstärkung');
 assert.equal(saved.rolls['Fera|4'],'Waffenschadensverstärkung');
+assert.equal(saved.rolls['Natura|4'],'Schadensresistenz (Rückseitig)');
+assert.equal(saved.details['Natura|4'].value,'0,6 %');
 ctx.data={name:'Anderer',sourceRef:{sid:'1305',id:'456'},gear:{}};
 ctx.render();
 assert.equal((list.innerHTML.match(/class="ps-cell unknown"/g)||[]).length,45,'separate per-character storage');
-console.log('Pet species: 5 collapsible groups; 45 slots; green/yellow/red/unknown; character separation PASS');
+console.log('Manual Pet species: 45 slots, own talent names, numeric values, green/yellow/red/unknown and separate character storage PASS');
