@@ -40,8 +40,8 @@ def main():
             continue
         try:
             with urlopen(Request(url, headers={"User-Agent": "AION2-GearChecker-Fan-Project/1.0"}), timeout=25) as rsp:
-                content = rsp.read(300001)
-            if len(content) < 300 or len(content) > 300000:
+                content = rsp.read(1000001)
+            if len(content) < 300 or len(content) > 1000000:
                 raise ValueError("unexpected image size")
             if filename.endswith(".webp") and (content[:4] != b"RIFF" or content[8:12] != b"WEBP"):
                 raise ValueError("invalid WEBP header")
