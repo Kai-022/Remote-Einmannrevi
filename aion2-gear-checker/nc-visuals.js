@@ -13,6 +13,12 @@ const image=(url,size=30,extra='')=>{
 };
 const css=document.createElement('style');
 css.textContent=`
+.tabs{flex-wrap:wrap!important;overflow:visible!important;row-gap:0!important}
+.tabs button{padding:11px 12px!important;font-size:13px}
+#aion-board-button{color:#edd097;font-weight:800;border:1px solid #947546;border-radius:8px;background:#302a20}
+#aion-board-button.active{background:#51432f;color:#ffe1a0}
+.aion-board-jump{display:flex;align-items:center;justify-content:space-between;gap:12px;border:1px solid #9d7945;border-radius:10px;padding:12px 14px;margin:12px 0;background:#2a2b25;flex-wrap:wrap}
+.aion-board-jump button{border:1px solid #e8c687;color:#fff1cf;background:#554127;border-radius:7px;padding:9px 12px}
 .aion-board-tabs{display:flex;gap:9px;flex-wrap:wrap;margin:14px 0}
 .aion-board-select{display:flex;gap:9px;align-items:center;border:1px solid #47536a;border-radius:10px;background:#172233;color:#edf1f8;padding:11px;text-align:left;flex:1 1 160px;cursor:pointer}
 .aion-board-select.active{border-color:#e8c687;background:#333125}
@@ -42,7 +48,13 @@ const nav=$('dash')?.querySelector('.tabs');
 if(!nav)return;
 const boardButton=document.createElement('button');
 boardButton.type='button';boardButton.textContent='◆ Daevanion-Boards';boardButton.id='aion-board-button';
-nav.append(boardButton);
+const gearTab=nav.querySelector('[data-tab="gear"]');
+if(gearTab)gearTab.after(boardButton);else nav.prepend(boardButton);
+const jump=document.createElement('div');jump.id='aion-board-jump';jump.className='aion-board-jump';
+jump.innerHTML='<span>◆ <strong>Daevanion-Boards</strong> <small id="aion-board-indicator">– nach dem Import hier ansehen</small></span>'+
+ '<button type="button" id="aion-board-jump-btn">Boards öffnen</button>';
+nav.before(jump);
+jump.querySelector('button').onclick=()=>boardButton.click();
 const page=document.createElement('section');page.id='tab-daevanion';page.className='hidden';
 page.innerHTML='<section class="panel"><h2>◆ Daevanion-Boards</h2>'+
  '<p>Offiziell importierte Knoten, Freischaltungen und Effekte. Tippe auf einen Knoten, um die Details zu sehen.</p>'+
@@ -104,6 +116,11 @@ function panelFor(node){
 }
 function renderBoards(){
  portrait();
+ const indicator=$('aion-board-indicator');
+ if(indicator){
+   const count=Object.values(data?.characterExtras?.boards||{}).filter(b=>Array.isArray(b?.nodes)&&b.nodes.length).length;
+   indicator.textContent=count?' · '+count+' Tafeln importiert':' · noch keine Tafeln importiert';
+ }
  const meta=data?.characterExtras||{},boards=meta.boards||{},list=Array.isArray(meta.daevanion)?meta.daevanion:[];
  const ids=Object.keys(boards).filter(id=>Array.isArray(boards[id]?.nodes)&&boards[id].nodes.length);
  const root=$('aion-board-content');if(!root)return;
