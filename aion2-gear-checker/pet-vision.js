@@ -34,7 +34,7 @@ function findPanel(source){
   for(let x=xlo;x<xhi;x+=2)if(cyan(x,y))hit++;
   if(hit>best.score)best={score:hit,y};
  }
- if(best.score<Math.max(18,Math.round(w*.045)))return null;
+ if(best.score<Math.max(16,Math.round(w*.012)))return null;
  const xs=[];for(let x=xlo;x<xhi;x++)if(cyan(x,best.y))xs.push(x);
  if(xs.length<50)return null;
  // Find the contiguous cyan progress bar rather than disjoint UI icons.
@@ -45,7 +45,7 @@ function findPanel(source){
  }
  runs.push([start,prev]);runs.sort((a,b)=>(b[1]-b[0])-(a[1]-a[0]));
  const [barLeft,barRight]=runs[0],bw=barRight-barLeft+1;
- if(bw<w*.068||bw>w*.40)return null;
+ if(bw<Math.max(50,w*.024)||bw>w*.40)return null;
  const pitch=bw*.125,first=best.y+bw*.166;
  const x0=Math.max(0,Math.round(barLeft+bw*.145));
  const x1=Math.min(w,Math.round(barRight+bw*.06));
