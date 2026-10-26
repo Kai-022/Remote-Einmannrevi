@@ -259,7 +259,7 @@ async function recognizeImage(worker,source){
   found.push({...row,name,value:readNumber(row.text)});
  }
  found.sort((a,b)=>a.slot-b.slot);
- return {found,raw:result.data.text||'',active:scene.active,expected:9,vision:true};
+ return {found,raw:result.data.text||'',active:scene.active,expected:9,vision:true,preview:scene.canvas};
 }
 window.aionPetOCR={
  species,loadOCR,extract,speciesFromText,unlockedSlotsFromText,storeCompleteSpecies,getPetKey,recognizeImage,
