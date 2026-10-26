@@ -11,7 +11,7 @@
   panel.innerHTML =
     '<div class="eyebrow">NEU · DIREKT ZUM PET-SCANNER</div>' +
     '<h2>🎮 Spezieskenntnisse aus Aion 2 scannen</h2>' +
-    '<p>Funktioniert auch ohne vorherigen Charakterimport. Gib deinen Charakternamen ein, öffne den Scanner und gib im Browser das Spiel-Fenster frei. Die Werte werden erst nach deiner Bestätigung gespeichert.</p>' +
+    '<p>Funktioniert auch ohne vorherigen Charakterimport. Gib deinen Charakternamen ein, öffne den Scanner und gib im Browser das Spiel-Fenster frei. Vollständig erkannte neun Werte werden automatisch lokal gespeichert. Unklare Treffer kannst du vor der Übernahme im Formular prüfen.</p>' +
     '<div class="grid" style="align-items:end">' +
     '<div class="field"><label for="pet-scanner-name">Charaktername für die lokale Speicherung</label>' +
     '<input id="pet-scanner-name" maxlength="45" placeholder="Dein Aion-2-Charaktername" autocomplete="off"></div>' +
