@@ -16,7 +16,7 @@ section.style.cssText='border:1px solid #776344;border-radius:12px;padding:16px;
 section.innerHTML=
  '<div class="eyebrow">BETA · PET-DURCHLAUF</div>'+
  '<h3 style="margin:6px 0">Einmal starten – durch die fünf Pets klicken</h3>'+
- '<p style="margin:8px 0">Gib das <b>Aion-2-Fenster</b> einmal frei. Öffne im Spiel die Spezieskenntnisse und klicke langsam durch die fünf Spezies (etwa 6–10 Sekunden je Ansicht). Der Scanner prüft automatisch das Fensterbild – ohne weitere Screenshots und ohne einen Knopf pro Pet.</p>'+
+ '<p style="margin:8px 0">Gib das <b>Aion-2-Fenster</b> einmal frei. Öffne im Spiel die Spezieskenntnisse und klicke langsam durch die fünf Spezies (etwa 6–10 Sekunden je Ansicht). Der Scanner liest automatisch die freigeschalteten Talentwerte – ohne weitere Screenshots oder Knöpfe pro Pet.</p>'+
  '<div class="actions">'+
  '<button type="button" class="primary" id="pet-live-start">▶ Durchlauf starten · Fenster freigeben</button>'+
  '<button type="button" id="pet-live-pause" disabled>Automatik pausieren</button>'+
@@ -49,13 +49,13 @@ function readState(){
 function drawProgress(){
  const saved=readState();
  const marks=saved.scanned&&typeof saved.scanned==='object'?saved.scanned:{};
- const count=species.filter(name=>Array.isArray(marks[name]?.rolls)&&marks[name].rolls.length===9).length;
+ const count=species.filter(name=>Array.isArray(marks[name]?.rolls)&&marks[name].rolls.length===(marks[name].slots||9)).length;
  progress.innerHTML=species.map(name=>{
-  const success=Array.isArray(marks[name]?.rolls)&&marks[name].rolls.length===9;
+  const success=Array.isArray(marks[name]?.rolls)&&marks[name].rolls.length===(marks[name].slots||9);
   const pending=reviewQueue.has(name);
   const border=success?'#388c68':pending?'#b99a53':'#485767';
   const bg=success?'#173e30':pending?'#463a22':'#121c2c';
-  const words=success?'🟢 9/9 erkannt':pending?'🟡 Bitte prüfen':'⚪ Noch offen';
+  const words=success?'🟢 '+marks[name].rolls.length+'/'+(marks[name].slots||9)+' erkannt':pending?'🟡 Bitte prüfen':'⚪ Noch offen';
   const rows=success?'<details style="margin-top:5px"><summary style="font-size:11px">Werte anzeigen</summary><div style="font-size:11px;line-height:1.65">'+marks[name].rolls.map((roll,i)=>esc(String(i+1)+'. '+roll)).join('<br>')+'</div></details>':'';
   const btn=pending?'<button type="button" data-pet-review="'+esc(name)+'" style="width:100%;margin-top:5px;padding:6px">Prüfen</button>':'';
   return '<div style="border:1px solid '+border+';border-radius:9px;padding:9px;background:'+bg+'"><b>'+esc(name)+'</b><div style="font-size:12px">'+words+'</div>'+rows+btn+'</div>';
@@ -126,6 +126,7 @@ async function runAuto(){
   const raw=String(response.data?.text||'');
   const genus=api.speciesFromText(raw);
   const lines=api.extract(response.data||{});
+  const expected=api.unlockedSlotsFromText(raw);
   const hash=genus+'|'+lines.map(x=>x.name).join('|')+'|'+raw.replace(/\s+/g,' ').slice(0,80);
   if(hash===seenText){status('Fensterfreigabe aktiv – auf die nächste Pet-Ansicht warten …');return}
   seenText=hash;
@@ -137,18 +138,18 @@ async function runAuto(){
    result.innerHTML='Unzugeordnet: '+lines.length+' Wert(e). <button type="button" data-pet-review="unassigned" style="padding:5px;margin-left:6px">Manuell zuordnen</button>';
    return;
   }
-  if(lines.length!==9 || avgConfidence(lines)<55){
+  if(!expected||lines.length!==expected || avgConfidence(lines)<55){
    reviewQueue.set(genus,{lines,raw});
-   status(genus+': '+lines.length+'/9 Talentwerte erkannt. Bitte etwas länger anzeigen oder später prüfen.');
+   status(genus+': '+lines.length+'/'+(expected||'?')+' freigeschaltete Talentwerte erkannt. Bitte etwas länger anzeigen oder später prüfen.');
    drawProgress();return;
   }
-  // Only one genus and 9 high-confidence recognized rows may be saved.
-  if(api.storeCompleteSpecies(genus,lines)){
+  // Only one genus and all unlocked high-confidence rows may be saved.
+  if(api.storeCompleteSpecies(genus,lines,expected)){
    reviewQueue.delete(genus);
    drawProgress();
-   status('✓ '+genus+' vollständig erkannt und gespeichert (9/9). Du kannst jetzt zum nächsten Pet wechseln.');
+   status('✓ '+genus+' vollständig erkannt und gespeichert ('+lines.length+'/'+expected+'). Du kannst jetzt zum nächsten Pet wechseln.');
    seenText=hash;
-   if(species.every(name=>Array.isArray(readState().scanned?.[name]?.rolls)&&readState().scanned[name].rolls.length===9)){
+   if(species.every(name=>{const mark=readState().scanned?.[name];return Array.isArray(mark?.rolls)&&mark.rolls.length===(mark.slots||9)})){
     watching=false;status('✓ Alle fünf Pet-Spezies erfasst! Du kannst die Fensterfreigabe jetzt beenden.');controls();
    }
   }
