@@ -26,6 +26,7 @@ section.innerHTML=
  '<details id="pet-icon-mapping" style="margin:10px 0;border:1px solid #69778a;border-radius:8px;padding:9px"><summary>Einmalig: Die fünf Pet-Symbole von oben nach unten zuordnen</summary><p class="tip">Links im Spiel stehen fünf Symbole ohne Pet-Namen. Bitte die Zuordnung bestätigen, damit keine Werte beim falschen Pet landen.</p><div id="pet-icon-map-fields" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px"></div><button type="button" id="pet-icon-map-save" style="margin-top:9px">Zuordnung bestätigen</button></details>'+
  '<div id="pet-live-progress" role="group" aria-label="Fortschritt der fünf Pet-Spezies" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(135px,1fr));gap:8px;margin-top:12px"></div>'+
  '<p id="pet-live-result" class="tip" aria-live="polite"></p>'+
+ '<details style="margin:12px 0"><summary>Erkennungsbild anzeigen (Fehlersuche)</summary><p style="font-size:12px">Hier siehst du, welchen Ausschnitt der Scanner tatsächlich liest. Bleibt er leer, konnte die rechte Werteliste nicht gefunden werden.</p><canvas id="pet-live-preview" style="display:block;max-width:100%;max-height:450px;object-fit:contain;border:1px solid #50647a" aria-label="Zuletzt erkannter Pet-Wertebereich"></canvas></details>'+
  '<details style="margin-top:12px"><summary>Hinweise und Fehlerbehebung</summary>'+
  '<p>Nutze Chrome oder Edge mit Aion 2 im randlosen Fenstermodus. Der Browser verlangt ausdrücklich die Auswahl eines Fensters; diese Sicherheitsabfrage lässt sich nicht umgehen. Wähle Aion 2 statt des Browser-Tabs. Die Erkennung ist noch ein Test: Wenn eine Spezies oder ein Slot nicht eindeutig ist, wird nichts automatisch überschrieben. Du kannst einen unsicheren Treffer später im Formular prüfen.</p></details>';
 panel.querySelector('h2')?.insertAdjacentElement('afterend',section);
@@ -135,18 +136,21 @@ async function runAuto(){
  processing=true;controls();const token=generation;
  try{
   const frame=frameCanvas();
+  if(!worker)status('OCR wird vorbereitet. Beim ersten Mal werden Sprachdateien heruntergeladen – das kann etwas dauern.');
   const runningWorker=await ensureWorker();
   if(token!==generation||!watching)return;
   const focused=await api.recognizeImage(runningWorker,frame);
-  const response=focused?null:await runningWorker.recognize(frame);
+  if(!focused){status('Die rechte Spezieskenntnis-Liste ist im freigegebenen Bild nicht zu finden. Aion 2 öffnen, Pet → Spezieskenntnis wählen, randlosen Fenstermodus testen.');return;}
+  if(focused.preview){const output=$('pet-live-preview');output.width=focused.preview.width;output.height=focused.preview.height;output.getContext('2d')?.drawImage(focused.preview,0,0);}
+  const response=null;
   if(token!==generation||!watching)return;
-  const raw=focused?focused.raw:String(response.data?.text||'');
+  const raw=focused.raw;
   const textGenus=api.speciesFromText(raw);
   const mappedGenus=focused?.active&&confirmedMap?confirmedMap[focused.active-1]:null;
   const genus=textGenus&&mappedGenus&&textGenus!==mappedGenus?null:(textGenus||mappedGenus);
-  const lines=focused?focused.found:api.extract(response.data||{});
-  const expected=focused?9:api.unlockedSlotsFromText(raw);
-  const hash=(focused?.active||'?')+'|'+genus+'|'+lines.map(x=>x.slot+':'+x.name+':'+(x.value||'')).join('|');
+  const lines=focused.found;
+  const expected=9;
+  const hash=(focused.active||'?')+'|'+genus+'|'+lines.map(x=>x.slot+':'+x.name+':'+(x.value||'')).join('|');
   if(hash===seenText){status('Fensterfreigabe aktiv – auf die nächste Pet-Ansicht warten …');return}
   seenText=hash;
   if(!lines.length){status('Noch keine Talente sichtbar. Öffne im Spiel die Spezieskenntnisse und halte die Ansicht kurz ruhig.');return}
