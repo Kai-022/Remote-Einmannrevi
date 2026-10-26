@@ -24,7 +24,7 @@ const ctx={document,data:{name:'Test',sourceRef:{sid:'1305',id:'test'},character
  {id:'a',name:'Statue A',kind:'statue',stats:{Death:12,Freedom:12},where:'Test'},
  {id:'b',name:'Painting A',kind:'artwork',stats:{Wisdom:5,Illusion:5},where:'Test'},
  {id:'c',name:'Colossus A',kind:'colossus',stats:{Destruction:10,Justice:10,Time:10},where:'Test'}
- ]})})},console};
+ ]})}),console};
 vm.runInNewContext(code,ctx,{timeout:2000});
 assert.equal(registered.get('pi-calc').disabled,false);
 await registered.get('pi-calc').listeners.click[0]();
