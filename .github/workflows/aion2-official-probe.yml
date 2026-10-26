@@ -6,6 +6,8 @@ on:
     paths:
       - 'aion2-gear-checker/nc-probe.py'
       - 'aion2-gear-checker/nc-snapshot.py'
+      - 'aion2-gear-checker/nc-live-server.py'
+      - 'aion2-gear-checker/nc-live-smoke.py'
       - '.github/workflows/aion2-official-probe.yml'
 
 permissions:
@@ -22,6 +24,10 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+      - name: Validate Python live importer
+        run: python3 -m py_compile aion2-gear-checker/nc-live-server.py
+      - name: Test EU character name search
+        run: python3 aion2-gear-checker/nc-live-smoke.py
       - name: Query official EU public character endpoints
         run: python3 aion2-gear-checker/nc-probe.py
       - name: Snapshot official public equipment and item details
@@ -31,6 +37,7 @@ jobs:
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add aion2-gear-checker/nc-test-result.json
+          git add aion2-gear-checker/nc-live-search-result.json
           if test -f aion2-gear-checker/nc-character-snapshot.json; then
             git add aion2-gear-checker/nc-character-snapshot.json
           fi
