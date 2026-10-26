@@ -64,9 +64,9 @@ function openGear(slot){
  panel.innerHTML='<button type="button" id="gear-detail-close" style="float:right">✕</button>'+
  '<div class="eyebrow">'+esc(slot)+'</div><div style="display:flex;align-items:center;gap:13px;margin:9px 0">'+cdnImage(item.iconUrl||item.importDetail?.iconUrl,68)+'<h2 style="margin:0">+'+esc(item.plus||0)+' '+esc(item.name||'Unbekannt')+'</h2></div>'+
  '<div class="tip">'+esc(grade)+(breakthrough!=null?' · ◆'+esc(breakthrough):'')+'</div>'+
- section('Basiswerte',basics,'Shugo zeigt diese meist erst beim Öffnen des Items.')+
+ section('Basiswerte',basics,'Für diese Werte liegen keine Informationen aus dem offiziellen Charakterprofil vor.')+
  (detail.soulRate!=null?'<div class="tip">Seelenbindungsrate: '+esc(detail.soulRate)+'</div>':'')+
- section('Zusätzliche Werte / Seelenbindung',souls,'Das Profil liefert bisher nur die Ausrüstungsliste. Erst ein ausgelesener Item-Tooltip liefert diese Werte.')+
+ section('Zusätzliche Werte / Seelenbindung',souls,'Diese Zusatzwerte sind in den verfügbaren öffentlichen Charakterdaten nicht enthalten.')+
  section('Manasteine',stones)+
  section('Götterstein',god?[[god.name,god.description||'','',god.icon]]:[])+
  '<div class="actions"><button type="button" id="gear-detail-edit">Werte bearbeiten</button></div>';
