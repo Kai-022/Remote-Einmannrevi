@@ -125,5 +125,21 @@ $('nc-import').addEventListener('click',async()=>{
  }catch(e){note('Import nicht möglich: '+String(e.message||e),true);}
  finally{btn.disabled=false;}
 });
+$('nc-import-name').addEventListener('click',async()=>{
+ const btn=$('nc-import-name');btn.disabled=true;
+ try{
+  const serverId=$('nc-server-select').value;
+  const name=$('nc-character-name').value.trim();
+  if(!serverId||name.length<2)throw Error('Bitte Server und Charakternamen eingeben.');
+  note('Lade öffentliche Charakterdaten …');
+  const response=await fetch('./nc-character-snapshot.json?t='+Date.now(),{cache:'no-store'});
+  if(!response.ok)throw Error('Testdatensatz nicht verfügbar.');
+  const d=await response.json();
+  if(String(d.serverId)!==serverId||String(d.info?.profile?.characterName||'').toLowerCase()!==name.toLowerCase())
+   throw Error('Für diesen Charakter ist noch kein Live-Datenserver angeschlossen. Der Test funktioniert derzeit mit Taty auf Yustiel.');
+  useData(d,{serverId,characterId:d.characterId});
+ }catch(e){note('Import nicht möglich: '+e.message,true)}
+ finally{btn.disabled=false}
+});
 window.aionNC={useData,parseOfficialLink};
 })();
