@@ -6,7 +6,7 @@ import vm from 'node:vm';
 const base=new URL('../',import.meta.url);
 const core=await readFile(new URL('upgrade-advisor-core.js',base),'utf8');
 const ui=await readFile(new URL('upgrade-advisor.js',base),'utf8');
-const html=await readFile(new URL('index.html',base),'utf8');
+const html=await readFile(new URL('armory.html',base),'utf8');
 assert(html.includes('<script src="./upgrade-advisor-core.js?v='));
 assert(html.includes('<script src="./upgrade-advisor.js?v='));
 const nodes=[];
