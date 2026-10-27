@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
 import vm from 'node:vm';
 const src=await readFile(new URL('../pet-species.js',import.meta.url),'utf8');
-const html=await readFile(new URL('../index.html',import.meta.url),'utf8');
+const html=await readFile(new URL('../armory.html',import.meta.url),'utf8');
 assert(html.includes('pet-species.js?v='));
 assert(html.includes('pet-species.css?v='));
 class Fake{
@@ -22,7 +22,9 @@ assert.equal((list.innerHTML.match(/class="ps-group"/g)||[]).length,5);
 assert.equal((list.innerHTML.match(/class="ps-cell unknown"/g)||[]).length,45);
 assert(list.innerHTML.includes('Empfohlen:'));
 assert(!html.includes('src="./pet-live-capture.js'), 'broken live capture must be disabled');
-assert(html.includes('pet-scanner-start.js?v='));
+assert(!html.includes('pet-scanner-start.js?v='),'old scanner shortcut should no longer be shown');
+assert(!html.includes('pantheon-screenshot.js?v='),'screenshot importer should be disabled');
+assert(html.includes('missing-list.js?v='),'missing checklist must load');
 assert(list.innerHTML.includes('Zahlenwert (optional)'));
 const input=(species,slot,value,kind='select')=>list.listeners.change[0]({
  target:{closest:()=>({dataset:{species,slot:String(slot)},value,
