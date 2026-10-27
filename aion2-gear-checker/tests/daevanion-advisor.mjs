@@ -66,5 +66,5 @@ rootElement.listeners.click[0]({target:{closest:s=>s==='[data-daevaboard]'?{data
 assert.deepEqual(lastSelected,['71',12]);
 data.characterExtras.boards={};
 window.aionDaevanion.render();
-assert(rootElement.innerHTML.includes('noch')||rootElement.innerHTML.includes('Noch'));
+assert(rootElement.innerHTML.includes('Bitte zuerst die offiziellen Daevanion-Tafeln importieren'));
 console.log('Daevanion advisor PASS: snapshot comparison, tri-color audit, roles, missing Ariel, navigation');
