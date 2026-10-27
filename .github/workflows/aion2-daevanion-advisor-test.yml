@@ -3,6 +3,7 @@ on:
   push:
     paths:
       - 'aion2-gear-checker/daevanion-advisor.js'
+      - 'aion2-gear-checker/cleric-board-references.json'
       - 'aion2-gear-checker/nc-visuals.js'
       - 'aion2-gear-checker/armory.html'
       - 'aion2-gear-checker/tests/daevanion-advisor.mjs'
