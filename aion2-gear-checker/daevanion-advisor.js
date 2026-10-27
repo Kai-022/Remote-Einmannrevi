@@ -1,167 +1,217 @@
-/* PvE Cleric Daevanion comparison: imported nodes + heuristically ranked path choices.
- * References: AION2 Vault 2026-10-22, Aion2 Companion, Aion2.gg EU.
- * Does not edit the game; path prices reflect official board grade costs. */
+/* Compare official user Daevanion nodes to sourced PUBLIC Cleric board plans.
+ * No skill-name-to-DPS guesses, no invented live leaderboard snapshots.
+ * Published build targets are partial; absence from a summary is NOT proof of a mistake. */
 (()=>{
 'use strict';
-const $=id=>document.getElementById(id),page=$('tab-daevanion');if(!page)return;
-const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const boardNames={'71':'Nezekan','72':'Zikel','73':'Vaizel','74':'Triniel','75':'Ariel','76':'Azphel'};
-const damage={'Condemnation':107,'Chain of Torment':106,'Judgment Thunder':100,'Divine Aura':97,"Earth's Retribution":94,'Debilitating Mark':90,"Empyrean Lord's Grace":106,"Empyrean Lords' Grace":106,"Earth's Grace":100,'Bolt':71};
-const heals={'Radiant Recovery':110,'Healing Light':108,'Light of Regeneration':103,'Healing Enhancement':99,'Warm Benediction':98,'Radiant Benediction':95,'Prayer of Concentration':88,'Immortal Veil':68};
-const stats={
- hybrid:{'Cooldown Reduction':109,'Combat Speed':108,'Damage Boost':103,'PvE Damage Boost':107,'Critical Damage Boost':91,'Multi-Hit Chance':87,'Damage Tolerance':79,'PvE Damage Tolerance':81},
- heal:{'Cooldown Reduction':108,'Combat Speed':97,'Damage Tolerance':101,'PvE Damage Tolerance':105,'Damage Boost':69,'PvE Damage Boost':69},
- dps:{'Cooldown Reduction':109,'Combat Speed':108,'Damage Boost':111,'PvE Damage Boost':115,'Critical Damage Boost':98,'Multi-Hit Chance':92,'Damage Tolerance':37}
-};
-const roles=['hybrid','heal','dps'],titles={hybrid:'Hybrid',heal:'Heilung',dps:'Schaden'};
-let mode='hybrid',character='',audit=null;
-const charKey=()=>String(data?.sourceRef?.sid||'lokal')+':'+String(data?.sourceRef?.id||data?.name||'Charakter').normalize('NFKC');
+const $=id=>document.getElementById(id),root=$('tab-daevanion');if(!root)return;
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const names={'71':'Nezekan','72':'Zikel','73':'Vaizel','74':'Triniel','75':'Ariel','76':'Azphel'};
+const nodeCost=n=>n?.type==='Start'?0:({Common:1,Rare:2,Legend:3,Unique:4})[n?.grade]||0;
+const nameOf=n=>String((n?.effects||[]).find(e=>/\+\s*\d+\s*$/.test(e))||n?.name||'').replace(/^Skill Level Up\s*-\s*/i,'').replace(/\s*\+\s*\d+\s*$/,'');
+const canonical=s=>String(s||'').toLowerCase().replace(/[’‘']/g,'').replace(/lords\b/g,'lord').replace(/[^a-z0-9]+/g,' ').trim();
+const includes=(list,name)=>Array.isArray(list)&&list.some(x=>canonical(x)===canonical(name));
 const boards=()=>data?.characterExtras?.boards||{};
-const norm=t=>String(t||'').toLowerCase().replace(/[’‘']/g,'').replace(/[^a-z0-9]+/g,' ').trim();
-const nodeName=n=>String((n.effects||[]).find(s=>/\+\s*\d+\s*$/.test(s))||n.name||'').replace(/^Skill Level Up\s*-\s*/i,'').replace(/\s*\+\s*\d+\s*$/,'');
-function updateMode(){
- const k=charKey();if(k===character)return;
- character=k;mode=roles.includes(data?.mode)?data.mode:'hybrid';
- try{const m=localStorage.getItem('aion2-daevanion-role-v1:'+k);if(roles.includes(m))mode=m}catch{}
+const currentId=()=>String(data?.sourceRef?.sid||'lokal')+':'+String(data?.sourceRef?.id||data?.name||'Charakter').normalize('NFKC');
+let refs=null,fetchFailed=false,chosen='rosaEarly',activeId='',comparison=null;
+function restore(){
+ const key=currentId();
+ if(key===activeId)return;
+ activeId=key;chosen='rosaEarly';
+ try{const saved=localStorage.getItem('aion2-daevanion-reference-v1:'+key);
+  if(['rosaEarly','whelps','rosaEnd'].includes(saved))chosen=saved;
+ }catch{}
 }
-function value(id,n){
- if(!n||n.type==='None'||n.type==='Start')return 0;
- if(String(id)==='76'||/^pvp/i.test(n.name||''))return -50;
- const name=norm(n.type==='SkillLevel'?nodeName(n):n.name);
- if(n.type==='SkillLevel'){
-  const d=Object.entries(damage).find(([x])=>norm(x)===name)?.[1]||15;
-  const h=Object.entries(heals).find(([x])=>norm(x)===name)?.[1]||15;
-  return mode==='dps'?d:mode==='heal'?h:Math.max(d*.91,h*.9);
+function byId(id){return refs?.sources?.find(x=>x.id===id)||null}
+function boardTargets(ref,id){
+ return ref?.boards?.[String(id)]||{};
+}
+function occurrences(nodes,type,name){
+ return nodes.filter(n=>n.type===type&&canonical(nameOf(n))===canonical(name)).length;
+}
+function selected(ref,id,n,nodes){
+ if(!ref||!n||n.type==='None'||n.type==='Start'||String(id)==='76'||String(id)==='75')return false;
+ const skill=nameOf(n),onBoard=boardTargets(ref,id);
+ if(ref.nearlyFull){
+  // Only explicit late-game skill targets; never infer filler or the exact one omitted corner.
+  if(n.type!=='SkillLevel')return false;
+  return !includes(ref.exclusions,skill)&&!includes(['Prayer of Concentration','Heal Block'],skill);
  }
- return Object.entries(stats[mode]).find(([x])=>norm(x)===name)?.[1]||8;
+ if(n.type==='SkillLevel'){
+  if(includes(onBoard.skills,skill))return true;
+  if(includes(ref.allBoardSkills,skill))return true;
+  if(Object.keys(onBoard.passives||{}).some(k=>canonical(k)===canonical(skill))){
+   const limit=Object.entries(onBoard.passives).find(([k])=>canonical(k)===canonical(skill))[1];
+   return occurrences(nodes,'SkillLevel',skill)<=Number(limit);
+  }
+  // Across four boards, the referenced passive was taken to +4 (all its copies).
+  if(includes(ref.allBoardPassives,skill))return true;
+ }
+ if(n.type==='Stat'&&n.grade==='Unique'){
+  const explicit=Object.entries(onBoard.stats||{}).find(([k])=>canonical(k)===canonical(skill));
+  if(explicit)return occurrences(nodes,'Stat',skill)<=Number(explicit[1]);
+  // whelps: guide provides global counts, but not board coordinates. Don't guess which square.
+ }
+ return false;
 }
-const price=n=>({Start:0,Common:1,Rare:2,Legend:3,Unique:4})[n.grade]??(n.type==='SkillLevel'?3:1);
-function neighbors(nodes){
- const map=new Map();nodes.forEach((n,i)=>{if(n.type!=='None'&&n.row&&n.col)map.set(n.row+','+n.col,i)});
- return i=>{const n=nodes[i];return [[1,0],[-1,0],[0,1],[0,-1]]
-   .map(([dy,dx])=>map.get((n.row+dy)+','+(n.col+dx))).filter(v=>v!==undefined)};
+function nearIndex(nodes){
+ const pos=new Map();
+ nodes.forEach((n,i)=>{if(n.type!=='None'&&n.row>0&&n.col>0)pos.set(n.row+':'+n.col,i)});
+ return i=>{
+  const n=nodes[i];return [[-1,0],[1,0],[0,-1],[0,1]]
+   .map(([dr,dc])=>pos.get((n.row+dr)+':'+(n.col+dc))).filter(x=>x!==undefined);
+ };
 }
-function route(nodes,target,around){
- const dist=nodes.map(n=>n.open||n.type==='Start'?0:Infinity),prev=nodes.map(()=>-1),seen=new Set();
+function pathTo(nodes,target){
+ const adjacent=nearIndex(nodes);
+ const dist=nodes.map(n=>n.open||n.type==='Start'?0:Infinity),prev=nodes.map(()=>-1),done=new Set();
  for(;;){
-  let ix=-1;dist.forEach((d,i)=>{if(!seen.has(i)&&nodes[i].type!=='None'&&Number.isFinite(d)&&(ix<0||d<dist[ix]))ix=i});
-  if(ix<0||ix===target)break;seen.add(ix);
-  for(const j of around(ix)){
-   const next=dist[ix]+(nodes[j].open?0:price(nodes[j]));
-   if(next<dist[j]){dist[j]=next;prev[j]=ix;}
+  let first=-1;
+  dist.forEach((d,i)=>{if(!done.has(i)&&nodes[i].type!=='None'&&Number.isFinite(d)&&(first<0||d<dist[first]))first=i});
+  if(first<0||first===target)break;
+  done.add(first);
+  for(const j of adjacent(first)){
+   const v=dist[first]+(nodes[j].open?0:nodeCost(nodes[j]));
+   if(v<dist[j]){dist[j]=v;prev[j]=first}
   }
  }
  if(!Number.isFinite(dist[target]))return null;
- const path=[];let cursor=target;
- while(cursor>=0&&!nodes[cursor].open&&nodes[cursor].type!=='Start'){
-  path.unshift(cursor);cursor=prev[cursor];
+ const path=[];let next=target;
+ while(next>=0&&!nodes[next].open&&nodes[next].type!=='Start'){
+  path.unshift(next);next=prev[next];
  }
- return {path,cost:dist[target]};
+ return {cost:dist[target],steps:path.length};
 }
-function analyze(){
- updateMode();
- const missing=[],warnings=[],status={},summary={good:0,missing:0,caution:0};
- for(const [id,b] of Object.entries(boards())){
-  const nodes=b.nodes||[];if(!nodes.length)continue;
-  status[id]={};const around=neighbors(nodes);
-  const stillHigh=nodes.some(n=>!n.open&&value(id,n)>=78);
-  nodes.forEach((n,i)=>{
-   if(n.type==='None'||n.type==='Start')return;
-   const v=value(id,n);
-   if(v>=78){
-    if(n.open){summary.good++;status[id][i]='good';}
+function audit(){
+ restore();
+ const ref=byId(chosen),other=byId(chosen==='rosaEarly'?'whelps':'rosaEarly');
+ const result={marked:{},missing:[],caution:[],activeCount:0,matched:0,targetCount:0,spent:0};
+ if(!refs||!ref)return result;
+ for(const [id,board] of Object.entries(boards())){
+  const ns=board?.nodes||[];if(!ns.length)continue;
+  result.marked[id]={};
+  for(let i=0;i<ns.length;i++){
+   const n=ns[i];if(n.type==='None'||n.type==='Start')continue;
+   if(n.open){result.activeCount++;if(id!=='76'&&id!=='75')result.spent+=nodeCost(n)}
+   const take=selected(ref,id,n,ns),peer=selected(other,id,n,ns);
+   const label=nameOf(n);
+   if(take){
+    result.targetCount++;
+    if(n.open){result.matched++;result.marked[id][i]='good'}
     else{
-     const path=route(nodes,i,around);
-     if(path){summary.missing++;status[id][i]='missing';
-      missing.push({id,i,name:nodeName(n),points:v,cost:path.cost,steps:path.path.length})}
+     result.marked[id][i]='missing';
+     const route=pathTo(ns,i);
+     if(route)result.missing.push({id,i,name:label,peer,route,chosen:ref.id});
     }
+   }else if(n.open&&n.type==='SkillLevel'&&
+    includes(['Lightning Strike Scattershot','Defiance'],label)&&id!=='76'){
+     // Both published early-game player builds explicitly skipped these.
+     result.marked[id][i]='caution';
+     result.caution.push({id,i,name:label,
+      note:'In beiden dokumentierten frühen Vergleichs-Builds ausgelassen. Das bedeutet nicht automatisch, dass ein Reset sinnvoll ist.'});
    }
-   if(n.open&&(id==='76'||(n.type==='SkillLevel'&&v<30&&stillHigh))){
-    const links=around(i).filter(j=>nodes[j].open||nodes[j].type==='Start').length;
-    if(id==='76'||links<=1){
-     status[id][i]='caution';summary.caution++;
-     warnings.push({id,i,name:nodeName(n),reason:id==='76'?
-      'PvP-Tafel mit eigener Währung – für PvE nur eingeschränkt hilfreich.':
-      'Für diesen Build niedrige Priorität. Vor einer Rücksetzung prüfen, ob ein anderer Knoten davon abhängt.'});
-    }
-   }
-  });
+  }
  }
- missing.sort((a,b)=>b.points/Math.max(1,b.cost)-a.points/Math.max(1,a.cost)||b.points-a.points);
- return {missing,warnings,status,summary};
+ // Most agreement first; then reachable nodes with shorter extra investment.
+ result.missing.sort((a,b)=>Number(b.peer)-Number(a.peer)||
+   a.route.cost-b.route.cost||a.route.steps-b.route.steps);
+ return result;
 }
-const css=document.createElement('style');
-css.textContent=[
- '#daeva-audit{padding:14px;margin:0 0 15px;border:1px solid #9b7e49;border-radius:13px;background:#172436}',
- '#daeva-audit h3{color:#f0d29e;font-size:19px;margin:5px 0 9px}',
- '#daeva-audit h4{font-size:15px;color:#eac58d;margin:16px 0 8px}',
- '#daeva-audit p{color:#bdc9d9;font-size:12px}',
- '.daeva-modes{display:flex;gap:7px;flex-wrap:wrap;margin:12px 0}',
- '.daeva-modes button{flex:1;min-width:80px;padding:10px;border:1px solid #66748a;background:#20314a;border-radius:8px}',
- '.daeva-modes button.active{background:#543f26;color:#f5d9a3;border-color:#dbba79}',
- '.daeva-counters{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:11px 0}',
- '.daeva-counters>div{padding:10px;border-radius:9px;border:1px solid #445870;background:#102033}',
- '.daeva-counters strong{display:block;color:#efd196;font-size:23px}',
- '.daeva-counters small{font-size:11px;color:#c0cdde}',
- '.daeva-item{display:flex;align-items:center;gap:9px;padding:10px;margin:7px 0;border:1px solid #56657b;border-left:4px solid #e6bb66;background:#1b2c42;border-radius:8px}',
- '.daeva-item.caution{border-left-color:#df7e8a}',
- '.daeva-item>div{flex:1;min-width:0}',
- '.daeva-item strong{font-size:13px;display:block}',
- '.daeva-item small{color:#b5c4d6;font-size:11px;display:block;margin-top:4px}',
- '.daeva-item button{padding:8px;flex-shrink:0;font-size:11px}',
- '.daeva-notice{border:1px solid #7c673f;border-radius:8px;background:#2b271e;padding:10px;margin:11px 0;color:#ecd9b8;font-size:12px}',
- '.daeva-more summary{color:#eed2a1;font-size:13px;padding:10px;cursor:pointer}',
- '.aion-node.audit-good{border:2px solid #74e0a9!important;box-shadow:inset 0 0 0 2px #4db681!important}',
- '.aion-node.audit-missing{border:2px solid #ffd273!important;box-shadow:inset 0 0 0 2px #d6a247!important}',
- '.aion-node.audit-caution{border:2px solid #f3949b!important;box-shadow:inset 0 0 0 2px #cf5363!important}',
- '@media(max-width:600px){.daeva-counters{gap:5px}.daeva-counters>div{padding:7px}.daeva-counters strong{font-size:19px}.daeva-item{flex-wrap:wrap}.daeva-item button{margin-left:auto}}'
+const style=document.createElement('style');
+style.textContent=[
+ '#daeva-audit{border:1px solid #947b4c;border-radius:12px;background:#162437;padding:14px;margin:0 0 15px}',
+ '#daeva-audit h3{font-size:19px;margin:4px 0 11px;color:#f4d8a7}',
+ '#daeva-audit h4{font-size:15px;margin:18px 0 8px;color:#e8c894}',
+ '#daeva-audit p,#daeva-audit small{font-size:12px;color:#c0ccda;line-height:1.55}',
+ '#daeva-audit .reference-tabs{display:flex;flex-wrap:wrap;gap:7px;margin:11px 0}',
+ '#daeva-audit .reference-tabs button{flex:1;min-width:130px;border:1px solid #66778e;padding:11px 8px;border-radius:8px;background:#223249;color:#e5ecf8}',
+ '#daeva-audit .reference-tabs button.active{border-color:#d9b576;background:#4a3a27;color:#f8e0b0}',
+ '#daeva-audit .daeva-meta{background:#172f39;border:1px solid #53756a;padding:11px;border-radius:10px;margin:12px 0}',
+ '#daeva-audit .daeva-counters{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;margin:10px 0}',
+ '#daeva-audit .daeva-counters div{background:#1b2e44;border:1px solid #4f667e;padding:9px;border-radius:9px}',
+ '#daeva-audit .daeva-counters strong{display:block;color:#eacf9c;font-size:20px}',
+ '#daeva-audit .daeva-counters small{display:block;font-size:11px}',
+ '#daeva-audit .daeva-row{display:flex;align-items:center;gap:9px;background:#1b2b40;border:1px solid #52667c;border-left:4px solid #efc578;padding:10px;margin:7px 0;border-radius:9px}',
+ '#daeva-audit .daeva-row.warn{border-left-color:#df8191}',
+ '#daeva-audit .daeva-row>div{flex:1;min-width:0}',
+ '#daeva-audit .daeva-row strong{font-size:13px;display:block}',
+ '#daeva-audit .daeva-row button{padding:8px 10px;flex-shrink:0;font-size:11px}',
+ '#daeva-audit .reference-note{background:#29281f;border:1px solid #807049;padding:11px;border-radius:9px;margin:10px 0}',
+ '#daeva-audit .peer-stat{display:flex;justify-content:space-between;gap:10px;padding:7px 4px;border-bottom:1px solid #3c4e63}',
+ '#daeva-audit .peer-stat b{font-size:12px}',
+ '#daeva-audit details summary{font-size:13px;font-weight:750;color:#e9ca96;cursor:pointer;padding:10px 0}',
+ '.aion-node.audit-good{border:2px solid #6cd6a0!important;box-shadow:inset 0 0 0 2px #419972!important}',
+ '.aion-node.audit-missing{border:2px solid #f5c974!important;box-shadow:inset 0 0 0 2px #a4823d!important}',
+ '.aion-node.audit-caution{border:2px solid #f18b99!important;box-shadow:inset 0 0 0 2px #ad5461!important}',
+ '@media(max-width:600px){#daeva-audit .daeva-row{flex-wrap:wrap}#daeva-audit .daeva-row button{margin-left:auto}#daeva-audit .daeva-counters div{padding:7px 5px}}'
 ].join('\n');
-document.head.append(css);
+document.head.append(style);
 const host=document.createElement('div');host.id='daeva-audit';
 $('aion-board-content').before(host);
-const recommendation=(x,i,isWarning)=>'<div class="daeva-item'+(isWarning?' caution':'')+'"><div><strong>'+
- (i+1)+'. '+esc(boardNames[x.id]||x.id)+' · '+esc(x.name)+'</strong><small>'+
- (isWarning?esc(x.reason):'Geschätzter zusätzlicher Weg: '+x.cost+' Kristalle über '+x.steps+' neue Knoten')+
- '</small></div><button type="button" data-daevaboard="'+esc(x.id)+'" data-daevaindex="'+x.i+'">Auf Tafel zeigen</button></div>';
+function row(x,i,warning=false){
+ const subtitle=warning?x.note:
+  'Noch nicht aktiv · '+(x.peer?'Beide unabhängigen Autoren nutzen diesen Knoten · ':'In dieser veröffentlichten Vorlage · ')+
+  'kürzester Weg: '+x.route.cost+' weitere Kristalle ('+x.route.steps+' Knoten)';
+ return '<div class="daeva-row'+(warning?' warn':'')+'"><div><strong>'+(i+1)+'. '+esc(names[x.id]||x.id)+
+ ' · '+esc(x.name)+'</strong><small>'+esc(subtitle)+'</small></div>'+
+ '<button type="button" data-ref-board="'+esc(x.id)+'" data-ref-index="'+x.i+'">Auf Board zeigen</button></div>';
+}
 function render(){
- audit=analyze();
- const ids=Object.keys(boards()).filter(id=>boards()[id]?.nodes?.length);
- if(!ids.length){host.innerHTML='<h3>Deine Skillung vergleichen</h3><p>Bitte zuerst die offiziellen Daevanion-Tafeln importieren. Ohne importierte Knoten kann keine Skillung ausgewertet werden.</p>';return}
- const missing=audit.missing,warnings=audit.warnings,s=audit.summary;
- host.innerHTML='<div class="eyebrow">DAEVANION · KLERIKER PVE</div>'+
- '<h3>Dein Skillbaum im Vergleich</h3><p>Vergleich deiner aktuell importierten Knoten mit Empfehlungen. Wähle den Spielstil.</p>'+
- '<div class="daeva-modes">'+roles.map(x=>'<button type="button" data-daevamode="'+x+'" class="'+(x===mode?'active':'')+'">'+titles[x]+'</button>').join('')+'</div>'+
- '<div class="daeva-counters"><div><strong>'+s.good+'</strong><small>Wichtige Punkte aktiv</small></div>'+
- '<div><strong>'+s.missing+'</strong><small>Wichtige Punkte fehlen</small></div>'+
- '<div><strong>'+s.caution+'</strong><small>Mögliche Fehlprioritäten</small></div></div>'+
- (ids.includes('75')?'':'<div class="daeva-notice">Die neue Ariel-PvE-Tafel (seit 21.10.2026) fehlt in deinen gespeicherten Profildaten. Sie wird nicht als falsch gewertet.</div>')+
- '<div class="daeva-notice">Farben im Skillbaum: <b style="color:#8beab9">Grün</b> = wichtiger Punkt aktiviert, <b style="color:#f1cb82">Gelb</b> = empfohlen, aber fehlt, <b style="color:#f1a1a9">Rot</b> = bei diesem Build möglicherweise nicht sinnvoll. Verbindungsknoten werden nicht pauschal als falsch markiert.</div>'+
- '<h4>Deine nächsten empfohlenen Skillpunkte</h4>'+
- (missing.length?missing.slice(0,8).map((x,i)=>recommendation(x,i,false)).join(''):'<p>Keine wichtigen fehlenden Punkte in den importierten Tafeln erkannt.</p>')+
- (missing.length>8?'<details class="daeva-more"><summary>Weitere '+(missing.length-8)+' Empfehlungen anzeigen ▾</summary>'+
- missing.slice(8).map((x,i)=>recommendation(x,i+8,false)).join('')+'</details>':'')+
- '<h4>Was könnte ungünstig verteilt sein?</h4>'+
- (warnings.length?warnings.slice(0,12).map((x,i)=>recommendation(x,i,true)).join(''):
- '<p>Keine offensichtlich unpassenden Endknoten gefunden. Alle verbundenen Füllknoten können notwendig sein.</p>')+
- '<p>Die Empfehlungen sind regelbasiert und kein nachgewiesener mathematischer Best-in-Slot-Skillbaum. Keine Änderung im Spiel. <a href="https://aion2vault.com/builds/cleric/daevanion/" target="_blank" rel="noopener noreferrer">Kleriker-Build (22.10.2026)</a> · <a href="https://aion2.grimvane.app/companion/wiki/daevanion-cleric/" target="_blank" rel="noopener noreferrer">Heiler-Routen</a>.</p>';
+ restore();
+ const count=Object.keys(boards()).length;
+ if(!count){host.innerHTML='<h3>Spieler-Builds vergleichen</h3><p>Bitte zuerst Daevanion-Boards importieren. Ohne deine freigeschalteten Knoten ist kein Vergleich möglich.</p>';return}
+ if(!refs){host.innerHTML='<h3>Spieler-Builds vergleichen</h3><p>'+ (fetchFailed?'Vergleichsdaten momentan nicht verfügbar. Keine erfundenen Empfehlungen.':'Lade dokumentierte Spieler-Builds …') +'</p>';return}
+ comparison=audit();const ref=byId(chosen);
+ const sc=comparison;
+ const refsButtons=refs.sources.map(x=>'<button type="button" data-ref-id="'+esc(x.id)+'" class="'+(chosen===x.id?'active':'')+'">'+esc(x.title)+'</button>').join('');
+ const top=refs.top100||{};
+ const meta=(top.nezekan||[]).map(x=>'<div class="peer-stat"><b>'+esc(x.name)+'</b><strong>'+x.pct+' %</strong></div>').join('');
+ host.innerHTML='<div class="eyebrow">DAEVANION · VERÖFFENTLICHTE SPIELER-BUILDS</div>'+
+ '<h3>Dein Skillbaum gegen andere Kleriker</h3>'+
+ '<p>Die markierten Knoten stammen aus veröffentlichten Spieler-Builds. Die eigene Daevanion-Tafel wird nur für den Vergleich ausgelesen – es wird nichts im Spiel verändert.</p>'+
+ '<div class="reference-tabs">'+refsButtons+'</div>'+
+ '<div class="daeva-meta"><strong>'+esc(ref.creator)+' · '+esc(ref.points)+' Kristalle</strong>'+
+ '<p>'+esc(ref.description)+'</p>'+
+ '<small>Dein vorhandener Stand: ca. '+sc.spent+' Kristalle auf den vier PvE-Skilltafeln.</small>'+
+ '<p><a target="_blank" rel="noopener noreferrer" href="'+esc(ref.uri)+'">Veröffentlichtes Spieler-Board ↗</a> · '+
+ '<a target="_blank" rel="noopener noreferrer" href="'+esc(ref.documentation)+'">Quellen & Vergleich ↗</a></p></div>'+
+ '<div class="daeva-counters"><div><strong>'+sc.matched+'/'+sc.targetCount+'</strong><small>Belegte Zielknoten vorhanden</small></div>'+
+ '<div><strong>'+sc.missing.length+'</strong><small>Belegte Zielknoten fehlen</small></div>'+
+ '<div><strong>'+sc.caution.length+'</strong><small>Auffällige frühe Abweichungen</small></div></div>'+
+ (ref.nearlyFull?'<div class="reference-note">Endgame: Bei fast vollem Board werden auch Heilfähigkeiten gelernt. Das ist <b>keine frühe Damage-Empfehlung</b>. Für Damage-Fokus wähle die 239-Punkte-Vorlage.</div>':'')+
+ '<div class="reference-note">🟢 Grün: im gewählten öffentlichen Spieler-Build und bei dir aktiv. 🟡 Gelb: im öffentlichen Build, bei dir noch offen. 🔴 Rot: in beiden frühen Builds ausdrücklich ausgelassener Skill. Graue Knoten: aus den Quellen nicht eindeutig belegbar – <b>nicht automatisch falsch</b>.</div>'+
+ (!boards()['75']?'<p>Die neue Ariel-Tafel fehlt in deinem Import. Sie wird mangels Vergleich nicht bewertet.</p>':'')+
+ '<h4>Diese Punkte fehlen gegenüber '+esc(ref.creator)+'</h4>'+
+ (sc.missing.length?sc.missing.slice(0,10).map((x,i)=>row(x,i)).join(''):'<p>Alle anhand der Veröffentlichung belegbaren Zielknoten sind bei dir vorhanden.</p>')+
+ (sc.missing.length>10?'<details><summary>Weitere '+(sc.missing.length-10)+' Unterschiede anzeigen</summary>'+
+ sc.missing.slice(10).map((x,i)=>row(x,i+10)).join('')+'</details>':'')+
+ '<h4>Bei beiden frühen Damage-Builds ausgelassen</h4>'+
+ (sc.caution.length?sc.caution.map((x,i)=>row(x,i,true)).join(''):
+ '<p>Keine eindeutig belegte auffällige Abweichung dieser Art gefunden.</p>')+
+ '<details><summary>Was nutzen Top-100-Kleriker häufig? (separater Datensatz)</summary>'+
+ '<p>'+esc(top.title)+' · Stichprobe '+(top.sampleSize||'?')+' · '+esc(top.observed||'')+'. Es sind <b>nicht nur Damage-Kleriker</b>. Die Prozentwerte beziehen sich auf angegebene Knoten in Nezekan; Mehrfachknoten werden nicht koordinatengenau zugeordnet.</p>'+
+ meta+'<p><a target="_blank" rel="noopener noreferrer" href="'+esc(top.uri)+'">Top-100-Auswertung ansehen ↗</a></p></details>'+
+ '<p>Die veröffentlichten Tabellen nennen nicht jeden Verbindungsknoten. Deshalb wird <b>kein kompletter fremder 15×15-Baum erfunden</b>. Eine goldene „Best-in-Slot“-Route lässt sich daraus nicht beweisen. Unterschiedlicher Punktestand und Spielstil machen einen direkten Vergleich begrenzt sinnvoll.</p>';
 }
 host.addEventListener('click',e=>{
- const change=e.target.closest('[data-daevamode]');
- if(change&&roles.includes(change.dataset.daevamode)){
-  mode=change.dataset.daevamode;
-  try{localStorage.setItem('aion2-daevanion-role-v1:'+charKey(),mode)}catch{}
+ const btn=e.target.closest('[data-ref-id]');
+ if(btn&&byId(btn.dataset.refId)){
+  chosen=btn.dataset.refId;
+  try{localStorage.setItem('aion2-daevanion-reference-v1:'+currentId(),chosen)}catch{}
   render();window.aionBoardsRefresh?.();return;
  }
- const loc=e.target.closest('[data-daevaboard]');
- if(loc)window.aionBoardSelect?.(loc.dataset.daevaboard,Number(loc.dataset.daevaindex));
+ const node=e.target.closest('[data-ref-board]');
+ if(node)window.aionBoardSelect?.(node.dataset.refBoard,Number(node.dataset.refIndex));
 });
-window.aionDaevanion={
- render,
- classify:(id,n)=>{
-  const list=boards()[String(id)]?.nodes;if(!list)return '';
-  const ix=list.indexOf(n);return audit?.status[String(id)]?.[ix]||'';
- }
-};
+window.aionDaevanion={render,classify:(id,n)=>{
+ const ns=boards()[String(id)]?.nodes||[],ix=ns.indexOf(n);
+ return comparison?.marked?.[String(id)]?.[ix]||'';
+}};
 $('aion-board-button')?.addEventListener('click',render);
-render();window.aionBoardsRefresh?.();
+fetch('./cleric-board-references.json?v=1',{cache:'no-cache'})
+.then(async res=>{if(!res.ok)throw Error('HTTP '+res.status);const d=await res.json();
+ if(!Array.isArray(d.sources)||d.sources.length<2||!d.top100)throw Error('Ungültige Vergleichsdaten');
+ refs=d;
+}).catch(()=>{fetchFailed=true})
+.finally(()=>{render();window.aionBoardsRefresh?.()});
+render();
 })();
