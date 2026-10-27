@@ -1,0 +1,178 @@
+{
+  "version": 1,
+  "generatedAt": "2026-10-27",
+  "locale": "Global/EU",
+  "disclaimer": "Publizierte Board-Zielwerte von zwei unabhängigen Autoren; keine Live-Kopie der aktuellen Top-EU-Spieler. Nur explizit dokumentierte Knoten werden hervorgehoben.",
+  "sources": [
+    {
+      "id": "rosaEarly",
+      "creator": "MrRosaPony",
+      "title": "DPS-Fokus · 239 Punkte",
+      "points": 239,
+      "description": "Veröffentlichte Early-Game-Boards. Frühe Heilknoten überwiegend ausgelassen; Schaden und Kernpassive priorisiert.",
+      "uri": "https://questlog.gg/aion-2/en/daevanion-planner/FQXZUw3OF054?build-id=3714",
+      "documentation": "https://aion2vault.com/builds/cleric/daevanion/",
+      "boards": {
+        "71": {
+          "skills": [
+            "Condemnation",
+            "Judgment Thunder",
+            "Divine Aura",
+            "Chain of Torment",
+            "Debilitating Mark",
+            "Earth's Retribution",
+            "Light of Regeneration"
+          ],
+          "passives": {
+            "Empyrean Lord's Grace": 2
+          },
+          "stats": {
+            "Combat Speed": 2,
+            "Cooldown Reduction": 2
+          }
+        },
+        "72": {
+          "skills": [
+            "Condemnation",
+            "Judgment Thunder",
+            "Divine Aura",
+            "Chain of Torment",
+            "Debilitating Mark",
+            "Earth's Retribution"
+          ],
+          "passives": {
+            "Earth's Grace": 1,
+            "Survival Willpower": 1
+          },
+          "stats": {
+            "Damage Boost": 2
+          }
+        },
+        "73": {
+          "skills": [
+            "Condemnation",
+            "Judgment Thunder",
+            "Divine Aura",
+            "Chain of Torment",
+            "Debilitating Mark",
+            "Earth's Retribution"
+          ],
+          "passives": {
+            "Survival Willpower": 1,
+            "Heal Block": 1,
+            "Empyrean Lords' Benediction": 1
+          },
+          "stats": {
+            "Critical Damage Boost": 2
+          }
+        },
+        "74": {
+          "skills": [
+            "Condemnation",
+            "Judgment Thunder",
+            "Divine Aura",
+            "Chain of Torment",
+            "Debilitating Mark",
+            "Earth's Retribution",
+            "Light of Regeneration"
+          ],
+          "passives": {
+            "Radiant Benediction": 1,
+            "Warm Benediction": 1,
+            "Heal Block": 1
+          },
+          "stats": {
+            "Multi-Hit Chance": 3
+          }
+        }
+      },
+      "source": "public player-authored board; node effects summarized by AION2 Vault (Oct 22)"
+    },
+    {
+      "id": "whelps",
+      "creator": "whelps",
+      "title": "Schaden + Absicherung · 316 Punkte",
+      "points": 316,
+      "description": "Sechs +4 Fähigkeiten einschließlich Bolt und Healing Light; Kernpassive. Deutlich mehr Heilung als MrRosaPony Early.",
+      "uri": "https://questlog.gg/aion-2/en/daevanion-planner/X2aYOSzHtbA6?build-id=5309",
+      "documentation": "https://aion2vault.com/builds/cleric/daevanion/",
+      "allBoardSkills": [
+        "Judgment Thunder",
+        "Divine Aura",
+        "Chain of Torment",
+        "Earth's Retribution",
+        "Bolt",
+        "Healing Light"
+      ],
+      "allBoardPassives": [
+        "Empyrean Lord's Grace",
+        "Earth's Grace"
+      ],
+      "globalStats": {
+        "Combat Speed": 2,
+        "Cooldown Reduction": 2,
+        "Damage Boost": 2,
+        "Critical Damage Boost": 2,
+        "Multi-Hit Chance": 3,
+        "Damage Tolerance": 2,
+        "Critical Damage Tolerance": 2
+      },
+      "source": "public player-authored rough starting board summarized in guide; precise per-node routes not exposed in summary"
+    },
+    {
+      "id": "rosaEnd",
+      "creator": "MrRosaPony",
+      "title": "Endgame-Fortschritt · 416 Punkte",
+      "points": 416,
+      "description": "Fast fertige PvE-Boards. Viele Heilungsknoten sind auf diesem Ausbaustand enthalten, ohne frühe Damage-Priorität zu bedeuten.",
+      "uri": "https://aion2vault.com/builds/cleric/daevanion/",
+      "documentation": "https://aion2vault.com/builds/cleric/daevanion/",
+      "nearlyFull": true,
+      "exclusions": [
+        "Lightning Strike Scattershot"
+      ],
+      "source": "endgame stage summarized from 416 point public plan; exact per-node omissions not available"
+    }
+  ],
+  "top100": {
+    "title": "Top-100-Kleriker nach Kampfkraft (PvE/PvP gemischt)",
+    "sampleSize": 100,
+    "observed": "2026-10-23 bis 2026-10-24",
+    "uri": "https://daevameta.io/en/class/cleric/guide?tab=daevanion",
+    "notice": "Nicht rein Damage: Sichtbare Knoten-Anteile von hochrangigen Klerikern aller Builds. Werte sind keine Beweise für höchste DPS.",
+    "nezekan": [
+      {
+        "name": "Judgment Thunder",
+        "pct": 100
+      },
+      {
+        "name": "Empyrean Lord's Grace",
+        "pct": 99
+      },
+      {
+        "name": "Cooldown Reduction",
+        "pct": 100
+      },
+      {
+        "name": "Condemnation",
+        "pct": 98
+      },
+      {
+        "name": "Divine Aura",
+        "pct": 97
+      },
+      {
+        "name": "Healing Light",
+        "pct": 96
+      },
+      {
+        "name": "Combat Speed",
+        "pct": 100
+      },
+      {
+        "name": "Chain of Torment",
+        "pct": 98
+      }
+    ]
+  }
+}
