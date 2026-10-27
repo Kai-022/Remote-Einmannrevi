@@ -102,7 +102,7 @@ nav.querySelectorAll('button[data-tab]').forEach(button=>button.addEventListener
 let selected=null;
 function portrait(){
  const info=data?.characterExtras?.profile||{};
- const symbol=$('dash')?.querySelector('.char .symbol');
+ const symbol=document.querySelector('#armory-profile .char .symbol, #dash .char .symbol');
  if(!symbol)return;
  symbol.textContent='✧';
  try{
@@ -114,7 +114,7 @@ function portrait(){
    symbol.replaceChildren(img);
   }
  }catch{}
- const char=$('dash')?.querySelector('.char');
+ const char=document.querySelector('#armory-profile .char, #dash .char');
  let line=$('aion-profile-meta');
  if(!line&&char){
   line=document.createElement('small');line.id='aion-profile-meta';
