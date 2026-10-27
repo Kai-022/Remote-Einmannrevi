@@ -5,6 +5,9 @@ on:
     paths:
       - 'aion2-gear-checker/pantheon.js'
       - 'aion2-gear-checker/pantheon-priority.js'
+      - 'aion2-gear-checker/pantheon-wtb-bridge.js'
+      - 'aion2-gear-checker/want-to-buy.js'
+      - 'aion2-gear-checker/tests/pantheon-wtb.mjs'
       - 'aion2-gear-checker/armory.html'
       - 'aion2-gear-checker/tests/pantheon-priority.mjs'
       - 'aion2-gear-checker/pantheon-catalog.json'
@@ -27,3 +30,4 @@ jobs:
         run: |
           node aion2-gear-checker/tests/pantheon.mjs
           node aion2-gear-checker/tests/pantheon-priority.mjs
+          node aion2-gear-checker/tests/pantheon-wtb.mjs
