@@ -60,12 +60,22 @@ a{color:var(--gold)}.wrap{max-width:1180px;margin:0 auto;padding:0 22px}.top{dis
 body.armory-pick-mode .wrap > :not(.top):not(#nc-official-import){display:none!important}
 body.armory-pick-mode #nc-official-import{display:block!important;margin-top:24px}
 body.armory-pick-mode #nc-official-import #nc-api-hint{display:none}
-body.armory-loaded .wrap > section:not(#armory-home):not(#dash):not(#nc-official-import){display:none!important}
+body.armory-loaded .wrap > section:not(#armory-home):not(#dash):not(#nc-official-import):not(#wtb-panel){display:none!important}
 body.armory-loaded #nc-official-import{display:none!important}
 body.armory-loaded.armory-show-import #nc-official-import{display:block!important}
 body.armory-loaded #armory-intro{display:none}
 body.armory-loaded .armory-menu{margin-top:16px}
 #armory-back{margin:10px 0 0}
+</style><style id="pantheon-wtb-style">
+#tab-pantheon .pan-buy-group{margin:18px 0 7px;font-weight:800;color:#f5d9a9;font-size:15px}
+#tab-pantheon .pan-buy-group:first-of-type{margin-top:11px}
+#tab-pantheon .pan-cost-note{color:#a4b3c4;font-size:11px}
+#tab-pantheon .pan-buy-footer{display:flex;justify-content:flex-end;margin-top:15px}
+#tab-pantheon .pan-buy-footer button{background:#55402b;color:#f7e9d5;border-color:#b18a51}
+#tab-pantheon .pan-next-card button:disabled{opacity:.75;background:#243a31;border-color:#629c78;color:#b4e0c1;cursor:default}
+#tab-pantheon .pan-buttons button[data-pan-wtb-add]{background:#40351f;border-color:#ad8959;color:#f6dfb9}
+body.armory-loaded #wtb-panel{margin:24px 0}
+#wtb-panel [data-wtb-check^="pantheon:"]{accent-color:#8bcaa1}
 </style></head><body class="armory-pick-mode"><div class="wrap">
 <header class="top"><div class="brand">✧ DAEVA <span>GEAR</span></div><div class="region">AION 2 · EU · KLERIKER PVE</div></header>
 <section class="hero"><div class="eyebrow">GEAR OPTIMIEREN • PETS VERGLEICHEN</div><h1>Finde die <em>Schwachstellen</em> deiner Ausrüstung.</h1><p>Importiere deinen EU-Charakter über Server und Name und überprüfe Gear, Fähigkeiten, Daevanion-Tafeln und PvE-Empfehlungen – ganz ohne Installation oder Zugangsdaten.</p></section>
@@ -243,7 +253,7 @@ try{
   render();
  }
 }catch(e){/* No previously saved data; import normally. */}
-</script><script src="./gear-detail.js?v=8"></script><script src="./nc-official-import.js?v=7"></script><script src="./nc-visuals.js?v=5"></script><script src="./pantheon.js?v=2"></script><script src="./pantheon-inference.js?v=1"></script><script src="./pantheon-priority.js?v=1"></script><script src="./upgrade-advisor-core.js?v=1"></script><script src="./upgrade-advisor.js?v=1"></script><script src="./pet-species.js?v=8"></script><script src="./missing-list.js?v=1"></script><script src="./want-to-buy.js?v=2"></script><script id="armory-clean-script">
+</script><script src="./gear-detail.js?v=8"></script><script src="./nc-official-import.js?v=7"></script><script src="./nc-visuals.js?v=5"></script><script src="./pantheon-wtb-bridge.js?v=1"></script><script src="./pantheon.js?v=3"></script><script src="./pantheon-inference.js?v=1"></script><script src="./pantheon-priority.js?v=2"></script><script src="./upgrade-advisor-core.js?v=1"></script><script src="./upgrade-advisor.js?v=1"></script><script src="./pet-species.js?v=8"></script><script src="./missing-list.js?v=1"></script><script src="./want-to-buy.js?v=2"></script><script id="armory-clean-script">
 (function(){
 const buttons=[...document.querySelectorAll('[data-armory]')];
 const sections={missing:'missing',gear:'gear',upgrades:'advisor',pets:'pets',pantheon:'pantheon',daevanion:'daevanion'};
