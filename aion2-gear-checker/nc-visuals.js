@@ -129,13 +129,14 @@ function portrait(){
 function tile(n,index){
  if(!n||n.type==='None')return '<div class="aion-node filler" aria-hidden="true"></div>';
  const on=!!n.open,special=n.type==='SkillLevel'||n.grade==='Legend',recommended=priority(n);
+ const auditClass=window.aionDaevanion?.classify?.(selected,n)||'';
  const title=esc((n.name||n.type||'Knoten')+(on?' · Freigeschaltet':' · Nicht freigeschaltet'));
  const isSkill=n.type==='SkillLevel',src=isSkill?iconForSkill(nodeSkillName(n)):'';
  const frame='./nc-icons/frames/'+nodeFrame(n)+'.png';
  const fallback=n.type==='Start'?'★':(isSkill?'✦':'');
  const art=smallArt(src,'aion-node-skill')||(fallback?'<span class="aion-node-fallback">'+fallback+'</span>':'');
  return '<button type="button" class="aion-node with-art '+(on?'on':'off')+
-  (special?' special':'')+(recommended?' priority':'')+
+  (special?' special':'')+(recommended?' priority':'')+(auditClass?' audit-'+auditClass:'')+
   '" style="background-image:url(\''+frame+'\')" data-node="'+index+
   '" title="'+title+'" aria-label="'+title+'">'+art+
   (on?'<span class="tick">✓</span>':'')+'</button>';
@@ -247,6 +248,7 @@ function renderBoards(){
  '<span><i class="aion-board-dot" style="background:#b28b50"></i>Skill-Knoten</span></div>'+
  '<div class="aion-board-scroll"><div class="aion-board-grid">'+matrix+'</div></div>'+
  '<div id="aion-board-node-detail" aria-live="polite"><div class="tip" style="margin-top:12px">Klicke einen Knoten an, um seine Werte anzusehen.</div></div>'+summary;
+ window.aionDaevanion?.render?.();
 }
 $('aion-board-content').addEventListener('click',async e=>{
  const reload=e.target.closest('#aion-recover-boards');
@@ -271,6 +273,14 @@ $('aion-board-content').addEventListener('click',async e=>{
   panelFor(node);
  }
 });
+window.aionBoardsRefresh=renderBoards;
+window.aionBoardSelect=(id,index)=>{
+ const board= data?.characterExtras?.boards?.[String(id)];
+ if(!board?.nodes)return;
+ selected=String(id);renderBoards();
+ const button=$('aion-board-content')?.querySelector('[data-node="'+Number(index)+'"]');
+ if(button){button.scrollIntoView({behavior:'smooth',block:'center'});button.click();}
+};
 const previous=render;
 render=function(){previous();renderBoards()};
 renderBoards();
