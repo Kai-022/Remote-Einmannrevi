@@ -1,0 +1,37 @@
+name: AION 2 Missing Checklist Test
+on:
+  push:
+    paths:
+      - 'aion2-gear-checker/missing-list.js'
+      - 'aion2-gear-checker/armory.html'
+      - 'aion2-gear-checker/pet-species.js'
+      - 'aion2-gear-checker/pantheon.js'
+      - '.github/workflows/aion2-missing-list-test.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  check-missing-list:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate checklist code and UI wiring
+        run: |
+          node --check aion2-gear-checker/missing-list.js
+          node --check aion2-gear-checker/pet-species.js
+          node --check aion2-gear-checker/pantheon.js
+          node --input-type=module <<'NODE'
+          import assert from 'node:assert/strict';
+          import {readFileSync} from 'node:fs';
+          const html=readFileSync('aion2-gear-checker/armory.html','utf8');
+          assert(html.includes('data-armory="missing"'));
+          assert(html.includes('./missing-list.js?v='));
+          assert(!html.includes('<script src="./pantheon-screenshot.js'));
+          assert(!html.includes('<script src="./pet-scanner-start.js'));
+          assert(html.includes('window.armoryRenderMissing'));
+          console.log('AION missing checklist is wired and old screenshot UI is disabled.');
+          NODE
