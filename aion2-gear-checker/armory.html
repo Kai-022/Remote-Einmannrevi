@@ -18,12 +18,29 @@ a{color:var(--gold)}.wrap{max-width:1180px;margin:0 auto;padding:0 22px}.top{dis
 #dash>.tabs{display:none!important}
 #armory-intro{margin-top:15px}
 @media(max-width:600px){.armory-menu{grid-template-columns:1fr}}
+</style><style id="armory-profile-layout">
+/* One character card above all navigation; no duplicate overview box. */
+.armory-profile{border:1px solid #80663f;background:linear-gradient(135deg,#202a3a,#111927);border-radius:16px;padding:18px;margin:14px 0 18px}
+.armory-profile .char{display:grid;grid-template-columns:94px minmax(0,1fr);gap:17px;align-items:center;margin:0;padding:0;background:none;border:0;border-radius:0}
+.armory-profile .char .symbol{width:94px;height:94px;display:grid;place-items:center;overflow:hidden;padding:5px;margin:0;background:#141923;border:1px solid #8f7345;border-radius:13px}
+.armory-profile .char .symbol .aion-profile-pic{display:block;width:100%;height:100%;object-fit:cover;border:0;border-radius:9px}
+.armory-profile .char #current{font-size:clamp(23px,5vw,31px);line-height:1.2;margin:3px 0 4px}
+.armory-profile .char #current-mode{display:block;font-size:13px}
+.armory-profile .char .right,.armory-profile .char #aion-profile-meta{display:none!important}
+.armory-profile-metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:16px}
+.armory-profile-metrics>div{min-width:0;border:1px solid #46546a;border-radius:10px;background:#101b2c;padding:10px}
+.armory-profile-metrics small{display:block;color:#b8c0d1;font-weight:700;letter-spacing:.6px;font-size:10px}
+.armory-profile-metrics strong{display:block;color:#f2f4f8;font-size:18px;font-variant-numeric:tabular-nums;margin-top:3px}
+.armory-menu{margin-top:14px}
+.armory-menu button{min-width:0}
+@media(max-width:600px){.armory-profile{padding:14px}.armory-profile .char{grid-template-columns:78px minmax(0,1fr);gap:12px}.armory-profile .char .symbol{width:78px;height:78px}.armory-profile-metrics strong{font-size:15px}.armory-profile-metrics>div{padding:9px 7px}.armory-profile-metrics small{font-size:9px}.armory-profile .char small{font-size:11px}}
 </style><style id="armory-entry-style">
 body.armory-pick-mode .wrap > :not(.top):not(#nc-official-import){display:none!important}
 body.armory-pick-mode #nc-official-import{display:block!important;margin-top:24px}
 body.armory-pick-mode #nc-official-import #nc-api-hint{display:none}
 body.armory-loaded .wrap > section:not(#armory-home):not(#dash):not(#nc-official-import){display:none!important}
 body.armory-loaded #nc-official-import{display:none!important}
+body.armory-loaded.armory-show-import #nc-official-import{display:block!important}
 body.armory-loaded #armory-intro{display:none}
 body.armory-loaded .armory-menu{margin-top:16px}
 #armory-back{margin:10px 0 0}
@@ -33,7 +50,25 @@ body.armory-loaded .armory-menu{margin-top:16px}
 <section class="panel hidden" id="manual-preparation" aria-hidden="true"><h2>1. Deinen Charakter vorbereiten</h2><div class="info"><b>Hinweis zum automatischen Import:</b> Diese GitHub-Pages-Version kann noch keine NCSOFT-Charakterdaten direkt abrufen. GitHub Pages führt keinen Datenserver aus. Du kannst dein Gear hier aber schon eingeben und vergleichen. Für den Live-Import brauchen wir später einen kleinen Online-Dienst.</div>
 <div class="grid"><div class="field"><label for="charname">Dein Charaktername</label><input id="charname" placeholder="z. B. mein Kleriker" maxlength="45" value="Mein Kleriker"></div><div class="field"><label for="mode">PvE-Spielstil</label><select id="mode"><option value="hybrid">Hybrid (Heilung + Schaden)</option><option value="heal">Gruppenheilung</option><option value="dps">Boss-Schaden</option></select></div></div>
 <div class="actions"><button id="start" class="primary">✧ Meinen Charakter erstellen</button><button id="restore">Gespeicherte Werte laden</button><button id="demo">Demo ansehen</button><a class="button" target="_blank" rel="noopener noreferrer" href="https://aion2.plaync.com/en-us/characters/index?region=eu">Offizielle EU-Charaktersuche ↗</a></div><div class="status" id="status" role="status"></div></section>
-<section class="armory-home" id="armory-home"><div id="armory-intro" class="panel"><div class="eyebrow">AION 2 · EU · CHARAKTER</div><h2>Dein Charakter</h2><p>Dein Charakter steht im Mittelpunkt. Alle Einzelwerte und Einstellungen findest du in den Untermenüs.</p></div><nav class="armory-menu" aria-label="Charakter-Untermenüs"><button type="button" data-armory="overview" class="active">✧ Charakterübersicht<small>Profil und Zusammenfassung</small></button><button type="button" data-armory="gear">⚔ Ausrüstung<small>Gear und Zusatzwerte</small></button><button type="button" data-armory="upgrades">✦ Verbesserungen<small>Upgrade-Plan</small></button><button type="button" data-armory="pets">◇ Pet-Spezieskenntnisse<small>45 Werte und Talente</small></button><button type="button" data-armory="import">⇩ Charakter verwalten<small>Import, Server und Einstellungen</small></button></nav><div id="armory-overview" class="panel"><h2>Charakterübersicht</h2><p>Wähle oben einen Bereich, um Details anzuzeigen.</p><div class="stats"><div><small>Klasse</small><strong style="font-size:19px">Kleriker</strong></div><div><small>Region</small><strong style="font-size:19px">EU</strong></div><div><small>Gear-Slots erfasst</small><strong id="armory-gear-count">0</strong></div></div></div></section><section id="dash" class="hidden"><div class="char"><div class="symbol">✧</div><div><small>KLERIKER · EU · <span id="type">MANUELLE AUSWERTUNG</span></small><strong id="current">—</strong><small id="current-mode">Hybrid</small></div><div class="right tiny muted">Nur Analyse • keine Änderungen im Spiel</div></div>
+<section class="armory-home" id="armory-home">
+<div id="armory-intro" class="panel"><h2>Charakter</h2></div>
+<div class="armory-profile" id="armory-profile" aria-label="Dein Charakter">
+  <div id="armory-profile-body"></div>
+  <div class="armory-profile-metrics" aria-label="Charakterdaten">
+    <div><small>LEVEL</small><strong id="armory-level">–</strong></div>
+    <div><small>KAMPFKRAFT</small><strong id="armory-cp">–</strong></div>
+    <div><small>GEAR-SLOTS</small><strong id="armory-gear-count">0</strong></div>
+  </div>
+</div>
+<nav class="armory-menu" aria-label="Charakter-Untermenüs">
+ <button type="button" data-armory="gear">⚔ Ausrüstung<small>Gear und Zusatzwerte</small></button>
+ <button type="button" data-armory="upgrades">✦ Verbesserungen<small>Upgrade-Plan</small></button>
+ <button type="button" data-armory="pets">◇ Pet-Spezieskenntnisse<small>Talente und Werte</small></button>
+ <button type="button" data-armory="pantheon">▣ Pantheon<small>Sammlung und Boni</small></button>
+ <button type="button" data-armory="daevanion">◆ Daevanion<small>Tafeln und Fähigkeiten</small></button>
+ <button type="button" data-armory="import">⇩ Charakter verwalten<small>Import und Einstellungen</small></button>
+</nav>
+</section><section id="dash" class="hidden"><div class="char"><div class="symbol">✧</div><div><small>KLERIKER · EU · <span id="type">MANUELLE AUSWERTUNG</span></small><strong id="current">—</strong><small id="current-mode">Hybrid</small></div><div class="right tiny muted">Nur Analyse • keine Änderungen im Spiel</div></div>
 <div class="tabs"><button data-tab="gear" class="active">⚔ Gear</button><button data-tab="upgrades">✦ Upgrade-Plan</button><button data-tab="pets">◇ Pets (45 Slots)</button></div>
 <section id="tab-gear"><section class="panel"><h2>Deine Ausrüstung</h2><p>Dein importiertes Gear erscheint unten. Tippe auf einen Gegenstand für Details. Bei Bedarf kannst du einzelne Werte hier manuell korrigieren.</p>
 <form id="editform"><div class="grid third"><div class="field"><label for="slot">Ausrüstungsplatz</label><select id="slot"></select></div><div class="field"><label for="itemname">Gegenstand</label><input id="itemname" maxlength="110" placeholder="z. B. Streitkolben"></div><div class="field"><label for="plus">Verbesserungsstufe</label><input id="plus" type="number" min="0" max="99" value="0"></div></div><div class="field" style="margin-top:12px"><label for="rolls">Zusatzwerte / Seelenbindung – jeweils eine Zeile</label><textarea id="rolls" placeholder="Schadensverstärkung 2,7 %&#10;Kampftempo 3,1 %&#10;MP +92"></textarea></div><div class="actions"><button type="submit" class="primary">✓ Gear übernehmen & bewerten</button><button id="remove" type="button">Diesen Slot entfernen</button><button id="clear" type="button">Alles zurücksetzen</button></div></form></section>
@@ -188,33 +223,46 @@ try{
 </script><script src="./gear-detail.js?v=8"></script><script src="./nc-official-import.js?v=7"></script><script src="./nc-visuals.js?v=5"></script><script src="./pantheon.js?v=2"></script><script src="./pantheon-inference.js?v=1"></script><script src="./pantheon-screenshot.js?v=5"></script><script src="./upgrade-advisor-core.js?v=1"></script><script src="./upgrade-advisor.js?v=1"></script><script src="./pet-species.js?v=5"></script><script src="./pet-scanner-start.js?v=4"></script><script src="./want-to-buy.js?v=2"></script><script id="armory-clean-script">
 (function(){
 const buttons=[...document.querySelectorAll('[data-armory]')];
-const sections=['gear','upgrades','pets'];
+const sections={gear:'gear',upgrades:'advisor',pets:'pets',pantheon:'pantheon',daevanion:'daevanion'};
+const tabButtons={gear:'[data-tab="gear"]',upgrades:'#aion-advisor-button',pets:'[data-tab="pets"]',pantheon:'#pantheon-tab-button',daevanion:'#aion-board-button'};
+const mount=document.getElementById('armory-profile-body');
 function update(){
- const count=document.getElementById('count');
- const preview=document.getElementById('armory-gear-count');
- if(count&&preview)preview.textContent=count.textContent||'0';
- const dash=document.getElementById('dash');
- const char=document.querySelector('#dash .char');
- const menu=document.getElementById('armory-home');
- if(dash&&char&&menu&&char.parentElement===dash)menu.insertBefore(char,document.getElementById('armory-overview'));
+ const char=document.querySelector('#armory-profile .char')||document.querySelector('#dash .char');
+ if(char&&char.parentElement!==mount)mount.appendChild(char);
+ const p=(typeof data==='object'&&data?.characterExtras?.profile)||{};
+ const gear=(typeof data==='object'&&data?.gear)||{};
+ document.getElementById('armory-level').textContent=p.level?Number(p.level).toLocaleString('de-DE'):'–';
+ document.getElementById('armory-cp').textContent=p.combatPower?Number(p.combatPower).toLocaleString('de-DE'):'–';
+ document.getElementById('armory-gear-count').textContent=Object.keys(gear).length;
 }
 function select(section){
  buttons.forEach(b=>b.classList.toggle('active',b.dataset.armory===section));
- document.getElementById('armory-overview')?.classList.toggle('armory-folded',section!=='overview');
- document.querySelectorAll('#dash [data-tab]').forEach(b=>{if(b.dataset.tab===section)b.click()});
+ const active=sections[section]||null;
  const dash=document.getElementById('dash');
- if(dash) {
-   sections.forEach(x=>document.getElementById('tab-'+x)?.classList.toggle('armory-folded',section!==x));
-   dash.classList.toggle('armory-folded',section==='overview'||section==='import');
+ if(active){
+  const b=dash?.querySelector(tabButtons[section]);
+  if(b)b.click();
+  else if(section==='upgrades')dash?.querySelector('[data-tab="upgrades"]')?.click();
  }
- const importPanel=document.getElementById('manual-preparation');
- if(importPanel)importPanel.classList.toggle('armory-folded',section!=='import');
+ if(dash){
+  for(const id of ['gear','upgrades','pets','advisor','pantheon','daevanion']){
+   const panel=document.getElementById('tab-'+id);
+   if(panel)panel.classList.toggle('armory-folded',id!==active&&(section!=='upgrades'||id!=='upgrades'));
+  }
+  dash.classList.toggle('armory-folded',!active);
+ }
+ const importer=document.getElementById('nc-official-import');
+ document.body.classList.toggle('armory-show-import',section==='import');
+ if(importer&&section==='import')importer.scrollIntoView({behavior:'smooth',block:'start'});
  update();
 }
+window.armoryShowSection=select;
 buttons.forEach(b=>b.addEventListener('click',()=>select(b.dataset.armory)));
-const obs=new MutationObserver(()=>update());
+const obs=new MutationObserver(update);
 const root=document.getElementById('dash');
 if(root)obs.observe(root,{attributes:true,attributeFilter:['class']});
+const count=document.getElementById('count');
+if(count)obs.observe(count,{childList:true,characterData:true,subtree:true});
 select('overview');
 setTimeout(()=>{update();select('overview')},0);
 })();
@@ -235,7 +283,7 @@ setTimeout(()=>{update();select('overview')},0);
  const showProfile=()=>{
   body.classList.remove('armory-pick-mode');
   body.classList.add('armory-loaded');
-  document.querySelector('[data-armory="overview"]')?.click();
+  window.armoryShowSection?.('overview');
   window.scrollTo({top:0,behavior:'smooth'});
  };
  back.addEventListener('click',()=>{
