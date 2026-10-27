@@ -4,6 +4,9 @@ on:
   push:
     paths:
       - 'aion2-gear-checker/pantheon.js'
+      - 'aion2-gear-checker/pantheon-priority.js'
+      - 'aion2-gear-checker/armory.html'
+      - 'aion2-gear-checker/tests/pantheon-priority.mjs'
       - 'aion2-gear-checker/pantheon-catalog.json'
       - 'aion2-gear-checker/index.html'
       - 'aion2-gear-checker/tests/pantheon.mjs'
@@ -21,4 +24,6 @@ jobs:
         with:
           node-version: '22'
       - name: Validate Pantheon catalog, artwork and local character UI
-        run: node aion2-gear-checker/tests/pantheon.mjs
+        run: |
+          node aion2-gear-checker/tests/pantheon.mjs
+          node aion2-gear-checker/tests/pantheon-priority.mjs
