@@ -20,6 +20,12 @@ const ctx={data,isDemo:false,render:()=>{},document:{
 vm.runInNewContext(src,ctx,{timeout:2500});
 assert.equal((list.innerHTML.match(/class="ps-group"/g)||[]).length,5);
 assert.equal((list.innerHTML.match(/class="ps-cell unknown"/g)||[]).length,45);
+assert.equal((list.innerHTML.match(/class="ps-mini unknown"/g)||[]).length,45,'all slots immediately visible in compact overview');
+assert.equal((list.innerHTML.match(/class="ps-species"/g)||[]).length,5,'one compact overview per species');
+assert.equal((list.innerHTML.match(/class="ps-recommendations"/g)||[]).length,5,'top-three lists are separately collapsible');
+assert.equal((list.innerHTML.match(/class="ps-recommendation-row"/g)||[]).length,45,'recommendations per slot');
+assert(list.innerHTML.includes('Doppelchance'),'Special slot 4 should include available double chance');
+assert(list.innerHTML.includes('Waffenschadensresistenz'),'Fera defensive line is represented');
 assert(list.innerHTML.includes('Empfohlen:'));
 assert(!html.includes('src="./pet-live-capture.js'), 'broken live capture must be disabled');
 assert(!html.includes('pet-scanner-start.js?v='),'old scanner shortcut should no longer be shown');
@@ -33,6 +39,8 @@ const input=(species,slot,value,kind='select')=>list.listeners.change[0]({
 });
 input('Cogni',4,'PvE-Schadensverstärkung');
 assert((list.innerHTML.match(/class="ps-cell good"/g)||[]).length===1);
+assert((list.innerHTML.match(/class="ps-mini good"/g)||[]).length===1,'good stat shown in compact preview');
+assert(list.innerHTML.includes('PvE-Schadensverstärkung'),'saved stat visible without expanding editor');
 input('Fera',4,'Waffenschadensverstärkung');
 assert((list.innerHTML.match(/class="ps-cell alt"/g)||[]).length===1);
 input('Natura',4,'__other__');
