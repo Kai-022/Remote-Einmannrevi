@@ -171,7 +171,7 @@ function renderList(){
  box.innerHTML=list.length?list.map(card).join(''):'<p class="pan-empty">Für diesen Filter keine Sammelstücke gefunden.</p>';
 }
 function renderPantheon(){ensureCharacter();renderSummary();renderList()}
-window.addEventListener('aion2:pantheon-updated',()=>{currentKey='';renderPantheon();});
+if(typeof window!=='undefined')window.addEventListener('aion2:pantheon-updated',()=>{currentKey='';renderPantheon();});
 page.addEventListener('click',event=>{
  const btn=event.target.closest('[data-pan-action]');if(!btn)return;
  ensureCharacter();
