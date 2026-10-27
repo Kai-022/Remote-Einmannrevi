@@ -27,7 +27,7 @@ assert.equal(types.statue,19);
 assert(types.artwork>=60);
 const code=await readFile(new URL('../pantheon.js',import.meta.url),'utf8');
 execFileSync(process.execPath,['--check','-'],{input:code});
-const html=await readFile(new URL('../index.html',import.meta.url),'utf8');
+const html=await readFile(new URL('../armory.html',import.meta.url),'utf8');
 assert(html.includes('<script src="./pantheon.js?v='));
 const fakeItems=[];
 const fakeById=new Map();
