@@ -34,6 +34,28 @@ a{color:var(--gold)}.wrap{max-width:1180px;margin:0 auto;padding:0 22px}.top{dis
 .armory-menu{margin-top:14px}
 .armory-menu button{min-width:0}
 @media(max-width:600px){.armory-profile{padding:14px}.armory-profile .char{grid-template-columns:78px minmax(0,1fr);gap:12px}.armory-profile .char .symbol{width:78px;height:78px}.armory-profile-metrics strong{font-size:15px}.armory-profile-metrics>div{padding:9px 7px}.armory-profile-metrics small{font-size:9px}.armory-profile .char small{font-size:11px}}
+</style><style id="armory-missing-style">
+#tab-missing .need-counters{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;margin:16px 0}
+#tab-missing .need-counters>div{background:#111e2e;border:1px solid #46566c;border-radius:10px;padding:11px;min-width:0}
+#tab-missing .need-counters strong{display:block;color:#e8c687;font-size:23px;font-variant-numeric:tabular-nums}
+#tab-missing .need-counters small{font-size:11px;color:#b4c1d2}
+#tab-missing label.need-toggle{display:flex;align-items:center;gap:9px;color:#dbe4f1;font-size:12px;margin:12px 0}
+#tab-missing .need-toggle input{width:17px;height:17px;accent-color:#e8c687}
+#tab-missing details.need-section{border:1px solid #4a5a70;border-radius:10px;background:#142131;margin:10px 0;overflow:hidden}
+#tab-missing details.need-section[open]{border-color:#8d7650}
+#tab-missing details.need-section>summary{display:flex;justify-content:space-between;gap:10px;align-items:center;cursor:pointer;padding:14px;list-style:none}
+#tab-missing details.need-section>summary::-webkit-details-marker{display:none}
+#tab-missing details.need-section>summary small{font-size:11px;color:#b5c3d4;text-align:right}
+#tab-missing .need-items{padding:0 11px 12px;display:grid;gap:7px}
+#tab-missing .need-line{display:flex;align-items:center;gap:9px;min-width:0;background:#1b2a3b;border:1px solid #4d5e73;border-radius:8px;padding:10px;border-left:4px solid #9aabbf}
+#tab-missing .need-line.improve{border-left-color:#e8c687}
+#tab-missing .need-line.done{border-left-color:#6ec798;background:#193529}
+#tab-missing .need-description{flex:1;min-width:0;overflow-wrap:anywhere}
+#tab-missing .need-description b{font-size:13px;display:block}
+#tab-missing .need-description small{display:block;font-size:11px;color:#c5cfdd;margin-top:3px}
+#tab-missing .need-line button{font-size:11px;padding:9px 10px;flex-shrink:0}
+#tab-missing .need-done,#tab-missing .need-loading{color:#99dab4;font-size:13px}
+@media(max-width:600px){#tab-missing .need-counters{gap:6px}#tab-missing .need-counters>div{padding:9px 6px}#tab-missing .need-counters strong{font-size:18px}#tab-missing .need-line{flex-wrap:wrap;align-items:flex-start}#tab-missing .need-line button{margin-left:auto}}
 </style><style id="armory-entry-style">
 body.armory-pick-mode .wrap > :not(.top):not(#nc-official-import){display:none!important}
 body.armory-pick-mode #nc-official-import{display:block!important;margin-top:24px}
@@ -61,6 +83,7 @@ body.armory-loaded .armory-menu{margin-top:16px}
   </div>
 </div>
 <nav class="armory-menu" aria-label="Charakter-Untermenüs">
+ <button type="button" data-armory="missing">☑ Was fehlt mir noch?<small>Offene Punkte &amp; Sammelliste</small></button>
  <button type="button" data-armory="gear">⚔ Ausrüstung<small>Gear und Zusatzwerte</small></button>
  <button type="button" data-armory="upgrades">✦ Verbesserungen<small>Upgrade-Plan</small></button>
  <button type="button" data-armory="pets">◇ Pet-Spezieskenntnisse<small>Talente und Werte</small></button>
@@ -220,10 +243,10 @@ try{
   render();
  }
 }catch(e){/* No previously saved data; import normally. */}
-</script><script src="./gear-detail.js?v=8"></script><script src="./nc-official-import.js?v=7"></script><script src="./nc-visuals.js?v=5"></script><script src="./pantheon.js?v=2"></script><script src="./pantheon-inference.js?v=1"></script><script src="./pantheon-screenshot.js?v=5"></script><script src="./upgrade-advisor-core.js?v=1"></script><script src="./upgrade-advisor.js?v=1"></script><script src="./pet-species.js?v=5"></script><script src="./pet-scanner-start.js?v=4"></script><script src="./want-to-buy.js?v=2"></script><script id="armory-clean-script">
+</script><script src="./gear-detail.js?v=8"></script><script src="./nc-official-import.js?v=7"></script><script src="./nc-visuals.js?v=5"></script><script src="./pantheon.js?v=2"></script><script src="./pantheon-inference.js?v=1"></script><script src="./upgrade-advisor-core.js?v=1"></script><script src="./upgrade-advisor.js?v=1"></script><script src="./pet-species.js?v=6"></script><script src="./missing-list.js?v=1"></script><script src="./want-to-buy.js?v=2"></script><script id="armory-clean-script">
 (function(){
 const buttons=[...document.querySelectorAll('[data-armory]')];
-const sections={gear:'gear',upgrades:'advisor',pets:'pets',pantheon:'pantheon',daevanion:'daevanion'};
+const sections={missing:'missing',gear:'gear',upgrades:'advisor',pets:'pets',pantheon:'pantheon',daevanion:'daevanion'};
 const tabButtons={gear:'[data-tab="gear"]',upgrades:'#aion-advisor-button',pets:'[data-tab="pets"]',pantheon:'#pantheon-tab-button',daevanion:'#aion-board-button'};
 const mount=document.getElementById('armory-profile-body');
 function update(){
@@ -240,12 +263,12 @@ function select(section){
  const active=sections[section]||null;
  const dash=document.getElementById('dash');
  if(active){
-  const b=dash?.querySelector(tabButtons[section]);
+  const b=tabButtons[section]?dash?.querySelector(tabButtons[section]):null;
   if(b)b.click();
   else if(section==='upgrades')dash?.querySelector('[data-tab="upgrades"]')?.click();
  }
  if(dash){
-  for(const id of ['gear','upgrades','pets','advisor','pantheon','daevanion']){
+  for(const id of ['missing','gear','upgrades','pets','advisor','pantheon','daevanion']){
    const panel=document.getElementById('tab-'+id);
    if(panel)panel.classList.toggle('armory-folded',id!==active&&(section!=='upgrades'||id!=='upgrades'));
   }
@@ -253,6 +276,7 @@ function select(section){
  }
  const importer=document.getElementById('nc-official-import');
  document.body.classList.toggle('armory-show-import',section==='import');
+ if(section==='missing')window.armoryRenderMissing?.();
  if(importer&&section==='import')importer.scrollIntoView({behavior:'smooth',block:'start'});
  update();
 }
@@ -263,7 +287,7 @@ const root=document.getElementById('dash');
 if(root)obs.observe(root,{attributes:true,attributeFilter:['class']});
 const count=document.getElementById('count');
 if(count)obs.observe(count,{childList:true,characterData:true,subtree:true});
-select('overview');
+select('missing');
 setTimeout(()=>{update();select('overview')},0);
 })();
 </script><script id="armory-entry-script">
@@ -283,7 +307,7 @@ setTimeout(()=>{update();select('overview')},0);
  const showProfile=()=>{
   body.classList.remove('armory-pick-mode');
   body.classList.add('armory-loaded');
-  window.armoryShowSection?.('overview');
+  window.armoryShowSection?.('missing');
   window.scrollTo({top:0,behavior:'smooth'});
  };
  back.addEventListener('click',()=>{
