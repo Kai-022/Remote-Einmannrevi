@@ -1,0 +1,26 @@
+name: AION 2 Daevanion Advisor Test
+on:
+  push:
+    paths:
+      - 'aion2-gear-checker/daevanion-advisor.js'
+      - 'aion2-gear-checker/nc-visuals.js'
+      - 'aion2-gear-checker/armory.html'
+      - 'aion2-gear-checker/tests/daevanion-advisor.mjs'
+      - '.github/workflows/aion2-daevanion-advisor-test.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify-advisor:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Check Daevanion node planner
+        run: |
+          node --check aion2-gear-checker/daevanion-advisor.js
+          node --check aion2-gear-checker/nc-visuals.js
+          node aion2-gear-checker/tests/daevanion-advisor.mjs
