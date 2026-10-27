@@ -18,7 +18,16 @@ a{color:var(--gold)}.wrap{max-width:1180px;margin:0 auto;padding:0 22px}.top{dis
 #dash>.tabs{display:none!important}
 #armory-intro{margin-top:15px}
 @media(max-width:600px){.armory-menu{grid-template-columns:1fr}}
-</style></head><body><div class="wrap">
+</style><style id="armory-entry-style">
+body.armory-pick-mode .wrap > :not(.top):not(#nc-official-import){display:none!important}
+body.armory-pick-mode #nc-official-import{display:block!important;margin-top:24px}
+body.armory-pick-mode #nc-official-import #nc-api-hint{display:none}
+body.armory-loaded .wrap > section:not(#armory-home):not(#dash):not(#nc-official-import){display:none!important}
+body.armory-loaded #nc-official-import{display:none!important}
+body.armory-loaded #armory-intro{display:none}
+body.armory-loaded .armory-menu{margin-top:16px}
+#armory-back{margin:10px 0 0}
+</style></head><body class="armory-pick-mode"><div class="wrap">
 <header class="top"><div class="brand">✧ DAEVA <span>GEAR</span></div><div class="region">AION 2 · EU · KLERIKER PVE</div></header>
 <section class="hero"><div class="eyebrow">GEAR OPTIMIEREN • PETS VERGLEICHEN</div><h1>Finde die <em>Schwachstellen</em> deiner Ausrüstung.</h1><p>Importiere deinen EU-Charakter über Server und Name und überprüfe Gear, Fähigkeiten, Daevanion-Tafeln und PvE-Empfehlungen – ganz ohne Installation oder Zugangsdaten.</p></section>
 <section class="panel hidden" id="manual-preparation" aria-hidden="true"><h2>1. Deinen Charakter vorbereiten</h2><div class="info"><b>Hinweis zum automatischen Import:</b> Diese GitHub-Pages-Version kann noch keine NCSOFT-Charakterdaten direkt abrufen. GitHub Pages führt keinen Datenserver aus. Du kannst dein Gear hier aber schon eingeben und vergleichen. Für den Live-Import brauchen wir später einen kleinen Online-Dienst.</div>
@@ -208,5 +217,47 @@ const root=document.getElementById('dash');
 if(root)obs.observe(root,{attributes:true,attributeFilter:['class']});
 select('overview');
 setTimeout(()=>{update();select('overview')},0);
+})();
+</script><script id="armory-entry-script">
+(function(){
+ const body=document.body;
+ const importer=document.getElementById('nc-official-import');
+ const home=document.getElementById('armory-home');
+ const feedback=document.getElementById('nc-feedback');
+ if(!importer||!home)return;
+ const saved=document.createElement('div');
+ saved.className='actions';
+ saved.innerHTML='<button type="button" id="armory-load-saved">Gespeicherten Charakter laden</button>';
+ importer.append(saved);
+ const back=document.createElement('button');
+ back.id='armory-back';back.type='button';back.textContent='← Anderen Charakter auswählen';
+ home.prepend(back);
+ const showProfile=()=>{
+  body.classList.remove('armory-pick-mode');
+  body.classList.add('armory-loaded');
+  document.querySelector('[data-armory="overview"]')?.click();
+  window.scrollTo({top:0,behavior:'smooth'});
+ };
+ back.addEventListener('click',()=>{
+  body.classList.remove('armory-loaded');
+  body.classList.add('armory-pick-mode');
+  window.scrollTo({top:0,behavior:'smooth'});
+ });
+ saved.querySelector('button').addEventListener('click',()=>{
+  try{
+   const x=JSON.parse(localStorage.getItem('aion2-checker-eu-v1')||'null');
+   if(!x||!x.name||!x.gear)throw Error();
+   data=x;isDemo=false;
+   document.getElementById('dash').classList.remove('hidden');
+   document.getElementById('charname').value=x.name;
+   document.getElementById('type').textContent=x.sourceRef?'NCSOFT · GESPEICHERT':'GESPEICHERTE AUSWERTUNG';
+   render();showProfile();
+  }catch{feedback.textContent='Kein gespeicherter Charakter vorhanden.';feedback.classList.add('error');}
+ });
+ if(feedback){
+  new MutationObserver(()=>{
+   if((feedback.textContent||'').startsWith('Import erfolgreich:'))showProfile();
+  }).observe(feedback,{childList:true,characterData:true,subtree:true});
+ }
 })();
 </script></body></html>
