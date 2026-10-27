@@ -14,11 +14,11 @@ const gods={
  Destiny:'Schicksal (Marchutan)',Life:'Leben (Yustiel)'
 };
 const effects={
- Destruction:'Angriff + Widerstand gegen Präzisionstreffer',
+ Destruction:'Angriff + Perfektionsresistenz',
  Time:'Kampftempo + Widerstand gegen Doppelangriffe',
  Wisdom:'Doppelchance + geringere MP-Kosten',
  Illusion:'Kürzere Abklingzeiten + Ausdauerdurchdringung',
- Justice:'Verteidigung + Präzisionschance',
+ Justice:'Verteidigung + Perfektionschance',
  Life:'Lebenspunkte + Regenerationschance',
  Death:'Kritischer Treffer + Regenerationsdurchdringung',
  Freedom:'Präzision + Ausweichen',
