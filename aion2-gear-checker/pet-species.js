@@ -141,7 +141,7 @@ list.addEventListener('toggle',e=>{
  if(el.open)expanded.add(el.dataset.group);else expanded.delete(el.dataset.group);
  save();
 },true);
-window.aionPetSpecies={
+if(typeof window!=='undefined')window.aionPetSpecies={
   species:specs.map(x=>x[0]),
   getOptions:(name,slot)=>{const spec=specs.find(x=>x[0]===name);return spec?getOptions(spec,slot):null;},
   storageKey
