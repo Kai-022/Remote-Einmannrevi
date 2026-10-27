@@ -32,7 +32,7 @@ const knownStats=[
 ];
 const list=$('pet-list');
 if(!list)return;
-let current='',rolls={},details={},expanded=new Set(['Cogni']),feedback='';
+let current='',rolls={},details={},expanded=new Set(),recommendationsExpanded=new Set(),feedback='';
 function storageKey(){
  return 'aion2-pets-v2:'+String(data?.sourceRef?.sid||'local')+':'+
  String(data?.sourceRef?.id||data?.name||'Charakter').normalize('NFKC');
@@ -44,14 +44,15 @@ function load(){
  try{state=JSON.parse(localStorage.getItem(key)||'{}')||{}}catch{}
  rolls=state.rolls&&typeof state.rolls==='object'&&!Array.isArray(state.rolls)?state.rolls:{};
  details=state.details&&typeof state.details==='object'&&!Array.isArray(state.details)?state.details:{};
- expanded=new Set(Array.isArray(state.expanded)?state.expanded:['Cogni']);
+ expanded=new Set(Array.isArray(state.expanded)?state.expanded:[]);
+ recommendationsExpanded=new Set(Array.isArray(state.recommendationsExpanded)?state.recommendationsExpanded:[]);
  feedback='';
 }
 function save(){
  if(isDemo){feedback='Im Demomodus werden Änderungen nicht dauerhaft gespeichert.';return}
  try{
   const old=JSON.parse(localStorage.getItem(current)||'{}')||{};
-  localStorage.setItem(current,JSON.stringify({...old,rolls,details,expanded:[...expanded]}));
+  localStorage.setItem(current,JSON.stringify({...old,rolls,details,expanded:[...expanded],recommendationsExpanded:[...recommendationsExpanded]}));
   feedback='✓ Im Browser gespeichert';
  }catch{feedback='⚠ Speichern fehlgeschlagen. Prüfe, ob der Browser lokale Daten zulässt.'}
 }
@@ -88,23 +89,70 @@ function slotCard(spec,slot){
  '<div class="ps-tip"><b>Alternative:</b> '+safe(opts.alts.join(' oder ')||'Nicht hinterlegt')+'</div>'+
  '</div>';
 }
+/* Compact readable 9-slot overview, edit-on-demand and three PvE guidance choices.
+   The guide order is a starting recommendation, not a simulator or an item-grade score. */
+function topThree(spec,slot){
+ const o=getOptions(spec,slot);
+ const extras={
+ 1:['Boss-Angriff'],2:['Boss-Verteidigung'],3:['PvE-Präzision'],
+ 5:['PvE-Angriff'],6:['PvE-Präzision'],8:['Boss-Verteidigung'],9:['PvE-Präzision']
+ };
+ const special=slot===4?({
+  Fera:['Schadensverstärkung'],Varian:['Frontangriffsschaden']
+ }[spec[0]]||[]):slot===7?({
+  Cogni:['Schadensresistenz'],Fera:['Schadensresistenz'],
+  Natura:['Statusresistenz'],Varian:['Statusresistenz'],
+  Spezial:['Schadensresistenz']
+ }[spec[0]]||[]):[];
+ return [...new Set([o.best,...o.alts,...(extras[slot]||special)].filter(Boolean))].slice(0,3);
+}
+function mini(spec,slot){
+ const key=spec[0]+'|'+slot,result=status(spec,slot);
+ const actual=String(rolls[key]||'');
+ const number=String(details[key]?.value||'').trim();
+ const labels={unknown:'○ Offen',good:'✓ Zielwert',alt:'≈ Alternative',bad:'! Prüfen'};
+ return '<div class="ps-mini '+result+'">'+
+ '<div class="ps-mini-head"><span>Slot '+slot+'</span><strong>'+labels[result]+'</strong></div>'+
+ '<div class="ps-mini-name">'+safe(actual||'Noch kein Wert')+'</div>'+
+ (number?'<div class="ps-mini-number">'+safe(number)+'</div>':'')+
+ '</div>';
+}
+function topThreeList(spec){
+ return '<details class="ps-recommendations" data-recommendations="'+safe(spec[0])+'"'+(recommendationsExpanded.has(spec[0])?' open':'')+'>'+
+ '<summary>★ Beste 3 Werte je Slot <span>Empfehlungen aufklappen ▾</span></summary>'+
+ '<div class="ps-recommendations-body"><p>Orientierung für PvE-Kleriker. Platz 1 ist unser Zielwert; Platz 2 und 3 sind mögliche Alternativen. Die tatsächliche Eignung hängt von Build, Patch und Wertehöhe ab.</p>'+
+ Array.from({length:9},(_,i)=>{
+  const slot=i+1,items=topThree(spec,slot),current=String(rolls[spec[0]+'|'+slot]||'');
+  return '<div class="ps-recommendation-row"><strong>Slot '+slot+'</strong><ol>'+
+   items.map((value,n)=>'<li class="ps-recommendation-option"><span class="ps-rank">'+(n+1)+'.</span><span>'+safe(value)+'</span>'+
+   (current===value?'<em>Dein Wert ✓</em>':'')+'</li>').join('')+
+   '</ol></div>';
+ }).join('')+
+ '</div></details>';
+}
 function show(){
  load();
- list.innerHTML='<div class="ps-info"><b>Manuelle Pet-Eingabe</b> – Öffne deine Spezieskenntnisse im Spiel und trage je Slot das Talent ein. Auch eigene Namen und Zahlen wie 15 oder 1,9 % sind möglich. Jeder geänderte Wert wird automatisch für diesen Charakter gespeichert.</div>'+
- '<div class="ps-legend"><span>🟢 Empfohlener Wert</span><span>🟡 Alternative</span><span>🔴 Anderer Wert – prüfen</span><span>⚪ Noch offen</span></div>'+
+ const totals={good:0,alt:0,bad:0,unknown:0};
+ for(const spec of specs)for(let n=1;n<=9;n++)totals[status(spec,n)]++;
+ list.innerHTML='<div class="ps-overview-intro">'+
+ '<strong>Deine Spezieskenntnisse</strong><p>Alle 45 Slots auf einen Blick. Deine gespeicherten Talente und Zahlenwerte stehen direkt in den Feldern. Tippe auf „Werte bearbeiten“, um etwas zu ändern.</p>'+
+ '<div class="ps-total">'+(45-totals.unknown)+' / 45 eingetragen · ✓ '+totals.good+' Zielwerte · ≈ '+totals.alt+' Alternativen · ! '+totals.bad+' prüfen</div></div>'+
+ '<div class="ps-legend"><span class="ps-legend-good">✓ Zielwert</span><span class="ps-legend-alt">≈ Alternative</span><span class="ps-legend-bad">! Prüfen</span><span class="ps-legend-empty">○ Offen</span></div>'+
  '<div id="ps-saved" class="ps-saved" role="status">'+safe(feedback)+'</div>'+
  specs.map(spec=>{
   const counts={good:0,alt:0,bad:0,unknown:0};
   for(let n=1;n<=9;n++)counts[status(spec,n)]++;
   const filled=9-counts.unknown;
-  return '<details class="ps-group" data-group="'+safe(spec[0])+'"'+(expanded.has(spec[0])?' open':'')+'>'+
-   '<summary class="ps-summary"><div><div class="ps-name">◇ '+safe(spec[0])+
-   ' <span class="ps-count">'+filled+'/9 eingetragen</span></div><div class="ps-progress">'+
-   '🟢 '+counts.good+' · 🟡 '+counts.alt+' · 🔴 '+counts.bad+' · ⚪ '+counts.unknown+
-   '</div></div><span>⌄</span></summary>'+
-   '<div class="ps-grid">'+Array.from({length:9},(_,i)=>slotCard(spec,i+1)).join('')+'</div></details>';
+  return '<section class="ps-species"><div class="ps-species-head"><div><h3>◇ '+safe(spec[0])+'</h3>'+
+   '<small>'+filled+' von 9 eingetragen · ✓ '+counts.good+' · ≈ '+counts.alt+' · ! '+counts.bad+'</small></div>'+
+   '<span class="ps-species-counter">'+filled+'/9</span></div>'+
+   '<div class="ps-minigrid">'+Array.from({length:9},(_,i)=>mini(spec,i+1)).join('')+'</div>'+
+   '<details class="ps-group" data-group="'+safe(spec[0])+'"'+(expanded.has(spec[0])?' open':'')+'>'+
+   '<summary class="ps-summary">✎ Werte bearbeiten <span>▾</span></summary>'+
+   '<div class="ps-grid">'+Array.from({length:9},(_,i)=>slotCard(spec,i+1)).join('')+'</div></details>'+
+   topThreeList(spec)+'</section>';
  }).join('')+
- '<p class="tip">Die Farben zeigen allgemeine PvE-Empfehlungen, nicht die Güte des Zahlenwerts. Unbekannte oder andere Talente werden zur Prüfung rot angezeigt. Keine Angaben werden automatisch aus dem Spiel übernommen.</p>';
+ '<p class="tip">Die Farben bewerten nur die Art des eingetragenen Talents, nicht die Höhe des Zahlenwerts oder seine Seltenheit. Empfehlungen: PvE-Orientierung, keine offizielle Rangliste. Details zu tatsächlich möglichen Pet-Werten: <a href="https://aion2data.com/guides/pets" target="_blank" rel="noopener noreferrer">Aion2Data Pet Guide</a>.</p>';
 }
 list.addEventListener('change',e=>{
  const control=e.target.closest('select[data-species][data-slot],input[data-manual-roll],input[data-roll-number]');
@@ -136,9 +184,11 @@ list.addEventListener('change',e=>{
 });
 list.addEventListener('toggle',e=>{
  const el=e.target;
- if(!el?.matches?.('details[data-group]'))return;
- if(!specs.some(s=>s[0]===el.dataset.group))return;
- if(el.open)expanded.add(el.dataset.group);else expanded.delete(el.dataset.group);
+ if(!el?.matches?.('details[data-group],details[data-recommendations]'))return;
+ const name=el.dataset.group||el.dataset.recommendations;
+ if(!specs.some(s=>s[0]===name))return;
+ const target=el.dataset.group?expanded:recommendationsExpanded;
+ if(el.open)target.add(name);else target.delete(name);
  save();
 },true);
 if(typeof window!=='undefined')window.aionPetSpecies={
