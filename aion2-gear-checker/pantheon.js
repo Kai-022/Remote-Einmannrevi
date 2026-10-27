@@ -132,6 +132,7 @@ function card(item){
  '<p class="pan-source"><b>Fundort:</b> '+esc(item.where||'Noch nicht hinterlegt')+'</p>'+
  '<div class="pan-buttons"><button data-pan-action="own" data-id="'+esc(item.id)+'" aria-pressed="'+has+'">'+(has?'✓ Gesammelt':'○ Besitze ich')+'</button>'+
  '<button data-pan-action="place" data-id="'+esc(item.id)+'" aria-pressed="'+put+'">'+(put?'✓ Aufgestellt':'Aufstellen')+'</button>'+
+ (!has?'<button type="button" data-pan-wtb-add="'+esc(item.id)+'" aria-label="Auf die Want-to-Buy-Liste setzen">＋ WTB</button>':'')+
  (item.userAdded?'<button data-pan-action="remove" data-id="'+esc(item.id)+'">Entfernen</button>':'')+
  '</div></article>';
 }
@@ -183,6 +184,16 @@ function renderList(){
 function renderPantheon(){ensureCharacter();renderSummary();renderList()}
 if(typeof window!=='undefined')window.addEventListener('aion2:pantheon-updated',()=>{currentKey='';renderPantheon();});
 page.addEventListener('click',event=>{
+ const wtb=event.target.closest('[data-pan-wtb-add]');
+ if(wtb){
+  const item=items().find(x=>x.id===wtb.dataset.panWtbAdd);
+  if(item&&!owned.has(item.id)){
+   const added=window.aionPantheonWTB?.add({id:item.id,name:item.nameDe||item.name,kind:item.kind,stats:item.stats,where:item.where});
+   notice(added?'Zur WTB-Liste hinzugefügt.':'Konnte nicht zur WTB-Liste hinzugefügt werden.',!added);
+   renderList();
+  }
+  return;
+ }
  const btn=event.target.closest('[data-pan-action]');if(!btn)return;
  ensureCharacter();
  const item=items().find(x=>x.id===btn.dataset.id),action=btn.dataset.panAction;
@@ -203,7 +214,12 @@ page.addEventListener('click',event=>{
   if(!confirm('Eigenen Eintrag entfernen?'))return;
   custom=custom.filter(x=>x.id!==item.id);owned.delete(item.id);placed.delete(item.id);
  }
- notice(save()?'Sammlung für '+String(data?.name||'Charakter')+' gespeichert.':'Browser-Speicherung nicht möglich.',false);
+ const savedOK=save();
+ notice(savedOK?'Sammlung für '+String(data?.name||'Charakter')+' gespeichert.':'Browser-Speicherung nicht möglich.',!savedOK);
+ if(savedOK){
+  window.aionPantheonWTB?.syncOwned(item.id);
+  window.dispatchEvent(new Event('aion2:pantheon-updated'));
+ }
  renderSummary();renderList();
 });
 for(const [id,key] of [['pan-search','search'],['pan-kind','kind'],['pan-status','status'],['pan-faction','faction'],['pan-sort','sort']]){
