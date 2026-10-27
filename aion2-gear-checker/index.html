@@ -1,263 +1,87 @@
 <!doctype html>
-<html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#111722">
-<title>AION 2 | Daeva Gear Checker EU</title>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#0d131e">
+<title>AION 2 Armory · Charakter auswählen</title>
 <style>
-:root{--bg:#0d131e;--box:#192231;--box2:#131c2a;--line:#354051;--ink:#edf1f8;--muted:#a6b1c1;--gold:#e8c687;--good:#7fe0af;--bad:#f09595}
-*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:radial-gradient(ellipse at 52% -10%,#323346,transparent 55%),var(--bg);color:var(--ink);font:15px/1.55 system-ui,Segoe UI,Arial,sans-serif}
-a{color:var(--gold)}.wrap{max-width:1180px;margin:0 auto;padding:0 22px}.top{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--line);padding:17px 0}.brand{font-weight:900;letter-spacing:1.7px;font-size:20px}.brand span{color:var(--gold)}.region{font-size:11px;border:1px solid #776347;padding:6px 11px;border-radius:6px;color:var(--gold)}.hero{padding:52px 0 26px}.eyebrow{font-size:11px;letter-spacing:2px;color:var(--gold);font-weight:800}.hero h1{font-size:clamp(30px,5vw,51px);line-height:1.08;max-width:780px;letter-spacing:-1.5px;margin:12px 0}.hero em{color:var(--gold);font-style:normal}.hero p{color:var(--muted);max-width:740px}.panel{background:linear-gradient(155deg,#202a3b,#141d2a);border:1px solid var(--line);border-radius:14px;padding:24px;margin:18px 0}.panel h2{font-size:21px;margin:0 0 8px}.panel p{color:var(--muted);margin:0 0 18px}.info{border-left:3px solid var(--gold);background:#4c3d231f;padding:11px 15px;border-radius:5px;margin:16px 0;color:#e6d6b8;font-size:13px}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.grid.third{grid-template-columns:repeat(3,minmax(0,1fr))}.field{display:flex;flex-direction:column;gap:7px}.field label{font-size:12px;font-weight:700;color:#bac7d6}input,select,textarea{width:100%;background:#0f1724;color:white;border:1px solid #526072;border-radius:8px;font:inherit;padding:12px;outline:none}input:focus,select:focus,textarea:focus{border-color:var(--gold)}textarea{resize:vertical;min-height:108px}button,.button{border:1px solid #6c7684;border-radius:8px;padding:11px 16px;font:700 13px system-ui,Arial;cursor:pointer;background:#273346;color:#f4f4fa;text-decoration:none;display:inline-block;text-align:center}button:hover,.button:hover{filter:brightness(1.15)}.primary{background:linear-gradient(120deg,#f2d69f,#bd995a);color:#2a2115;border-color:#d8bd87}.actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:14px}.muted{color:var(--muted)}.tiny{font-size:12px}.status{min-height:22px;font-size:13px;margin-top:8px;color:var(--good)}.status.error{color:var(--bad)}.hidden{display:none!important}.char{display:flex;gap:17px;align-items:center;flex-wrap:wrap;border:1px solid #665637;background:linear-gradient(120deg,#263245,#171f2a);border-radius:13px;padding:17px;margin:20px 0}.symbol{font-size:33px;color:var(--gold);padding:8px 16px;background:#3e3a36;border-radius:10px}.char strong{display:block;font-size:24px}.char small{color:var(--muted)}.tabs{display:flex;gap:6px;overflow:auto;border-bottom:1px solid var(--line);margin:20px 0 16px}.tabs button{border:0;background:none;color:var(--muted);border-radius:0;border-bottom:2px solid transparent;padding:14px 17px;white-space:nowrap}.tabs .active{color:var(--gold);border-color:var(--gold)}.card{background:var(--box);border:1px solid var(--line);border-radius:11px;padding:17px}.card strong{font-size:15px}.slothead{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}.pill{border:1px solid #668777;border-radius:5px;padding:3px 8px;color:var(--good);font-size:11px;font-weight:800}.pill.bad{color:var(--bad);border-color:#996469}.pill.unknown{color:var(--muted);border-color:#5c6878}.stattag{padding:6px 0;border-bottom:1px solid #2b3747;font-size:13px;display:flex;justify-content:space-between;gap:9px}.stattag b.good{color:var(--good)}.stattag b.bad{color:var(--bad)}.stattag b.mid{color:var(--gold)}.tip{font-size:12px;color:var(--muted);margin:13px 0 0}.petgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;margin-top:14px}.petcell{background:var(--box2);border:1px solid #354152;border-radius:7px;padding:12px}.petcell small{display:block;font-size:10px;color:var(--gold)}.petcell b{font-size:13px}.petcell div{font-size:12px;color:var(--muted);margin-top:5px}.stats{display:flex;gap:10px;flex-wrap:wrap;margin:12px 0 20px}.stats>div{flex:1;min-width:130px;padding:12px;background:var(--box2);border:1px solid var(--line);border-radius:9px}.stats small{display:block;color:var(--muted);font-size:11px}.stats strong{font-size:24px}.foot{font-size:12px;color:var(--muted);border-top:1px solid var(--line);padding:30px 0;margin-top:50px}.empty{text-align:center;color:var(--muted);padding:22px;border:1px dashed #495465;border-radius:8px}.right{margin-left:auto}
-@media(max-width:730px){.grid,.grid.third{grid-template-columns:1fr}.petgrid{grid-template-columns:repeat(2,minmax(0,1fr))}.panel{padding:17px}.hero{padding-top:33px}.top .brand{font-size:15px}.slothead{flex-wrap:wrap}}
-.gear-modern{position:relative;overflow:hidden;cursor:pointer}.gear-modern:hover{border-color:#bb975a}.gear-modern:focus-within{border-color:#dfb873}.gear-modern-head{display:flex;gap:13px;align-items:center}.gear-icon{height:57px;width:57px;flex:0 0 57px;border:1px solid #917646;background:linear-gradient(145deg,#514333,#171f31);border-radius:10px;display:grid;place-items:center;position:relative;font-size:29px;color:#e5cc91}.gear-icon-photo{position:absolute;inset:3px;width:calc(100% - 6px);height:calc(100% - 6px);object-fit:contain;background:#121a27;border-radius:6px;z-index:1}.gear-item-info{min-width:0;flex:1}.gear-item-title{display:block;overflow-wrap:anywhere}.gear-meta{font-size:11px;color:#dcbf85;display:flex;gap:10px}.gear-modern .pill{font-size:10px;white-space:nowrap}.gear-rolls{margin-top:13px;display:grid;gap:5px}.gear-roll{border-left:3px solid transparent;display:flex;align-items:center;gap:9px;border-radius:7px;background:#121b2a;padding:9px 10px;font-size:12px}.gear-mark{display:grid;place-items:center;flex:0 0 20px;width:20px;height:20px;border-radius:50%;font-size:13px;font-weight:900}.gear-mark.good{background:#214f3c;color:#8df2b6}.gear-mark.mid{background:#544322;color:#f6cc79}.gear-mark.bad{background:#542b31;color:#ffa6ac}.gear-roll.good{background:#173729;border-left-color:#49cb83}.gear-roll.mid{background:#39321e;border-left-color:#e3bd64}.gear-roll.bad{background:#42252b;border-left-color:#ed818b}.gear-roll-name{flex:1;min-width:0}.gear-roll-rating{font-size:10px;text-align:right}.gear-roll-rating.good{color:#8df2b6}.gear-roll-rating.mid{color:#f6cc79}.gear-roll-rating.bad{color:#ffa6ac}.gear-unknown{font-size:12px;color:#a6b1c1;display:flex;align-items:center;gap:9px}@media(max-width:600px){.gear-modern-head{flex-wrap:wrap}.gear-modern-head .pill{margin-left:70px}.gear-roll-rating{max-width:100px}}</style><link rel="stylesheet" href="./pet-species.css?v=2"><style id="armory-clean-layout">
-.hero{display:none!important}
-.armory-home{margin:18px 0 12px}
-.armory-home h2{margin:0 0 8px;color:var(--gold)}
-.armory-menu{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:16px 0}
-.armory-menu button{text-align:left;background:#192538;border:1px solid #475267;padding:16px;font-size:14px}
-.armory-menu button.active{border-color:var(--gold);color:var(--gold);background:#322e29}
-.armory-menu small{display:block;color:var(--muted);font-weight:400;margin-top:5px}
-.armory-folded{display:none!important}
-#dash>.tabs{display:none!important}
-#armory-intro{margin-top:15px}
-@media(max-width:600px){.armory-menu{grid-template-columns:1fr}}
-</style><style id="armory-entry-style">
-body.armory-pick-mode .wrap > :not(.top):not(#nc-official-import){display:none!important}
-body.armory-pick-mode #nc-official-import{display:block!important;margin-top:24px}
-body.armory-pick-mode #nc-official-import #nc-api-hint{display:none}
-body.armory-loaded .wrap > section:not(#armory-home):not(#dash):not(#nc-official-import){display:none!important}
-body.armory-loaded #nc-official-import{display:none!important}
-body.armory-loaded #armory-intro{display:none}
-body.armory-loaded .armory-menu{margin-top:16px}
-#armory-back{margin:10px 0 0}
-</style></head><body class="armory-pick-mode"><div class="wrap">
-<header class="top"><div class="brand">✧ DAEVA <span>GEAR</span></div><div class="region">AION 2 · EU · KLERIKER PVE</div></header>
-<section class="hero"><div class="eyebrow">GEAR OPTIMIEREN • PETS VERGLEICHEN</div><h1>Finde die <em>Schwachstellen</em> deiner Ausrüstung.</h1><p>Importiere deinen EU-Charakter über Server und Name und überprüfe Gear, Fähigkeiten, Daevanion-Tafeln und PvE-Empfehlungen – ganz ohne Installation oder Zugangsdaten.</p></section>
-<section class="panel hidden" id="manual-preparation" aria-hidden="true"><h2>1. Deinen Charakter vorbereiten</h2><div class="info"><b>Hinweis zum automatischen Import:</b> Diese GitHub-Pages-Version kann noch keine NCSOFT-Charakterdaten direkt abrufen. GitHub Pages führt keinen Datenserver aus. Du kannst dein Gear hier aber schon eingeben und vergleichen. Für den Live-Import brauchen wir später einen kleinen Online-Dienst.</div>
-<div class="grid"><div class="field"><label for="charname">Dein Charaktername</label><input id="charname" placeholder="z. B. mein Kleriker" maxlength="45" value="Mein Kleriker"></div><div class="field"><label for="mode">PvE-Spielstil</label><select id="mode"><option value="hybrid">Hybrid (Heilung + Schaden)</option><option value="heal">Gruppenheilung</option><option value="dps">Boss-Schaden</option></select></div></div>
-<div class="actions"><button id="start" class="primary">✧ Meinen Charakter erstellen</button><button id="restore">Gespeicherte Werte laden</button><button id="demo">Demo ansehen</button><a class="button" target="_blank" rel="noopener noreferrer" href="https://aion2.plaync.com/en-us/characters/index?region=eu">Offizielle EU-Charaktersuche ↗</a></div><div class="status" id="status" role="status"></div></section>
-<section class="armory-home" id="armory-home"><div id="armory-intro" class="panel"><div class="eyebrow">AION 2 · EU · CHARAKTER</div><h2>Dein Charakter</h2><p>Dein Charakter steht im Mittelpunkt. Alle Einzelwerte und Einstellungen findest du in den Untermenüs.</p></div><nav class="armory-menu" aria-label="Charakter-Untermenüs"><button type="button" data-armory="overview" class="active">✧ Charakterübersicht<small>Profil und Zusammenfassung</small></button><button type="button" data-armory="gear">⚔ Ausrüstung<small>Gear und Zusatzwerte</small></button><button type="button" data-armory="upgrades">✦ Verbesserungen<small>Upgrade-Plan</small></button><button type="button" data-armory="pets">◇ Pet-Spezieskenntnisse<small>45 Werte und Talente</small></button><button type="button" data-armory="import">⇩ Charakter verwalten<small>Import, Server und Einstellungen</small></button></nav><div id="armory-overview" class="panel"><h2>Charakterübersicht</h2><p>Wähle oben einen Bereich, um Details anzuzeigen.</p><div class="stats"><div><small>Klasse</small><strong style="font-size:19px">Kleriker</strong></div><div><small>Region</small><strong style="font-size:19px">EU</strong></div><div><small>Gear-Slots erfasst</small><strong id="armory-gear-count">0</strong></div></div></div></section><section id="dash" class="hidden"><div class="char"><div class="symbol">✧</div><div><small>KLERIKER · EU · <span id="type">MANUELLE AUSWERTUNG</span></small><strong id="current">—</strong><small id="current-mode">Hybrid</small></div><div class="right tiny muted">Nur Analyse • keine Änderungen im Spiel</div></div>
-<div class="tabs"><button data-tab="gear" class="active">⚔ Gear</button><button data-tab="upgrades">✦ Upgrade-Plan</button><button data-tab="pets">◇ Pets (45 Slots)</button></div>
-<section id="tab-gear"><section class="panel"><h2>Deine Ausrüstung</h2><p>Dein importiertes Gear erscheint unten. Tippe auf einen Gegenstand für Details. Bei Bedarf kannst du einzelne Werte hier manuell korrigieren.</p>
-<form id="editform"><div class="grid third"><div class="field"><label for="slot">Ausrüstungsplatz</label><select id="slot"></select></div><div class="field"><label for="itemname">Gegenstand</label><input id="itemname" maxlength="110" placeholder="z. B. Streitkolben"></div><div class="field"><label for="plus">Verbesserungsstufe</label><input id="plus" type="number" min="0" max="99" value="0"></div></div><div class="field" style="margin-top:12px"><label for="rolls">Zusatzwerte / Seelenbindung – jeweils eine Zeile</label><textarea id="rolls" placeholder="Schadensverstärkung 2,7 %&#10;Kampftempo 3,1 %&#10;MP +92"></textarea></div><div class="actions"><button type="submit" class="primary">✓ Gear übernehmen & bewerten</button><button id="remove" type="button">Diesen Slot entfernen</button><button id="clear" type="button">Alles zurücksetzen</button></div></form></section>
-<div class="stats"><div><small>Erfasste Gear-Slots</small><strong id="count">0</strong></div><div><small>Gute Werte</small><strong id="good">0</strong></div><div><small>Verbesserungspotenzial</small><strong id="bad">0</strong></div></div><div id="gear-list" class="grid"></div></section>
-<section id="tab-upgrades" class="hidden"><div class="panel"><h2>Dein Upgrade-Plan</h2><p>Priorisiert nach den erkannten Zusatzwerten. Die Bewertung berücksichtigt nicht die tatsächliche Würfelhöhe, Set-Boni oder den genauen Schadensgewinn.</p><div id="plans" class="grid"></div><div class="actions"><button id="copy">Plan kopieren</button></div></div></section>
-<section id="tab-pets" class="hidden"><div class="panel"><h2>Pet-Spezieskenntnisse selbst eingeben</h2><p>Wähle für jede Spezies die Talente und trage ihre Werte ein. Die Armory speichert deine Eingaben lokal und vergleicht sie mit den vorhandenen PvE-Empfehlungen.</p><div id="pet-list"></div></div></section></section>
-<footer class="foot">Inoffizielles AION-2-Fanprojekt. Deine gespeicherten Werte bleiben lokal im Browser. Für den Live-Charakterabruf werden Server und Charaktername an den von dir verbundenen Datenserver übermittelt. Empfehlungen sind heuristisch und können sich mit Patches ändern. &nbsp; <a href="https://aion2data.com/guides/pets" target="_blank" rel="noopener noreferrer">Pet-Datenquelle ↗</a></footer></div>
+:root{color-scheme:dark;--bg:#0d131e;--panel:#171f2e;--border:#38475d;--ink:#f3f4f8;--muted:#a6b1c1;--gold:#e8c687}
+*{box-sizing:border-box}
+body{margin:0;min-height:100dvh;background:radial-gradient(ellipse at 50% -10%,#2e3049,transparent 58%),var(--bg);color:var(--ink);font:15px/1.5 system-ui,Segoe UI,Arial,sans-serif}
+.container{width:min(100% - 32px,620px);margin:0 auto}
+header{padding:22px 0;border-bottom:1px solid var(--border);font-size:18px;letter-spacing:1.6px;font-weight:900}
+header b{color:var(--gold)}
+main{padding:30px 0 45px}
+.eyebrow{color:var(--gold);font-size:11px;font-weight:800;letter-spacing:2px;text-transform:uppercase}
+h1{font-size:clamp(27px,6vw,38px);line-height:1.2;margin:9px 0 12px}
+p{color:var(--muted);margin:0 0 24px}
+.card{background:linear-gradient(145deg,#1c293c,#111a29);border:1px solid var(--border);border-radius:16px;padding:23px;margin-top:19px}
+label{display:block;font-size:13px;font-weight:700;color:#b9c5d7;margin-bottom:8px}
+.field{margin:0 0 20px}
+input,select{width:100%;background:#0e1725;color:#fff;border:1px solid #53617a;border-radius:9px;font:inherit;padding:14px}
+input:focus,select:focus{outline:2px solid var(--gold);outline-offset:1px}
+button{cursor:pointer;border:1px solid #b99863;border-radius:9px;background:linear-gradient(110deg,#f0d69f,#c49a5d);color:#271c13;font:800 14px system-ui,Arial,sans-serif;padding:15px 18px}
+button:focus-visible{outline:2px solid white;outline-offset:3px}
+button.main{width:100%}
+.profile{display:flex;align-items:center;gap:16px;margin-bottom:16px}
+.avatar{width:55px;height:55px;flex:0 0 55px;border:1px solid #887147;background:#35302d;border-radius:12px;display:grid;place-items:center;font-size:29px;color:var(--gold)}
+.profile-name{font-size:21px;font-weight:800}
+.muted{color:var(--muted);font-size:12px}
+.saved-card[hidden]{display:none}
+.note{margin:14px 0 0;font-size:12px;color:var(--muted)}
+@media(max-width:520px){main{padding-top:22px}.card{padding:18px}header{font-size:16px}}
+</style>
+</head>
+<body>
+<div class="container">
+<header>✧ AION 2 <b>ARMORY</b></header>
+<main>
+<div class="eyebrow">AION 2 · EU</div>
+<h1>Charakter auswählen</h1>
+<p>Wähle deinen Charakter. Ausrüstung, Pets, Pantheon und Verbesserungen findest du anschließend in den Untermenüs.</p>
+<section class="card saved-card" id="saved-card" hidden>
+<div class="eyebrow">Gespeicherter Charakter</div>
+<div class="profile" style="margin-top:17px">
+<div class="avatar" aria-hidden="true">✧</div>
+<div><div class="profile-name" id="saved-name"></div><div class="muted" id="saved-info"></div></div>
+</div>
+<button type="button" class="main" id="saved-open">Charakter öffnen</button>
+</section>
+<section class="card">
+<div class="eyebrow">Charakter laden</div>
+<h2 style="font-size:20px;margin:9px 0 22px">EU-Charakter importieren</h2>
+<form action="./armory.html" method="get">
+<div class="field"><label for="server">EU-Server</label><select id="server" name="server" required><option value="">Server auswählen …</option></select></div>
+<div class="field"><label for="name">Charaktername</label><input id="name" name="name" type="text" maxlength="45" minlength="2" placeholder="Name im Spiel" autocomplete="off" required></div>
+<button class="main" type="submit">✧ Charakter importieren</button>
+</form>
+<p class="note">Der Import öffnet die Charakteransicht. Auf GitHub Pages ist derzeit nur der vorhandene Testdatensatz direkt abrufbar.</p>
+</section>
+</main>
+</div>
 <script>
-'use strict';
-const $=s=>document.getElementById(s), safe=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const names=['Waffe','Nebenhand','Helm','Schultern','Brust','Hose','Handschuhe','Schuhe','Umhang','Halskette','Ohrring 1','Ohrring 2','Ring 1','Ring 2','Armband 1','Armband 2','Amulett','Gürtel','Rune 1','Rune 2','Arkana 1','Arkana 2','Arkana 3','Arkana 4','Arkana 5'];
-const targets={
-'Waffe':[['Schadensverstärkung','Kampftempo'],['Waffenschadensverstärkung','Macht','Angriff','Präzision']],
-'Nebenhand':[['Schadensverstärkung','Kampftempo'],['Waffenschadensverstärkung','Macht','Angriff']],
-'Helm':[['Wucht','Angriffserhöhung'],['Angriff','Kritischer Treffer','Vitalität']],
-'Schultern':[['Kritische Schadensverstärkung'],['Wucht','Angriff','Verteidigung']],
-'Brust':[['Schadensverstärkung'],['Perfektion','Angriff','Vitalität']],
-'Hose':[['Schadensresistenz','Perfektion'],['Angriffserhöhung','Angriff','Vitalität']],
-'Handschuhe':[['Kampftempo'],['Perfektion','Angriff']],
-'Schuhe':[['Bewegungstempo'],['Perfektion','Angriff','Vitalität']],
-'Umhang':[['Wucht','Angriffserhöhung'],['Angriff','Vitalität']],
-'Halskette':[['Kampftempo','Macht'],['Angriff','Präzision','Kritischer Treffer']],
-'Ohrring 1':[['Angriff','Macht'],['Präzision','Kritischer Treffer','Bewegungstempo']],
-'Ohrring 2':[['Angriff','Macht'],['Präzision','Kritischer Treffer','Bewegungstempo']],
-'Ring 1':[['Verdammnis','Angriff','Macht'],['Glanz der Genesung','Licht der Heilung','Präzision']],
-'Ring 2':[['Verdammnis','Angriff','Macht'],['Glanz der Genesung','Licht der Heilung','Präzision']]
-};
-const pats=[
-['PvE-Schadensverstärkung',/pve.*schaden.*verst|pve.*damage.*(boost|amp)/i],
-['Waffenschadensverstärkung',/waffenschaden|weapon.*damage/i],
-['Kritische Schadensverstärkung',/kritisch.*schaden|critical.*damage/i],
-['Schadensresistenz',/schadensresistenz|damage resistance|damage resist/i],
-['Schadensverstärkung',/schadensverst[aä]rkung|damage amplification|damage boost/i],
-['Kampftempo',/kampftempo|angriffsgeschwindigkeit|attack speed/i],
-['Wucht',/wucht|double chance/i],
-['Perfektion',/perfektion|perfection/i],
-['Angriffserhöhung',/angriffserh[oö]hung|attack increase/i],
-['Bewegungstempo',/bewegungstempo|movement speed/i],
-['Mehrfachtreffer',/mehrfachtreffer|multi.?hit/i],
-['Kritischer Treffer',/kritisch.*treffer|critical hit|crit chance/i],
-['Verdammnis',/verdammnis|doom|condemnation/i],
-['Glanz der Genesung',/glanz der genesung|healing splendor|radiant recovery/i],
-['Licht der Heilung',/licht der heilung/i],
-['Macht',/^macht\b|^power\b|^might\b/i],
-['Vitalität',/vitalit[aä]t|vitality/i],
-['Präzision',/pr[aä]zision|accuracy|precision/i],
-['Angriff',/^angriff\b|^attack\b/i],
-['Verteidigung',/verteidigung|defen[cs]e/i],
-['Lebenspunkte',/lebenspunkte|\blp\b|\bhp\b/i],
-['Mana',/\bmp\b|mana|regeneration/i],
-['Blocken',/blocken|block chance/i],
-['Flugwerte',/flug|flight/i]
-];
-const petData=[
-['Cogni','PvE-Schadensverstärkung','Schadensverstärkung / Kritischer Schaden','PvE-Schadensresistenz'],
-['Fera','PvE-Schadensverstärkung','Waffenschadensverstärkung','PvE-Schadensresistenz'],
-['Natura','PvE-Schadensverstärkung','Perfektion / Mehrfachtreffer','PvE-Schadensresistenz'],
-['Varian','PvE-Schadensverstärkung','Rückangriffsschaden','PvE-Schadensresistenz'],
-['Spezial','Wucht','Schadensverstärkung / Kritischer Schaden','Allgemeine Schadensresistenz']
-];
-let data={name:'Mein Kleriker',mode:'hybrid',gear:{}},isDemo=false;
-const store=()=>{if(!isDemo)localStorage.setItem('aion2-checker-eu-v1',JSON.stringify(data));};
-const labelMode=()=>({hybrid:'Hybrid · Heilung & Schaden',heal:'Gruppenheilung',dps:'Boss-Schaden'}[data.mode]||'Hybrid');
-function msg(s,bad=false){$('status').textContent=s;$('status').classList.toggle('error',bad);}
-function start(name,mode,demo=false){data={name:(name||'Mein Kleriker').slice(0,45),mode,gear:{}};isDemo=demo;$('dash').classList.remove('hidden');$('current').textContent=data.name;$('current-mode').textContent=labelMode();$('type').textContent=demo?'DEMODATEN':'MANUELLE AUSWERTUNG'; if(!demo)store();render();$('dash').scrollIntoView({behavior:'smooth'});}
-function categorize(t){for(const [n,r] of pats)if(r.test(t))return n;return null;}
-function rating(slot,roll){const x=categorize(roll),rules=targets[slot];
-if(!x)return {text:'Unbekannt',style:''};
-if(!rules)return {text:'Separat prüfen',style:'mid'};
-if(rules[0].includes(x))return{text:'S – Behalten',style:'good'};
-if(rules[1].includes(x)||x==='PvE-Schadensverstärkung'&&['Waffe','Nebenhand','Brust'].includes(slot))return{text:'A – Gut',style:'good'};
-if(data.mode==='heal'&&['Mana','Lebenspunkte','Verteidigung','Schadensresistenz'].includes(x))return{text:'B – Situativ',style:'mid'};
-if(['Angriff','Macht','Kritischer Treffer','Präzision','Vitalität','Verteidigung','Lebenspunkte','Perfektion'].includes(x))return{text:'B – Alternative',style:'mid'};
-if(['Mana','Blocken','Flugwerte'].includes(x))return{text:'Neu prüfen',style:'bad'};
-return{text:'Situativ',style:'mid'};}
-function gearIcon(slot,item){
- const key=String(slot||'').split(' ')[0];
- const symbols={'Waffe':'⚔','Nebenhand':'🛡','Helm':'♜','Schultern':'◆','Brust':'◈','Hose':'♙','Handschuhe':'✥','Schuhe':'➤','Umhang':'❖','Halskette':'◉','Ohrring':'◇','Ring':'◌','Armband':'▱','Amulett':'✧','Gürtel':'▰','Rune':'✺','Arkana':'✦'};
- const url=item?.iconUrl||item?.imageUrl||item?.importDetail?.iconUrl||'';
- let picture='';
+(()=>{
+ const el=document.getElementById('server');
+ const elyos='Siel|Nezekan|Vaizel|Kaisinel|Yustiel|Ariel|Fregion|Meslamtaeda|Hithanya|Nania|Tahavatha|Luteros|Phernos|Daminu|Kasaka|Bakarma|Tsenka|Kochi|Ishtar|Tiamat|Gauss|Lamuatan|Nathara'.split('|');
+ const asmo='Israphel|Zikel|Triniel|Lumiel|Marchutan|Azphel|Ereshkigal|Beritra|Nemon|Hadala|Ludra|Ulgorn|Munin|Odar|Zemurru|Kromede|Quai|Baba|Fafnir|Indnath|Agnita|Atiel|Tassin'.split('|');
+ for(const [title,arr,base] of [['Elyos',elyos,1301],['Asmodier',asmo,2301]]){
+  const group=document.createElement('optgroup');group.label=title;
+  arr.forEach((server,i)=>{const opt=document.createElement('option');opt.value=String(base+i);opt.textContent=server+' ('+title+')';group.append(opt)});
+  el.append(group);
+ }
  try{
-  const p=new URL(String(url));
-  if(p.protocol==='https:'&&/(^|\.)(shugo\.gg|aion2\.plaync\.com|aion2\.vi\.ki|assets\.playnccdn\.com)$/.test(p.hostname))
-    picture='<img class="gear-icon-photo" src="'+safe(p.href)+'" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.style.display=\'none\'">';
- }catch{}
- return '<div class="gear-icon" aria-hidden="true">'+picture+'<span>'+safe(symbols[key]||'✧')+'</span></div>';
-}
-function gearMark(r){
- return r.style==='good'?'<span class="gear-mark good">✓</span>':r.style==='bad'?'<span class="gear-mark bad">✕</span>':'<span class="gear-mark mid">!</span>';
-}
-function gearItemStatus(slot,item){
- if(!Array.isArray(item?.rolls)||!item.rolls.length)return 'unknown';
- const grades=item.rolls.map(r=>rating(slot,r));
- if(grades.some(g=>g.style==='bad'))return 'bad';
- if(grades.every(g=>g.style==='good'))return 'good';
- return 'mid';
-}
-function verdict(slot,item){return gearItemStatus(slot,item);}
-function render(){const els=Object.entries(data.gear);$('current').textContent=data.name;$('current-mode').textContent=labelMode();
-$('count').textContent=els.length;$('good').textContent=els.filter(([s,i])=>verdict(s,i)==='good').length;$('bad').textContent=els.filter(([s,i])=>verdict(s,i)==='bad').length;
-$('gear-list').innerHTML=els.length?els.map(([slot,item])=>{const v=verdict(slot,item);const badge=v==='good'?'✓ Gute Werte':v==='bad'?'↻ Optimieren':'? Prüfen';const klass=v==='bad'?'bad':v==='unknown'?'unknown':'';
-const status=gearItemStatus(slot,item);
-const statusText=status==='good'?'✓ Werte i. O.':status==='bad'?'✕ Neu prüfen':status==='mid'?'! Teilweise gut':'? Werte fehlen';
-const statusClass=status==='good'?'good':status==='bad'?'bad':'unknown';
-const rows=(item.rolls||[]).map(roll=>{const r=rating(slot,roll);
- return '<div class="gear-roll '+(r.style||'mid')+'">'+gearMark(r)+'<span class="gear-roll-name">'+safe(roll)+'</span><span class="gear-roll-rating '+safe(r.style)+'">'+safe(r.text)+'</span></div>';}).join('');
-const tip=targets[slot]?'Empfohlene Werte: '+targets[slot][0].join(' oder '):'Für diesen Slot fehlen verlässliche Soul-Binding-Zielwerte.';
-const grade=item.importDetail?.grade||'';
-const breakthrough=item.importDetail?.breakthrough;
-const meta=(grade?'<span>'+safe(grade)+'</span>':'')+(breakthrough!=null?'<span>◆ '+safe(breakthrough)+'</span>':'');
-return '<article class="card gear-modern"><div class="gear-modern-head">'+gearIcon(slot,item)+
- '<div class="gear-item-info"><div class="eyebrow">'+safe(slot)+'</div>'+
- '<strong class="gear-item-title">+'+safe(item.plus||0)+' '+safe(item.name||slot)+'</strong><div class="gear-meta">'+meta+'</div></div>'+
- '<span class="pill '+statusClass+'">'+statusText+'</span></div>'+
- '<div class="gear-rolls">'+(rows||'<div class="gear-unknown"><span class="gear-mark mid">?</span>Keine Zusatzwerte – Bewertung offen</div>')+'</div>'+
- '<div class="tip">'+safe(tip)+'</div><button class="edititem" data-slot="'+safe(slot)+'" style="margin-top:12px">Bearbeiten</button></article>';}).join(''):'<div class="empty">Noch kein Gear eingetragen. Beginne oben mit deiner Waffe oder probiere die Demo.</div>';
-document.querySelectorAll('.edititem').forEach(b=>b.addEventListener('click',()=>{ $('slot').value=b.dataset.slot;fillEdit();$('editform').scrollIntoView({behavior:'smooth',block:'center'});}));
-let issues=els.filter(([s,i])=>verdict(s,i)==='bad'||verdict(s,i)==='mid').map(([slot,item])=>({slot,item,v:verdict(slot,item)}));issues.sort((a,b)=>Number(b.v==='bad')-Number(a.v==='bad'));const plans=issues.map(({slot,item,v})=>'<article class="card"><div class="eyebrow">'+safe(slot)+'</div><strong>'+safe(item.name)+'</strong><p class="tip">'+safe(targets[slot]?'Suche '+targets[slot][0].join(' oder ')+'. Schwächere Werte nur neu würfeln, wenn die tatsächlichen Zusatzwerte geprüft wurden.':'Feste Effekte und Verbesserungsstufe vergleichen; hier keine sichere Soul-Binding-Empfehlung.')+'</p></article>').join('');
-$('plans').innerHTML=plans||'<div class="empty">Keine eindeutigen Schwachstellen erfasst. Dein Gear kann natürlich trotzdem verbessert werden.</div>';}
-function fillEdit(){const slot=$('slot').value,item=data.gear[slot];$('itemname').value=item?.name||'';$('plus').value=item?.plus||0;$('rolls').value=(item?.rolls||[]).join('\n');}
-function loadDemo(){start('BeispielKleriker','hybrid',true);data.gear={
-'Waffe':{name:'Demo-Streitkolben',plus:12,rolls:['Schadensverstärkung 2,7 %','Kampftempo 3,1 %','MP +92']},
-'Helm':{name:'Demo-Kapuze',plus:8,rolls:['MP +82','Blocken +59']},
-'Brust':{name:'Demo-Gewand',plus:10,rolls:['Schadensverstärkung 2,4 %','Angriff +71']},
-'Handschuhe':{name:'Demo-Handschuhe',plus:7,rolls:['MP +71','Präzision +80']},
-'Ring 1':{name:'Demo-Ring',plus:7,rolls:['Verdammnis +1','Angriff +89']}};render();msg('Demo mit frei erfundenen Werten geladen.');}
-function pets(){const common={1:['Max. Angriffskraft','Zusatzangriff / PvE-Angriff'],2:['LP %','PvE-Verteidigung'],3:['Kritischer Treffer','Zusatzpräzision'],5:['Max. Angriffskraft','Zusatzangriffskraft'],6:['Kritischer Treffer','Zusatzpräzision'],8:['LP %','PvE-Verteidigung'],9:['Kritischer Treffer','Zusatzpräzision']};
-$('pet-list').innerHTML=petData.map(row=>'<article class="card" style="margin-bottom:16px"><h3 style="color:var(--gold);margin:0">◇ '+row[0]+'</h3><div class="petgrid">'+Array.from({length:9},(_,i)=>{const k=i+1,v=k===4?[row[1],row[2]]:k===7?[row[3],'Situative Resistenz']:common[k];return '<div class="petcell"><small>SLOT '+k+(k===4?' · OFFENSIV':k===7?' · DEFENSIV':'')+'</small><b>'+safe(v[0])+'</b><div>Alternative: '+safe(v[1])+'</div></div>';}).join('')+'</div></article>').join('');}
-$('slot').innerHTML=names.map(x=>'<option value="'+x+'">'+x+'</option>').join('');
-$('start').addEventListener('click',()=>{start($('charname').value.trim(),$('mode').value);msg('Neuer Charakter angelegt. Deine Werte werden nur in diesem Browser gespeichert.');});
-$('demo').addEventListener('click',loadDemo);
-$('restore').addEventListener('click',()=>{try{const saved=JSON.parse(localStorage.getItem('aion2-checker-eu-v1'));if(!saved||!saved.gear||typeof saved.gear!=='object')throw Error();data=saved;isDemo=false;$('dash').classList.remove('hidden');$('charname').value=data.name;$('mode').value=data.mode;$('type').textContent='MANUELLE AUSWERTUNG';render();msg('Gespeicherte Werte geladen.');$('dash').scrollIntoView({behavior:'smooth'});}catch{msg('Noch kein gespeicherter Charakter vorhanden.',true);}});
-$('mode').addEventListener('change',()=>{data.mode=$('mode').value;if(!$('dash').classList.contains('hidden')){render();store();}});
-$('slot').addEventListener('change',fillEdit);
-$('editform').addEventListener('submit',e=>{e.preventDefault();const slot=$('slot').value;data.gear[slot]={name:$('itemname').value.trim()||slot,plus:Math.min(99,Math.max(0,Number($('plus').value)||0)),rolls:$('rolls').value.split(/\r?\n/).map(x=>x.trim()).filter(Boolean).slice(0,15)};store();render();msg(slot+' gespeichert.');});
-$('remove').addEventListener('click',()=>{delete data.gear[$('slot').value];store();fillEdit();render();msg('Ausrüstungsplatz entfernt.');});
-$('clear').addEventListener('click',()=>{if(confirm('Wirklich alle Gear-Eingaben löschen?')){data.gear={};store();fillEdit();render();msg('Eingaben gelöscht.');}});
-document.querySelectorAll('[data-tab]').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('[data-tab]').forEach(x=>x.classList.toggle('active',x===b));['gear','upgrades','pets'].forEach(x=>$('tab-'+x).classList.toggle('hidden',x!==b.dataset.tab));}));
-$('copy').addEventListener('click',async()=>{const lines=['AION 2 Kleriker – '+data.name,'Build: '+labelMode(),''].concat(Object.entries(data.gear).map(([s,i])=>s+': +'+i.plus+' '+i.name+' | '+i.rolls.join(', ')));try{await navigator.clipboard.writeText(lines.join('\n'));msg('Ausrüstungsliste kopiert.');}catch{msg('Kopieren ist hier nicht möglich.',true);}});
-pets();msg('Bereit. Wähle oben deinen EU-Server und deinen Charakternamen.');
-try{
- const saved=JSON.parse(localStorage.getItem('aion2-checker-eu-v1')||'null');
- if(saved&&saved.gear&&typeof saved.gear==='object'&&Object.keys(saved.gear).length){
-  data=saved;isDemo=false;
-  $('dash').classList.remove('hidden');
-  $('charname').value=saved.name||'EU-Charakter';
-  $('mode').value=saved.mode||'hybrid';
-  $('type').textContent=saved.sourceRef?'NCSOFT · GESPEICHERT':'GESPEICHERTE AUSWERTUNG';
-  render();
- }
-}catch(e){/* No previously saved data; import normally. */}
-</script><script src="./gear-detail.js?v=8"></script><script src="./nc-official-import.js?v=7"></script><script src="./nc-visuals.js?v=5"></script><script src="./pantheon.js?v=2"></script><script src="./pantheon-inference.js?v=1"></script><script src="./pantheon-screenshot.js?v=5"></script><script src="./upgrade-advisor-core.js?v=1"></script><script src="./upgrade-advisor.js?v=1"></script><script src="./pet-species.js?v=5"></script><script src="./pet-scanner-start.js?v=4"></script><script src="./want-to-buy.js?v=2"></script><script id="armory-clean-script">
-(function(){
-const buttons=[...document.querySelectorAll('[data-armory]')];
-const sections=['gear','upgrades','pets'];
-function update(){
- const count=document.getElementById('count');
- const preview=document.getElementById('armory-gear-count');
- if(count&&preview)preview.textContent=count.textContent||'0';
- const dash=document.getElementById('dash');
- const char=document.querySelector('#dash .char');
- const menu=document.getElementById('armory-home');
- if(dash&&char&&menu&&char.parentElement===dash)menu.insertBefore(char,document.getElementById('armory-overview'));
-}
-function select(section){
- buttons.forEach(b=>b.classList.toggle('active',b.dataset.armory===section));
- document.getElementById('armory-overview')?.classList.toggle('armory-folded',section!=='overview');
- document.querySelectorAll('#dash [data-tab]').forEach(b=>{if(b.dataset.tab===section)b.click()});
- const dash=document.getElementById('dash');
- if(dash) {
-   sections.forEach(x=>document.getElementById('tab-'+x)?.classList.toggle('armory-folded',section!==x));
-   dash.classList.toggle('armory-folded',section==='overview'||section==='import');
- }
- const importPanel=document.getElementById('manual-preparation');
- if(importPanel)importPanel.classList.toggle('armory-folded',section!=='import');
- update();
-}
-buttons.forEach(b=>b.addEventListener('click',()=>select(b.dataset.armory)));
-const obs=new MutationObserver(()=>update());
-const root=document.getElementById('dash');
-if(root)obs.observe(root,{attributes:true,attributeFilter:['class']});
-select('overview');
-setTimeout(()=>{update();select('overview')},0);
+  const d=JSON.parse(localStorage.getItem('aion2-checker-eu-v1')||'null');
+  if(d&&d.name&&d.gear&&typeof d.gear==='object'){
+    document.getElementById('saved-name').textContent=d.name;
+    const p=d.characterExtras?.profile||{};
+    const details=[p.className||'Kleriker',p.level?'Stufe '+p.level:null,Object.keys(d.gear).length+' Gear-Slots'].filter(Boolean);
+    document.getElementById('saved-info').textContent=details.join(' · ');
+    document.getElementById('saved-card').hidden=false;
+    document.getElementById('saved-open').addEventListener('click',()=>{location.href='./armory.html?load=saved';});
+  }
+ }catch(e){/* No locally saved character. */}
 })();
-</script><script id="armory-entry-script">
-(function(){
- const body=document.body;
- const importer=document.getElementById('nc-official-import');
- const home=document.getElementById('armory-home');
- const feedback=document.getElementById('nc-feedback');
- if(!importer||!home)return;
- const saved=document.createElement('div');
- saved.className='actions';
- saved.innerHTML='<button type="button" id="armory-load-saved">Gespeicherten Charakter laden</button>';
- importer.append(saved);
- const back=document.createElement('button');
- back.id='armory-back';back.type='button';back.textContent='← Anderen Charakter auswählen';
- home.prepend(back);
- const showProfile=()=>{
-  body.classList.remove('armory-pick-mode');
-  body.classList.add('armory-loaded');
-  document.querySelector('[data-armory="overview"]')?.click();
-  window.scrollTo({top:0,behavior:'smooth'});
- };
- back.addEventListener('click',()=>{
-  body.classList.remove('armory-loaded');
-  body.classList.add('armory-pick-mode');
-  window.scrollTo({top:0,behavior:'smooth'});
- });
- saved.querySelector('button').addEventListener('click',()=>{
-  try{
-   const x=JSON.parse(localStorage.getItem('aion2-checker-eu-v1')||'null');
-   if(!x||!x.name||!x.gear)throw Error();
-   data=x;isDemo=false;
-   document.getElementById('dash').classList.remove('hidden');
-   document.getElementById('charname').value=x.name;
-   document.getElementById('type').textContent=x.sourceRef?'NCSOFT · GESPEICHERT':'GESPEICHERTE AUSWERTUNG';
-   render();showProfile();
-  }catch{feedback.textContent='Kein gespeicherter Charakter vorhanden.';feedback.classList.add('error');}
- });
- if(feedback){
-  new MutationObserver(()=>{
-   if((feedback.textContent||'').startsWith('Import erfolgreich:'))showProfile();
-  }).observe(feedback,{childList:true,characterData:true,subtree:true});
- }
-})();
-</script></body></html>
+</script>
+</body>
+</html>
