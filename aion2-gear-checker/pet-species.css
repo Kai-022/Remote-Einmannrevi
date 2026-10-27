@@ -32,3 +32,57 @@
 #pet-list .ps-title{font-size:12px;align-items:center}
 #pet-list .ps-title .ps-state{font-size:11px;white-space:nowrap}
 @media(max-width:640px){#pet-list .ps-grid{grid-template-columns:1fr}}
+
+
+/* Pet system V3: persistent compact slot overview + separately collapsible editor and Top 3. */
+#pet-list .ps-overview-intro{border:1px solid #80704f;background:#27291f;padding:14px;border-radius:11px;margin:0 0 12px}
+#pet-list .ps-overview-intro strong{font-size:17px;color:#f1d19b}
+#pet-list .ps-overview-intro p{font-size:12px;line-height:1.5;margin:6px 0 10px;color:#d8dfeb}
+#pet-list .ps-total{font-size:12px;font-weight:750;color:#f4e5c7}
+#pet-list .ps-legend{display:flex;gap:7px;flex-wrap:wrap;align-items:center;margin:12px 0}
+#pet-list .ps-legend>span{border:1px solid #627183;border-radius:7px;padding:5px 8px;background:#192636;font-size:11px;white-space:nowrap}
+#pet-list .ps-legend .ps-legend-good{color:#9eedbc;border-color:#52996c}
+#pet-list .ps-legend .ps-legend-alt{color:#ffe0a1;border-color:#ae884c}
+#pet-list .ps-legend .ps-legend-bad{color:#ffb8b8;border-color:#ac6670}
+#pet-list .ps-saved{font-size:12px;color:#a6e3bd;min-height:17px;margin-bottom:8px}
+#pet-list .ps-species{border:1px solid #455770;border-radius:13px;background:#141f30;padding:13px;margin:14px 0 18px}
+#pet-list .ps-species-head{display:flex;align-items:center;justify-content:space-between;gap:11px;margin-bottom:12px}
+#pet-list .ps-species-head h3{margin:0;font-size:19px;color:#f0cd8f}
+#pet-list .ps-species-head small{display:block;color:#b4c3d3;font-size:11px;margin-top:3px}
+#pet-list .ps-species-counter{font-size:16px;font-weight:800;color:#f7e9ca;background:#30332d;border:1px solid #877448;border-radius:9px;padding:5px 9px;white-space:nowrap}
+#pet-list .ps-minigrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+#pet-list .ps-mini{min-width:0;border:1px solid #607087;border-left:4px solid #7f8da1;border-radius:9px;background:#1d2a3b;padding:10px 8px;display:flex;flex-direction:column;gap:5px;min-height:87px}
+#pet-list .ps-mini.good{background:#17392c;border-color:#4a9c6d;border-left-color:#66d998}
+#pet-list .ps-mini.alt{background:#37301f;border-color:#ad8d56;border-left-color:#f0c46d}
+#pet-list .ps-mini.bad{background:#3b262d;border-color:#aa6871;border-left-color:#f08d9c}
+#pet-list .ps-mini-head{display:flex;justify-content:space-between;align-items:start;gap:5px;flex-wrap:wrap}
+#pet-list .ps-mini-head span{font-weight:800;color:#c6d3df;font-size:11px}
+#pet-list .ps-mini-head strong{font-size:10px;font-weight:800;color:#bed0e0}
+#pet-list .ps-mini.good .ps-mini-head strong{color:#9becb9}
+#pet-list .ps-mini.alt .ps-mini-head strong{color:#ffdfa3}
+#pet-list .ps-mini.bad .ps-mini-head strong{color:#ffafb6}
+#pet-list .ps-mini-name{font-size:12px;line-height:1.36;font-weight:700;color:#f1f4fa;overflow-wrap:anywhere}
+#pet-list .ps-mini.unknown .ps-mini-name{color:#acb9cb;font-weight:500}
+#pet-list .ps-mini-number{font-size:14px;font-weight:850;color:#ffffff;font-variant-numeric:tabular-nums;margin-top:auto}
+#pet-list details.ps-group,#pet-list details.ps-recommendations{border:1px solid #52627a;border-radius:9px;margin:10px 0 0;background:#19283a;overflow:hidden}
+#pet-list details.ps-group[open],#pet-list details.ps-recommendations[open]{border-color:#c3a76c}
+#pet-list .ps-summary,#pet-list .ps-recommendations>summary{display:flex;align-items:center;justify-content:space-between;gap:10px;cursor:pointer;list-style:none;padding:12px 13px;color:#f0d2a0;font-size:13px;font-weight:800}
+#pet-list .ps-summary::-webkit-details-marker,#pet-list .ps-recommendations>summary::-webkit-details-marker{display:none}
+#pet-list .ps-recommendations>summary span{color:#b9c9da;font-size:11px;font-weight:500;text-align:right}
+#pet-list .ps-grid{padding:0 10px 12px;display:grid;grid-template-columns:repeat(auto-fit,minmax(215px,1fr));gap:9px}
+#pet-list .ps-recommendations-body{padding:0 10px 13px}
+#pet-list .ps-recommendations-body>p{font-size:12px;color:#becbd7;margin:6px 0 13px}
+#pet-list .ps-recommendation-row{padding:10px 8px;border-bottom:1px solid #384a61}
+#pet-list .ps-recommendation-row>strong{display:block;font-size:12px;color:#e5c38a;margin-bottom:7px}
+#pet-list .ps-recommendation-row ol{display:grid;grid-template-columns:repeat(auto-fit,minmax(135px,1fr));gap:7px;padding:0;margin:0;list-style:none}
+#pet-list .ps-recommendation-option{display:flex;align-items:center;gap:7px;flex-wrap:wrap;min-width:0;padding:7px;border:1px solid #51627a;border-radius:8px;background:#223148;color:#eef2f9;font-size:11px}
+#pet-list .ps-recommendation-option:first-child{border-color:#5fa986;background:#1c3c2e}
+#pet-list .ps-rank{color:#efd39f;font-weight:800;font-size:13px}
+#pet-list .ps-recommendation-option em{font-style:normal;color:#95edb0;font-size:10px}
+@media(max-width:630px){
+ #pet-list .ps-species{padding:10px}
+ #pet-list .ps-minigrid{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}
+ #pet-list .ps-mini{padding:9px 8px;min-height:78px}
+ #pet-list .ps-recommendation-row ol{grid-template-columns:1fr}
+ #pet-list .ps-grid{grid-template-columns:1fr}
+}
