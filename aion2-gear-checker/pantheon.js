@@ -185,7 +185,7 @@ function renderPantheon(){ensureCharacter();renderSummary();renderList()}
 if(typeof window!=='undefined')window.addEventListener('aion2:pantheon-updated',()=>{currentKey='';renderPantheon();});
 page.addEventListener('click',event=>{
  const wtb=event.target.closest('[data-pan-wtb-add]');
- if(wtb){
+ if(wtb&&wtb.dataset?.panWtbAdd){
   const item=items().find(x=>x.id===wtb.dataset.panWtbAdd);
   if(item&&!owned.has(item.id)){
    const added=typeof window!=='undefined'&&window.aionPantheonWTB?.add({id:item.id,name:item.nameDe||item.name,kind:item.kind,stats:item.stats,where:item.where});
