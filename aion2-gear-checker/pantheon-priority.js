@@ -72,33 +72,37 @@ function nextPieces(){
  const results=$('pan-priority-next');
  if(fetchState==='loading'){results.innerHTML='<p class="pan-lead">Sammelstücke werden geladen …</p>';return}
  if(fetchState==='failed'){results.innerHTML='<p class="pan-lead">Der Pantheon-Katalog ist derzeit nicht erreichbar.</p>';return}
+ const bridge=window.aionPantheonWTB;
  const identity=key(),saved=stored('aion2-pantheon-v1:'+identity);
  const owned=new Set(Array.isArray(saved.owned)?saved.owned:[]);
  const placed=new Set(Array.isArray(saved.placed)?saved.placed:[]);
  const race=String(data?.sourceRef?.sid||'')[0]==='1'?'elyos':String(data?.sourceRef?.sid||'')[0]==='2'?'asmodier':'';
  const limits={artwork:12,statue:4,colossus:1},used={artwork:0,statue:0,colossus:0};
  for(const x of catalog)if(placed.has(x.id))used[x.kind]=(used[x.kind]||0)+1;
- const choices=catalog.filter(x=>x.stats&&Object.keys(x.stats).length&&
-   !placed.has(x.id)&&(!race||x.faction==='alle'||x.faction===race));
- choices.sort((a,b)=>Number(owned.has(b.id))-Number(owned.has(a.id))||
-  buildScore(b)-buildScore(a));
- const picked=[],counts={};
- for(const x of choices){
-  if((counts[x.kind]||0)>=(x.kind==='colossus'?1:2))continue;
-  picked.push(x);counts[x.kind]=(counts[x.kind]||0)+1;
-  if(picked.length>=3)break;
- }
- results.innerHTML=picked.length?picked.map((x,i)=>{
+ const choices=catalog.filter(x=>x.stats&&Object.keys(x.stats).length&&!owned.has(x.id)&&!placed.has(x.id)&&
+  (!race||x.faction==='alle'||x.faction===race));
+ const sourceFor=x=>bridge?.acquireInfo(x)||{mode:'unknown',label:'Fundort prüfen',where:x.where||'Unbekannt'};
+ const shop=choices.filter(x=>['shop','market','both'].includes(sourceFor(x).mode))
+  .sort((a,b)=>buildScore(b)-buildScore(a)).slice(0,3);
+ const farm=choices.filter(x=>!['shop','market','both'].includes(sourceFor(x).mode))
+  .sort((a,b)=>buildScore(b)-buildScore(a)).slice(0,3);
+ const heading=(label,items)=>'<h5 class="pan-buy-group">'+label+'</h5>'+
+ (items.length?items.map((x,i)=>{
   const stats=Object.entries(x.stats||{}).sort((a,b)=>order[role].indexOf(a[0])-order[role].indexOf(b[0]))
-   .map(([k,n])=>gods[k]+' +'+n).join(' · ');
+   .map(([k,n])=>(gods[k]||k)+' +'+n).join(' · ');
+  const source=sourceFor(x),tracked=(bridge?.planned()||[]).some(p=>p.id===x.id);
   const full=used[x.kind]>=limits[x.kind];
-  const status=(owned.has(x.id)?'Schon gesammelt':'Noch sammeln')+
-   (full?' · Platz belegt, vorhandenes Stück tauschen':' · kann aufgestellt werden');
   return '<div class="pan-next-card"><div><strong>'+(i+1)+'. '+safe(x.nameDe||x.name)+'</strong>'+
-   '<small>'+safe(status)+'</small><small>'+safe(stats)+'</small>'+
-   '<small>Fundort: '+safe(x.where||'Nicht bekannt')+'</small></div>'+
-   '<button type="button" data-pan-guide-id="'+safe(x.id)+'">Ansehen</button></div>';
- }).join(''):'<p class="pan-lead">Keine weiteren passenden Sammelstücke vorhanden.</p>';
+   '<small>'+safe(source.label)+' · '+safe(source.where)+'</small>'+
+   '<small>'+safe(stats)+'</small>'+
+   (full?'<small>Aufstellplatz voll – vorhandenes Stück ggf. ersetzen</small>':'')+
+   '<small class="pan-cost-note">Aktueller Preis/Handelbarkeit nicht live geprüft.</small></div>'+
+   '<button type="button" data-pan-wtb-add="'+safe(x.id)+'" '+(tracked?'disabled':'')+'>'+
+    (tracked?'✓ Auf WTB':'＋ Auf WTB')+'</button></div>';
+ }).join(''):'<p class="pan-lead">Aktuell keine entsprechenden offenen Sammelstücke.</p>');
+ results.innerHTML='<p class="pan-guide-tip">Vorschläge nach Bonus-Priorität deines Builds, nicht nach Preis oder Farmzeit. Nur tatsächlich gesammelte Stücke werden übersprungen.</p>'+
+  heading('🛒 Im Shop / Handel prüfen',shop)+heading('⚔ Durch Spielen bekommen',farm)+
+  '<div class="pan-buy-footer"><button type="button" data-pan-open-wtb>🛒 Meine WTB-Liste öffnen</button></div>';
 }
 function render(){
  selectedRole();
@@ -117,6 +121,21 @@ root.addEventListener('click',event=>{
   try{localStorage.setItem('aion2-pantheon-role-v1:'+key(),role)}catch{}
   render();return;
  }
+ const add=event.target.closest('[data-pan-wtb-add]');
+ if(add){
+  const item=catalog.find(x=>x.id===add.dataset.panWtbAdd);
+  if(item){
+   if(window.aionPantheonWTB?.add({id:item.id,name:item.nameDe||item.name,kind:item.kind,stats:item.stats,where:item.where}))
+    render();
+   else alert('Der Eintrag konnte nicht auf der WTB-Liste gespeichert werden.');
+  }
+  return;
+ }
+ if(event.target.closest('[data-pan-open-wtb]')){
+  if(window.aionWTB?.open)window.aionWTB.open(true);
+  else alert('Die WTB-Liste ist noch nicht verfügbar.');
+  return;
+ }
  const choice=event.target.closest('[data-pan-guide-id]');
  if(!choice)return;
  const piece=catalog.find(x=>x.id===choice.dataset.panGuideId);
@@ -130,6 +149,7 @@ root.addEventListener('click',event=>{
 $('pantheon-tab-button')?.addEventListener('click',render);
 document.querySelector('[data-armory="pantheon"]')?.addEventListener('click',render);
 window.addEventListener('aion2:pantheon-updated',render);
+window.addEventListener('aion2:wtb-updated',render);
 $('tab-pantheon')?.addEventListener('click',event=>{
  if(event.target.closest('[data-pan-action]'))queueMicrotask(render);
 });
