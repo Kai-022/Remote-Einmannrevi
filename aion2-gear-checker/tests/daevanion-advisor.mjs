@@ -4,15 +4,18 @@ import vm from 'node:vm';
 
 const root=new URL('../',import.meta.url);
 const advisor=await readFile(new URL('daevanion-advisor.js',root),'utf8');
-const renderer=await readFile(new URL('nc-visuals.js',root),'utf8');
+const refs=JSON.parse(await readFile(new URL('cleric-board-references.json',root),'utf8'));
 const html=await readFile(new URL('armory.html',root),'utf8');
+const renderer=await readFile(new URL('nc-visuals.js',root),'utf8');
 const snapshot=JSON.parse(await readFile(new URL('nc-character-snapshot.json',root),'utf8'));
-assert(html.includes('daevanion-advisor.js?v='),'editor includes Daevanion advisor');
+assert(html.includes('daevanion-advisor.js?v=2'));
 assert(html.includes('nc-visuals.js?v='));
-assert(renderer.includes('window.aionDaevanion?.classify?.'),'node audit is wired into original renderer');
-assert(renderer.includes('window.aionBoardSelect'),'board deep-link must work');
+assert(renderer.includes('window.aionDaevanion?.classify?.'));
+assert(renderer.includes('window.aionBoardSelect'));
+assert.equal(refs.sources.length,3);
+assert.equal(new Set(refs.sources.map(s=>s.creator)).size,2,'two distinct public player authors');
+assert.equal(refs.top100.sampleSize,100);
 new vm.Script(advisor);
-new vm.Script(renderer);
 const boards={};
 for(const [id,b] of Object.entries(snapshot.daevanionBoards||{})){
  boards[id]={nodes:(b.nodeList||[]).map(n=>({
@@ -20,51 +23,55 @@ for(const [id,b] of Object.entries(snapshot.daevanionBoards||{})){
   open:!!n.open,effects:(n.effectList||[]).map(x=>x.desc)
  }))};
 }
-assert.equal(Object.keys(boards).length,5);
-class Element{
- constructor(){this.id='';this.innerHTML='';this.className='';this.listeners={};this.dataset={};this.style={};}
- before(){} append(){} querySelectorAll(){return []}
- addEventListener(type,fn){(this.listeners[type]??=[]).push(fn)}
+class Fake {
+ constructor(){this.id='';this.innerHTML='';this.listeners={};this.dataset={};this.style={};}
+ before(){}append(){}scrollIntoView(){}querySelectorAll(){return []}
+ addEventListener(type,callback){(this.listeners[type]??=[]).push(callback)}
 }
-const nodes=new Map();
-const created=[];
-const get=id=>{if(!nodes.has(id))nodes.set(id,new Element());return nodes.get(id)};
+const created=[],getters=new Map();
+const get=id=>{if(!getters.has(id))getters.set(id,new Fake());return getters.get(id)};
 const document={
- head:new Element(),createElement:()=>{const x=new Element();created.push(x);return x},
- getElementById:get
+ getElementById:get,head:new Fake(),
+ createElement:()=>{const el=new Fake();created.push(el);return el}
 };
-const storage=new Map(),localStorage={
- getItem:k=>storage.get(k)||null,setItem:(k,v)=>storage.set(k,v)
-};
-const data={name:'Taty',mode:'hybrid',sourceRef:{sid:snapshot.serverId,id:snapshot.characterId},
- characterExtras:{boards}};
-let refreshed=0,lastSelected=null;
-const window={
+const values=new Map();
+const localStorage={getItem:key=>values.get(key)||null,setItem:(k,v)=>values.set(k,v)};
+const data={name:'Taty',sourceRef:{sid:snapshot.serverId,id:snapshot.characterId},characterExtras:{boards}};
+let refreshed=0,opened=null;
+const win={
  aionBoardsRefresh:()=>{refreshed++},
- aionBoardSelect:(id,i)=>{lastSelected=[id,i]}
+ aionBoardSelect:(id,i)=>{opened=[id,i]}
 };
-const ctx={document,window,data,localStorage};
-vm.runInNewContext(advisor,ctx,{timeout:5000});
-const rootElement=created.find(el=>el.id==='daeva-audit');
-assert(rootElement,'advisor element must mount');
-assert(rootElement.innerHTML.includes('Ariel-PvE-Tafel'),'warn about Ariel data not yet imported');
-assert(rootElement.innerHTML.includes('Deine nächsten empfohlenen Skillpunkte'));
-assert(rootElement.innerHTML.includes('geschätzter')||rootElement.innerHTML.includes('Geschätzter')||rootElement.innerHTML.includes('Kristalle'));
-assert(rootElement.innerHTML.includes('Hybrid'));
-const statuses=[];
-for(const [id,b] of Object.entries(boards))for(const n of b.nodes)statuses.push(window.aionDaevanion.classify(id,n));
-assert(statuses.includes('good'),'recommended taken nodes colored green');
-assert(statuses.includes('missing'),'important unlearned nodes colored yellow');
-assert(statuses.includes('caution'),'low-priority nodes colored cautiously');
+const ctx={document,window:win,data,localStorage,fetch:async()=>({ok:true,json:async()=>refs})};
+vm.runInNewContext(advisor,ctx,{timeout:3000});
+await new Promise(resolve=>setImmediate(resolve));
+const host=created.find(el=>el.id==='daeva-audit');
+assert(host);
+assert(host.innerHTML.includes('MrRosaPony'));
+assert(host.innerHTML.includes('whelps'));
+assert(host.innerHTML.includes('392'),'compare with actual invested budget');
+assert(host.innerHTML.includes('Ariel'),'notify that newest board is not available');
+assert(host.innerHTML.includes('Top-100-Kleriker'));
+assert(host.innerHTML.includes('41/45'),'show actual matched reference target counts');
+
+const healingNodes=Object.entries(boards).flatMap(([id,b])=>
+ b.nodes.map((n,i)=>({id,n,i})).filter(x=>/Healing Light/i.test(x.n.name)));
+assert(healingNodes.length>=4);
+assert(healingNodes.every(x=>!['good','missing'].includes(win.aionDaevanion.classify(x.id,x.n))),
+ 'early DPS plan must not mark Healing Light as a target');
+const allStatuses=Object.entries(boards).flatMap(([id,b])=>b.nodes.map(n=>win.aionDaevanion.classify(id,n)));
+assert(allStatuses.includes('good')&&allStatuses.includes('missing'));
+
+host.listeners.click[0]({target:{closest:s=>s==='[data-ref-id]'?
+ {dataset:{refId:'whelps'}}:null}});
 assert(refreshed>=1);
-const original=rootElement.innerHTML;
-rootElement.listeners.click[0]({target:{closest:s=>s==='[data-daevamode]'?{dataset:{daevamode:'heal'}}:null}});
-assert.equal(storage.get('aion2-daevanion-role-v1:'+snapshot.serverId+':'+snapshot.characterId),'heal');
-assert(rootElement.innerHTML.includes('Gruppen')===false||rootElement.innerHTML.includes('Heilung'));
-assert(rootElement.innerHTML!==original,'different build must alter recommendations');
-rootElement.listeners.click[0]({target:{closest:s=>s==='[data-daevaboard]'?{dataset:{daevaboard:'71',daevaindex:'12'}}:null}});
-assert.deepEqual(lastSelected,['71',12]);
+assert(healingNodes.some(x=>['good','missing'].includes(win.aionDaevanion.classify(x.id,x.n))),
+ 'whelps build specifically buys Healing Light');
+assert.equal(values.get('aion2-daevanion-reference-v1:'+snapshot.serverId+':'+snapshot.characterId),'whelps');
+host.listeners.click[0]({target:{closest:s=>s==='[data-ref-board]'?
+ {dataset:{refBoard:'71',refIndex:'4'}}:null}});
+assert.deepEqual(opened,['71',4]);
 data.characterExtras.boards={};
-window.aionDaevanion.render();
-assert(rootElement.innerHTML.includes('Bitte zuerst die offiziellen Daevanion-Tafeln importieren'));
-console.log('Daevanion advisor PASS: snapshot comparison, tri-color audit, roles, missing Ariel, navigation');
+win.aionDaevanion.render();
+assert(host.innerHTML.includes('Bitte zuerst Daevanion-Boards importieren'));
+console.log('Daevanion public peer comparison PASS: three sourced boards, distinct DPS/heal marks, own costs and deep linking');
