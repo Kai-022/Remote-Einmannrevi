@@ -128,7 +128,7 @@ function portrait(){
 }
 function tile(n,index){
  if(!n||n.type==='None')return '<div class="aion-node filler" aria-hidden="true"></div>';
- const on=!!n.open,special=n.type==='SkillLevel'||n.grade==='Legend',recommended=priority(n);
+ const on=!!n.open,special=n.type==='SkillLevel'||n.grade==='Legend',recommended=!window.aionDaevanion&&priority(n);
  const auditClass=window.aionDaevanion?.classify?.(selected,n)||'';
  const title=esc((n.name||n.type||'Knoten')+(on?' · Freigeschaltet':' · Nicht freigeschaltet'));
  const isSkill=n.type==='SkillLevel',src=isSkill?iconForSkill(nodeSkillName(n)):'';
@@ -238,7 +238,7 @@ function renderBoards(){
   '<div class="grid" style="margin-top:10px"><div class="card"><strong>Attribut-Boni</strong>'+
   (stats?'<ul>'+stats+'</ul>':'<p class="tip">Keine erfasst</p>')+'</div>'+
   '<div class="card"><strong>Skill-Boni</strong>'+(skills?'<ul>'+skills+'</ul>':'<p class="tip">Keine erfasst</p>')+'</div></div></details>';
- const buildControls='<div class="aion-board-builds"><button data-build="none" class="'+(buildMode==='none'?'active':'')+'">Meine Skillung</button>'+
+ const buildControls=window.aionDaevanion?'':'<div class="aion-board-builds"><button data-build="none" class="'+(buildMode==='none'?'active':'')+'">Meine Skillung</button>'+
  plan.map(x=>'<button data-build="'+esc(x.label)+'" class="'+(buildMode===x.label?'active':'')+'">'+esc(x.label)+'</button>').join('')+'</div>'+
  '<p class="tip">Goldene Umrandung = empfohlener Zielknoten (keine automatisch berechnete günstigste Route). Empfehlungen nach öffentlich verfügbaren Kleriker-Guides; kein garantierter Max-DPS-Nachweis.</p>';
  root.innerHTML=buildControls+tabs+'<div class="slothead" style="margin:12px 0"><strong>'+esc(definition.name||'Daevanion-Board')+
