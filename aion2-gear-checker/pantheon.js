@@ -188,7 +188,7 @@ page.addEventListener('click',event=>{
  if(wtb){
   const item=items().find(x=>x.id===wtb.dataset.panWtbAdd);
   if(item&&!owned.has(item.id)){
-   const added=window.aionPantheonWTB?.add({id:item.id,name:item.nameDe||item.name,kind:item.kind,stats:item.stats,where:item.where});
+   const added=typeof window!=='undefined'&&window.aionPantheonWTB?.add({id:item.id,name:item.nameDe||item.name,kind:item.kind,stats:item.stats,where:item.where});
    notice(added?'Zur WTB-Liste hinzugefügt.':'Konnte nicht zur WTB-Liste hinzugefügt werden.',!added);
    renderList();
   }
@@ -217,8 +217,10 @@ page.addEventListener('click',event=>{
  const savedOK=save();
  notice(savedOK?'Sammlung für '+String(data?.name||'Charakter')+' gespeichert.':'Browser-Speicherung nicht möglich.',!savedOK);
  if(savedOK){
-  window.aionPantheonWTB?.syncOwned(item.id);
-  window.dispatchEvent(new Event('aion2:pantheon-updated'));
+  if(typeof window!=='undefined'){
+   window.aionPantheonWTB?.syncOwned(item.id);
+   window.dispatchEvent(new Event('aion2:pantheon-updated'));
+  }
  }
  renderSummary();renderList();
 });
