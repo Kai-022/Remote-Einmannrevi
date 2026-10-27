@@ -3,7 +3,7 @@
 'use strict';
 const DB='aion2.want-to-buy.v1';
 const categories=[
-{id:'all',label:'Alle Marken'}, {id:'shugo',label:'Shugo-Festival'}, {id:'nightmare',label:'Albtraum'},
+{id:'all',label:'Alle Marken'}, {id:'pantheon',label:'Pantheon / Sammelstücke'}, {id:'shugo',label:'Shugo-Festival'}, {id:'nightmare',label:'Albtraum'},
 {id:'season',label:'Saison'}, {id:'abyss',label:'Abgrund'}, {id:'pass',label:'Daeva-Pass'}, {id:'custom',label:'Eigene Wünsche'}
 ];
 const base=[
@@ -37,7 +37,7 @@ const esc=x=>String(x??'').replace(/[&<>"']/g,k=>({'&':'&amp;','<':'&lt;','>':'&
 const shell=document.createElement('section');shell.id='wtb-panel';shell.className='panel';shell.style.display='none';
 shell.innerHTML='<div class="eyebrow">AION 2 · EU · PVE</div>'+
  '<h2>🛒 Want to Buy – Was sollte ich kaufen?</h2>'+
- '<p>Deine Einkaufsliste für die Marken-Shops. Prioritäten für <b>Kleriker (PvE)</b>, nicht für einen PvP-Build. Du kannst Einkäufe abhaken und eigene Wünsche hinzufügen.</p>'+
+ '<p>Deine Einkaufsliste für die Marken-Shops und vorgemerkte Pantheon-Stücke. Bei <b>„Gekauft“</b> wird ein Pantheon-Stück automatisch als gesammelt markiert und aus den offenen Kaufzielen entfernt.</p>'+
  '<div class="stats" style="margin-top:12px"><div><small>Offen</small><strong id="wtb-open">0</strong></div><div><small>Gekauft</small><strong id="wtb-done">0</strong></div><div><small>Priorität 1 offen</small><strong id="wtb-top">0</strong></div></div>'+
  '<div class="grid" style="align-items:end"><div class="field"><label for="wtb-filter">Marken / Shop</label><select id="wtb-filter"></select></div>'+
  '<label style="font-size:13px;display:flex;align-items:center;gap:9px"><input id="wtb-hide" type="checkbox" style="width:auto"> Gekaufte ausblenden</label></div>'+
@@ -56,9 +56,16 @@ if(head)head.insertAdjacentElement('afterend',nav);
 (document.getElementById('dash')||document.getElementById('nc-official-import')||document.querySelector('.hero'))?.insertAdjacentElement('afterend',shell);
 const $=id=>document.getElementById(id);
 $('wtb-filter').innerHTML=categories.map(c=>'<option value="'+c.id+'">'+esc(c.label)+'</option>').join('');
-$('wtb-new-shop').innerHTML=categories.filter(c=>!['all','custom'].includes(c.id)).map(c=>'<option value="'+c.id+'">'+esc(c.label)+'</option>').join('');
+$('wtb-new-shop').innerHTML=categories.filter(c=>!['all','custom','pantheon'].includes(c.id)).map(c=>'<option value="'+c.id+'">'+esc(c.label)+'</option>').join('');
 function render(){
- const all=[...base,...custom.filter(x=>x&&typeof x.id==='string'&&typeof x.item==='string')];
+ const bridge=window.aionPantheonWTB;
+ const planned=(bridge?.planned?.()||[]).filter(x=>!bridge.owned(x.id)).map(x=>{
+  const source=bridge.acquireInfo(x);
+  const stats=Object.entries(x.stats||{}).map(([k,v])=>k+' +'+v).join(' · ');
+  return {id:'pantheon:'+x.id,pieceId:x.id,cat:'pantheon',item:x.name,prio:1,isPantheon:true,
+   why:'Bezugsquelle: '+source.where+(stats?' · Boni: '+stats:'')};
+ });
+ const all=[...base,...custom.filter(x=>x&&typeof x.id==='string'&&typeof x.item==='string'),...planned];
  const allDone=all.filter(x=>bought.includes(x.id));
  $('wtb-open').textContent=all.length-allDone.length;
  $('wtb-done').textContent=allDone.length;
@@ -71,26 +78,38 @@ function render(){
     '<div style="flex:1;min-width:0"><strong style="'+(done?'text-decoration:line-through;':'')+'">'+esc(x.item)+'</strong>'+
     '<div class="tiny muted">'+esc(shop)+' · '+esc(weights[x.prio]||'Danach')+'</div>'+
     '<div class="tip">'+esc(x.why||'Eigener Wunsch')+'</div></div>'+
-    (x.id.startsWith('own-')?'<button type="button" data-wtb-remove="'+esc(x.id)+'" aria-label="Wunsch löschen">✕</button>':'')+
+    (x.id.startsWith('own-')||x.isPantheon?'<button type="button" data-wtb-remove="'+esc(x.id)+'" aria-label="Von der Einkaufsliste entfernen">✕</button>':'')+
     '</div></div>';
  }).join(''):'<div class="empty">Hier sind aktuell keine offenen Einträge.</div>';
 }
+function openWTB(showPantheon=false){
+ if(showPantheon){filter='pantheon';$('wtb-filter').value='pantheon';}
+ shell.style.display='block';
+ $('wtb-toggle').textContent='✕ Want to Buy schließen';
+ render();shell.scrollIntoView({behavior:'smooth',block:'start'});
+}
 $('wtb-toggle').addEventListener('click',()=>{
- const opening=shell.style.display==='none';
- shell.style.display=opening?'block':'none';
- $('wtb-toggle').textContent=opening?'✕ Want to Buy schließen':'🛒 Want to Buy';
- if(opening){render();shell.scrollIntoView({behavior:'smooth',block:'start'});}
+ if(shell.style.display==='none')openWTB();
+ else{shell.style.display='none';$('wtb-toggle').textContent='🛒 Want to Buy';}
 });
+window.aionWTB={open:openWTB,refresh:render};
 $('wtb-filter').addEventListener('change',e=>{filter=e.target.value;render()});
 $('wtb-hide').addEventListener('change',e=>{hideBought=e.target.checked;render()});
 $('wtb-items').addEventListener('change',e=>{
  const id=e.target?.dataset?.wtbCheck;if(!id)return;
+ if(id.startsWith('pantheon:')){
+  if(e.target.checked&&!window.aionPantheonWTB?.bought(id.slice(9))){
+   alert('Das Pantheon-Stück konnte nicht als gesammelt gespeichert werden.');render();
+  }
+  return;
+ }
  bought=e.target.checked?[...new Set([...bought,id])]:bought.filter(x=>x!==id);
  persist();render();
 });
 $('wtb-items').addEventListener('click',e=>{
  const id=e.target?.closest('[data-wtb-remove]')?.dataset?.wtbRemove;
- if(!id||!confirm('Diesen eigenen Wunsch löschen?'))return;
+ if(!id||!confirm('Diesen Eintrag von der Einkaufsliste entfernen?'))return;
+ if(id.startsWith('pantheon:')){window.aionPantheonWTB?.remove(id.slice(9));return;}
  custom=custom.filter(x=>x.id!==id);bought=bought.filter(x=>x!==id);persist();render();
 });
 $('wtb-add').addEventListener('click',()=>{
@@ -102,5 +121,7 @@ $('wtb-add').addEventListener('click',()=>{
 $('wtb-reset').addEventListener('click',()=>{
  if(!confirm('Alle „Gekauft“-Häkchen zurücksetzen?'))return;bought=[];persist();render();
 });
+window.addEventListener('aion2:wtb-updated',render);
+window.addEventListener('aion2:pantheon-updated',render);
 render();
 })();
