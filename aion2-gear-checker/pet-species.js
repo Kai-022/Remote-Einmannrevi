@@ -57,7 +57,21 @@ function save(){
  }catch{feedback='⚠ Speichern fehlgeschlagen. Prüfe, ob der Browser lokale Daten zulässt.'}
 }
 function getOptions(spec,slot){
- const pair=slot===4?[spec[1],spec[2]]:slot===7?[spec[3],'Situative Resistenz']:common[slot];
+ /* These slot-4/7 choices follow the rollable effect families from Aion2Data,
+    translated for the German interface. Order = heuristic PvE Cleric priority. */
+ const special={
+  Cogni:{7:['PvE-Schadensresistenz','Schadensresistenz','Kritische Schadensresistenz']},
+  Fera:{4:['PvE-Schadensverstärkung','Waffenschadensverstärkung','Schadensverstärkung'],
+        7:['PvE-Schadensresistenz','Schadensresistenz','Waffenschadensresistenz']},
+  Natura:{7:['PvE-Schadensresistenz','Mehrfachtreffer-Resistenz','Perfektionsresistenz']},
+  Varian:{4:['PvE-Schadensverstärkung','Rückangriffsschaden','Frontangriffsschaden'],
+          7:['PvE-Schadensresistenz','Frontangriffs-Schadensresistenz','Rückangriffs-Schadensresistenz']},
+  Spezial:{4:['Schadensverstärkung','Kritische Schadensverstärkung','Doppelchance'],
+           7:['Schadensresistenz','Kritische Schadensresistenz','Doppelresistenz']}
+ };
+ const configured=special[spec[0]]?.[slot];
+ if(configured)return {best:configured[0],alts:configured.slice(1)};
+ const pair=slot===4?[spec[1],spec[2]]:slot===7?[spec[3],'Schadensresistenz']:common[slot];
  return {best:String(pair?.[0]||''),
   alts:String(pair?.[1]||'').split(/\s*\/\s*/).map(x=>x.trim()).filter(Boolean)};
 }
