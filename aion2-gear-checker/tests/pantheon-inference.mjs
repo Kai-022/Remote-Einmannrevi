@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
 import vm from 'node:vm';
 const code=await readFile(new URL('../pantheon-inference.js',import.meta.url),'utf8');
-const html=await readFile(new URL('../index.html',import.meta.url),'utf8');
+const html=await readFile(new URL('../armory.html',import.meta.url),'utf8');
 assert(html.includes('pantheon-inference.js?v='));
 const registered=new Map(),arr=[];
 class Fake{
