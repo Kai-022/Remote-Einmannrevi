@@ -64,19 +64,32 @@ function evaluate(data,preset,guideBoards,boardCalculator){
   reason:'Die gewählten Skill-Spezialitäten sind in den vorhandenen Profildaten nicht enthalten.'
  }));
  const upgrades=all.filter(x=>x.upgrade);
+ // Optional, explicitly sourced level milestones add measurable progress when
+ // the public skill level is available. They are distinct from "skill learned".
+ const levelMilestones=all.filter(x=>Number.isInteger(x.optionalLevel)).map(x=>({
+  id:'milestone:'+x.id+':'+x.optionalLevel,
+  name:x.name,target:x.optionalLevel,current:x.level,
+  state:x.state==='unknown'?'unknown':x.level===null?'unknown':
+   x.level>=x.optionalLevel?'done':'missing'
+ }));
  return {
-  groups,all,board,specialties,improvements:upgrades,
-  confirmed:all.filter(x=>x.state==='done').length+(board?.confirmed||0),
-  needed:all.filter(x=>x.state==='missing').length+(board?.missing||0),
-  unknown:all.filter(x=>x.state==='unknown').length+(board?.unknown||0),
-  available:all.filter(x=>x.state!=='unknown').length+(board?.known||0),
-  total:all.length+(board?.total||0),
+  groups,all,board,specialties,improvements:upgrades,levelMilestones,
+  confirmed:all.filter(x=>x.state==='done').length+
+   levelMilestones.filter(x=>x.state==='done').length+(board?.confirmed||0),
+  needed:all.filter(x=>x.state==='missing').length+
+   levelMilestones.filter(x=>x.state==='missing').length+(board?.missing||0),
+  unknown:all.filter(x=>x.state==='unknown').length+
+   levelMilestones.filter(x=>x.state==='unknown').length+(board?.unknown||0),
+  available:all.filter(x=>x.state!=='unknown').length+
+   levelMilestones.filter(x=>x.state!=='unknown').length+(board?.known||0),
+  total:all.length+levelMilestones.length+(board?.total||0),
   asOf:data?.importedAt||null,characterName:data?.name||'Charakter'
  };
 }
 function pointState(results){
  const status={};
  for(const item of results?.all||[])if(item.state!=='unknown')status[item.id]=item.state==='done';
+ for(const step of results?.levelMilestones||[])if(step.state!=='unknown')status[step.id]=step.state==='done';
  const boards=results?.board?.owned||{};
  for(const [id,list] of Object.entries(boards)){
   if(!Array.isArray(list))continue;
