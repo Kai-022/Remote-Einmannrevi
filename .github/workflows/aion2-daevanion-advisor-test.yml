@@ -11,9 +11,6 @@ on:
       - 'aion2-gear-checker/daevanion-guide-tracker.js'
       - 'aion2-gear-checker/nc-official-import.js'
       - 'aion2-gear-checker/tests/daevanion-character-guide-tracker.mjs'
-      - 'aion2-gear-checker/daevanion-guide-plan-core.js'
-      - 'aion2-gear-checker/daevanion-guide-steps.js'
-      - 'aion2-gear-checker/tests/daevanion-guide-steps.mjs'
       - 'aion2-gear-checker/tests/daevanion-guide-import.mjs'
       - 'aion2-gear-checker/daevanion-eu-cleric-meta.json'
       - 'aion2-gear-checker/cleric-board-references.json'
@@ -46,6 +43,3 @@ jobs:
           node --check aion2-gear-checker/daevanion-character-guide-core.js
           node --check aion2-gear-checker/daevanion-guide-tracker.js
           node aion2-gear-checker/tests/daevanion-character-guide-tracker.mjs
-          node --check aion2-gear-checker/daevanion-guide-plan-core.js
-          node --check aion2-gear-checker/daevanion-guide-steps.js
-          node aion2-gear-checker/tests/daevanion-guide-steps.mjs
