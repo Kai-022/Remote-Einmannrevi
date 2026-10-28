@@ -5,6 +5,9 @@ on:
       - 'aion2-gear-checker/daevanion-eu-comparison.js'
       - 'aion2-gear-checker/daevanion-guide-codec.js'
       - 'aion2-gear-checker/daevanion-guide-import.js'
+      - 'aion2-gear-checker/daevanion-guide-plan-core.js'
+      - 'aion2-gear-checker/daevanion-guide-steps.js'
+      - 'aion2-gear-checker/tests/daevanion-guide-steps.mjs'
       - 'aion2-gear-checker/tests/daevanion-guide-import.mjs'
       - 'aion2-gear-checker/daevanion-eu-cleric-meta.json'
       - 'aion2-gear-checker/cleric-board-references.json'
@@ -32,3 +35,6 @@ jobs:
           node --check aion2-gear-checker/daevanion-guide-codec.js
           node --check aion2-gear-checker/daevanion-guide-import.js
           node aion2-gear-checker/tests/daevanion-guide-import.mjs
+          node --check aion2-gear-checker/daevanion-guide-plan-core.js
+          node --check aion2-gear-checker/daevanion-guide-steps.js
+          node aion2-gear-checker/tests/daevanion-guide-steps.mjs
