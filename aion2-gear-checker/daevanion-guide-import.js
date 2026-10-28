@@ -11,7 +11,7 @@ const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&
 const KEY='aion2-daevanion-guides-v1:';
 const key=()=>KEY+String(data?.sourceRef?.sid||'lokal')+':'+String(data?.sourceRef?.id||data?.name||'Charakter').normalize('NFKC');
 const boardNames=codec.LABELS;
-let lastKey='',guideList=[],chosenId='',editing=false,manualBoard='71',message='',previewURL='';
+let lastKey='',guideList=[],chosenId='',editing=false,manualBoard='71',message='',previewURL='',clearForm=false;
 const native=window.aionDaevanion;
 
 const sheet=document.createElement('style');
@@ -69,6 +69,8 @@ function sanitize(){
 function load(){
  const k=key();if(k===lastKey)return false;
  lastKey=k;
+ clearForm=true;
+ if(previewURL){try{URL.revokeObjectURL(previewURL)}catch{}previewURL='';}
  let saved={};try{saved=JSON.parse(localStorage.getItem(k)||'{}')||{}}catch{}
  guideList=Array.isArray(saved.guides)?saved.guides:[];sanitize();
  chosenId=guideList.some(g=>g.id===saved.activeId)?saved.activeId:'';
@@ -105,7 +107,7 @@ function guideState(id,node){
  if(!Array.isArray(cells)||cells.length===0)return '';
  const included=cells.includes(selectedPosition(node));
  if(included)return node.open?'good':'missing';
- return node.open?'caution':'';
+ return !editing&&node.open?'caution':'';
 }
 const toolbar=document.createElement('section');
 toolbar.id='daeva-guide-library';
@@ -136,7 +138,7 @@ function compare(){
    else out.missing.push({id,index:idx,name:node.name||node.type});
   }
   for(const [i,n] of board.nodes.entries()){
-   if(n?.open&&n.type!=='None'&&n.type!=='Start'&&!wanted.has(selectedPosition(n)))
+   if(!editing&&n?.open&&n.type!=='None'&&n.type!=='Start'&&!wanted.has(selectedPosition(n)))
     out.different.push({id,index:i,name:n.name||n.type});
   }
  }
@@ -174,8 +176,9 @@ function renderToolbar(){
  load();
  const guide=current();
  const old=$('dg-import-panel'),open=!!old?.open;
- const priorName=$('dg-guide-name')?.value||'';
- const priorText=$('dg-guide-link')?.value||'';
+ const priorName=clearForm?'':($('dg-guide-name')?.value||'');
+ const priorText=clearForm?'':($('dg-guide-link')?.value||'');
+ clearForm=false;
  const options=guideList.map(g=>'<option value="'+esc(g.id)+'"'+(g.id===chosenId?' selected':'')+'>'+esc(g.title)+'</option>').join('');
  const boards=codec.ORDER.map(id=>'<option value="'+id+'"'+(manualBoard===id?' selected':'')+'>'+esc(boardNames[id])+'</option>').join('');
  toolbar.innerHTML='<details id="dg-import-panel"'+(open?' open':'')+'><summary>＋ Guide-Board hinzufügen / importieren</summary>'+
