@@ -130,13 +130,14 @@ function tile(n,index){
  if(!n||n.type==='None')return '<div class="aion-node filler" aria-hidden="true"></div>';
  const on=!!n.open,special=n.type==='SkillLevel'||n.grade==='Legend',recommended=!window.aionDaevanion&&priority(n);
  const auditClass=window.aionDaevanion?.classify?.(selected,n)||'';
+ const upcoming=!!window.aionGuideSteps?.isNext?.(selected,n);
  const title=esc((n.name||n.type||'Knoten')+(on?' · Freigeschaltet':' · Nicht freigeschaltet'));
  const isSkill=n.type==='SkillLevel',src=isSkill?iconForSkill(nodeSkillName(n)):'';
  const frame='./nc-icons/frames/'+nodeFrame(n)+'.png';
  const fallback=n.type==='Start'?'★':(isSkill?'✦':'');
  const art=smallArt(src,'aion-node-skill')||(fallback?'<span class="aion-node-fallback">'+fallback+'</span>':'');
  return '<button type="button" class="aion-node with-art '+(on?'on':'off')+
-  (special?' special':'')+(recommended?' priority':'')+(auditClass?' audit-'+auditClass:'')+
+  (special?' special':'')+(recommended?' priority':'')+(auditClass?' audit-'+auditClass:'')+(upcoming?' plan-next':'')+
   '" style="background-image:url(\''+frame+'\')" data-node="'+index+
   '" title="'+title+'" aria-label="'+title+'">'+art+
   (on?'<span class="tick">✓</span>':'')+'</button>';
