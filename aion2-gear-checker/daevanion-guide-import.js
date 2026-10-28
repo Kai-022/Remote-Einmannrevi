@@ -190,6 +190,7 @@ function renderToolbar(){
  '<p>Unterstützt Aion2Data-Kleriker-Freigabelinks (fünf oder sechs Tafeln) und eigene JSON-Boards mit Zellen 0–224 bzw. {row, col}. Andere Guide-Webseiten können nicht automatisch ausgelesen werden.</p>'+
  '<div class="dg-manual"><label for="dg-manual-board">Ein einzelnes Board manuell übertragen</label><select id="dg-manual-board">'+boards+'</select>'+
  '<button type="button" id="dg-manual-start">Gewähltes Board durch Antippen bearbeiten</button>'+
+ '<button type="button" id="dg-import-one">Nur dieses Board aus dem Guide-Link übernehmen</button>'+
  '<p>Falls ein Guide nur ein Bild hat: Bild unten auswählen und dann die entsprechenden Knoten auf deiner Board-Grafik antippen.</p>'+
  '<label for="dg-image">Guide-Bild als Vorlage anzeigen (optional, nur auf diesem Gerät)</label>'+
  '<input id="dg-image" type="file" accept="image/png,image/jpeg,image/webp">'+
@@ -253,6 +254,24 @@ toolbar.addEventListener('click',event=>{
  if(id==='dg-import-button'){
   const value=$('dg-guide-link')?.value||'',title=($('dg-guide-name')?.value||'').trim();
   try{const parsed=codec.parse(value);put(parsed,title);}catch(e){message=String(e.message||e);renderToolbar();$('dg-import-panel').open=true}
+ }else if(id==='dg-import-one'){
+  const value=$('dg-guide-link')?.value||'',boardId=$('dg-manual-board')?.value||'71';
+  const title=($('dg-guide-name')?.value||'').trim()||'Guide '+boardNames[boardId];
+  try{
+   const parsed=codec.parse(value);
+   if(!Array.isArray(parsed.boards[boardId]))throw Error('Im eingefügten Guide fehlt die Tafel '+boardNames[boardId]+'.');
+   let guide=current();
+   if(!guide){
+    if(guideList.length>=20)throw Error('Maximal 20 eigene Guides.');
+    guide={id:newId(),title,format:parsed.format,source:parsed.sourceUrl||'',boards:{}};
+    guideList.push(guide);chosenId=guide.id;
+   }
+   guide.boards[boardId]=[...parsed.boards[boardId]];
+   if(!persist())throw Error('Das Board konnte nicht gespeichert werden.');
+   editing=false;manualBoard=boardId;
+   message='✓ '+boardNames[boardId]+' in '+guide.title+' übernommen ('+guide.boards[boardId].length+' Knoten).';
+   renderAll();selectOwnBoard(boardId);redraw();
+  }catch(e){message=String(e.message||e);renderToolbar();$('dg-import-panel').open=true}
  }else if(id==='dg-manual-start'){
   startManual($('dg-manual-board')?.value||'71');
  }else if(id==='dg-edit-toggle'){
