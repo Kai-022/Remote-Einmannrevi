@@ -44,7 +44,7 @@ for(const [id,b] of Object.entries(snapshot.daevanionBoards||{})){
 }
 class Fake {
  constructor(){this.id='';this.innerHTML='';this.listeners={};}
- before(){}after(node){this.afterNode=node}append(){}querySelectorAll(){return []}
+ before(){}after(node){this.afterNode=node}append(...children){this.appended=children}querySelectorAll(){return []}
  addEventListener(type,fn){(this.listeners[type]??=[]).push(fn)}
 }
 const created=[],byId=new Map();
@@ -58,7 +58,11 @@ vm.runInNewContext(src,context,{timeout:6000});
 await new Promise(r=>setImmediate(r));
 const host=created.find(x=>x.id==='daeva-eu-compare');
 assert(host);
-assert.equal(get('aion-board-content').afterNode,host,'boards must appear above comparison data');
+const fold=created.find(x=>x.id==='daeva-eu-fold');
+assert(fold,'EU comparison must have its own collapsible section');
+assert.equal(get('aion-board-content').afterNode,fold,'boards must appear above comparison accordion');
+assert(fold.appended.includes(host),'comparison content must be inside collapsible section');
+assert(fold.appended.some(x=>x.textContent.includes('aufklappen')),'accordion must have readable title');
 assert(host.innerHTML.includes('96'));
 assert(host.innerHTML.includes('297'));
 assert(host.innerHTML.includes('mindestens 50 %'));
