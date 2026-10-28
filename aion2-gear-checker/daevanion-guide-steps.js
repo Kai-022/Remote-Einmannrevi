@@ -8,6 +8,48 @@ const library=window.aionGuideLibrary,core=window.AionGuideRoutePlanner;
 if(!boardEl||!library||!core)return;
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const page=document.createElement('section');page.id='dg-step-plan';boardEl.before(page);
+const stylesheet=document.createElement('style');
+stylesheet.textContent=[
+ '#dg-step-plan{background:linear-gradient(145deg,#172a40,#132133);border:1px solid #8b774c;border-radius:13px;padding:15px;margin:12px 0 16px;color:#edf3fb}',
+ '#dg-step-plan .dg-plan-head{display:flex;justify-content:space-between;align-items:start;gap:12px;flex-wrap:wrap}',
+ '#dg-step-plan h3{margin:5px 0 7px;font-size:19px;color:#efd19f;overflow-wrap:anywhere}',
+ '#dg-step-plan .dg-plan-head p{margin:0;color:#c4cfdd;font-size:12px}',
+ '#dg-step-plan .dg-plan-complete{font-size:13px;font-weight:800;color:#f2d197;border:1px solid #85714e;border-radius:8px;padding:7px 9px;white-space:nowrap}',
+ '#dg-step-plan .dg-plan-progress{height:9px;border-radius:9px;background:#101a27;overflow:hidden;border:1px solid #495971;margin:13px 0 10px}',
+ '#dg-step-plan .dg-plan-progress span{display:block;height:100%;background:#67c89b;transition:width .2s}',
+ '#dg-step-plan .dg-plan-metrics{display:flex;gap:7px;flex-wrap:wrap;margin:8px 0 14px}',
+ '#dg-step-plan .dg-plan-metrics span{background:#22354a;border:1px solid #516880;border-radius:7px;padding:7px;font-size:11px;color:#cbd8e7}',
+ '#dg-step-plan .dg-plan-metrics b{color:#f2ddac;font-size:13px}',
+ '#dg-step-plan .dg-plan-choices{display:grid;gap:6px;margin-bottom:12px}',
+ '#dg-step-plan .dg-plan-choices label{font-size:12px;color:#e5cca0;font-weight:700}',
+ '#dg-step-plan .dg-plan-choices select{width:100%;background:#132135;border:1px solid #69788d;color:#f4f6fa;border-radius:8px;padding:11px;font-size:13px}',
+ '#dg-step-plan .dg-next-label{font-size:11px;letter-spacing:.04em;font-weight:850;color:#f0d499;margin:13px 0 7px}',
+ '#dg-step-plan .dg-step-card{border:1px solid #536b85;background:#1c2e43;border-radius:10px;padding:11px;display:flex;align-items:flex-start;gap:10px;margin:8px 0;flex-wrap:wrap}',
+ '#dg-step-plan .dg-step-card.current{border:2px solid #caa45e;background:#25303c;padding:13px}',
+ '#dg-step-plan .dg-step-number{display:grid;place-items:center;flex:0 0 30px;width:30px;height:30px;background:#645033;color:#ffe3a8;font-weight:850;border-radius:50%;font-size:14px}',
+ '#dg-step-plan .dg-step-info{flex:1 1 190px;min-width:0}',
+ '#dg-step-plan .dg-step-info strong{font-size:15px;line-height:1.35;color:#f9f5eb;display:block;overflow-wrap:anywhere}',
+ '#dg-step-plan .dg-step-info small{display:block;margin-top:5px;font-size:11px;color:#c1cfdf;line-height:1.4}',
+ '#dg-step-plan .dg-step-info p{font-size:12px;color:#edf0f4;line-height:1.6;margin:10px 0 0}',
+ '#dg-step-plan .dg-step-actions{display:flex;flex-wrap:wrap;gap:7px;align-items:stretch}',
+ '#dg-step-plan .dg-step-actions button{padding:9px 10px;border:1px solid #657e99;background:#2a415d;color:#f4f7fb;border-radius:8px;font-size:11px;font-weight:750;cursor:pointer}',
+ '#dg-step-plan .dg-step-actions button.dg-done{background:#264a3c;border-color:#65ab81;color:#c9f0d3}',
+ '#dg-step-plan .dg-plan-alert{padding:11px;border-radius:9px;background:#372d25;border:1px solid #947044;color:#f4dab0;font-size:12px;margin:10px 0}',
+ '#dg-step-plan .dg-plan-finished{border:1px solid #528369;background:#193b30;border-radius:9px;padding:13px;color:#c2f0d5}',
+ '#dg-step-plan .dg-plan-finished p{font-size:12px;color:#cde0d5}',
+ '#dg-step-plan details{border:1px solid #4f637c;border-radius:9px;margin:12px 0;overflow:hidden}',
+ '#dg-step-plan details>summary{cursor:pointer;list-style-position:inside;padding:12px;background:#21324a;color:#eed1a1;font-size:13px;font-weight:750}',
+ '#dg-step-plan .dg-plan-list{padding:9px}',
+ '#dg-step-plan .dg-confirmed{padding:10px;border-top:1px solid #465771;display:flex;justify-content:space-between;gap:7px;align-items:center;font-size:12px}',
+ '#dg-step-plan .dg-confirmed button{background:#324154;color:#dde7f1;border:1px solid #71839c;padding:7px;border-radius:7px;font-size:11px}',
+ '#dg-step-plan details>p{font-size:12px;color:#c5d0de;padding:0 12px}',
+ '#dg-step-plan .dg-plan-disclaimer{font-size:11px;color:#b3c3d5;line-height:1.65;margin:12px 0 5px}',
+ '#dg-step-plan #dg-plan-notice{color:#a9e8c5;font-size:12px;margin:7px 0 0}',
+ '.aion-node.plan-next{outline:3px solid #77baff!important;outline-offset:1px!important;box-shadow:0 0 0 2px #1d2c3b,0 0 14px #61b6ffa8!important;position:relative;z-index:3}',
+ '@media(max-width:650px){#dg-step-plan{padding:11px}#dg-step-plan .dg-step-actions{width:100%}#dg-step-plan .dg-step-actions button{flex:1}#dg-step-plan .dg-step-card.current{padding:10px}#dg-step-plan .dg-plan-complete{font-size:12px}}'
+].join('\n');
+document.head.append(stylesheet);
+
 const prefix='aion2-daevanion-step-checks-v1:';
 let selectedBoard='all',identity='',currentPlan=null,notice='',highlight=null;
 function getGuide(){return library.current()}
