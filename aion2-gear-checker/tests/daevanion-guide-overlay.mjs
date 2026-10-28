@@ -99,5 +99,6 @@ guideAvailable=false;
 window.aionGuideOverlay.render();
 assert.equal(panel.style.display,'none');
 assert.equal(window.aionDaevanion.classify('71',first),'missing','without guide raw classification is kept');
-assert(rawRenderCount>0);
+window.aionDaevanion.render();
+assert(rawRenderCount>0,'wrapped board renderer calls original');
 console.log('Guide overlay PASS: actual imported 203/297, 18 unavailable, per-board cards, live updates, mode toggle and character isolation');
