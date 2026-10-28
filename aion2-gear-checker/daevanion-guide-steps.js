@@ -105,6 +105,13 @@ function render(){
  const filtered=selectedBoard==='all'?plan.steps:plan.steps.filter(s=>s.boardId===selectedBoard);
  highlight=filtered[0]||null;
  const tally=plan.totals;
+ if(tally.target===0){
+  highlight=null;
+  page.innerHTML='<div class="eyebrow">DEIN PERSÖNLICHER SKILLFAHRPLAN</div>'+
+   '<h3>'+esc(guide.title)+'</h3>'+
+   '<p>In diesem Guide sind noch keine Knoten gespeichert. Wähle oben „Guide bearbeiten“, markiere die gewünschten Felder auf einem Board und beende dann die Bearbeitung. Anschließend wird der Schritt-für-Schritt-Plan erzeugt.</p>';
+  return;
+ }
  const progress=tally.open+tally.confirmed;
  const percent=tally.target?Math.round(100*progress/tally.target):100;
  const missingBoards=plan.boards.filter(b=>b.unavailable);
