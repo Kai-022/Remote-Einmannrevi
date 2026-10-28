@@ -81,7 +81,7 @@ function render(){
    '<span class="ov-mini"><i style="width:'+pct+'%"></i></span></button>';
  }).join('');
  panel.innerHTML='<div class="ov-heading"><h3>Guide über deine Boards legen</h3>'+
- '<strong>'+percent+' % nachgewiesen</strong></div>'+
+ '<strong>'+percent+' % nachgewiesen · '+info.confirmed+' / '+info.total+' Guide-Knoten</strong></div>'+
  '<p><b>'+esc(guide.title)+'</b> gegen den importierten Charakter <b>'+esc(data?.name||'Charakter')+'</b>.</p>'+
  '<div class="ov-bar" role="progressbar" aria-label="Nachgewiesene Guide-Knoten" aria-valuemin="0" aria-valuemax="100" aria-valuenow="'+percent+'"><span style="width:'+percent+'%"></span></div>'+
  '<div class="ov-counters"><span><b>'+info.confirmed+'</b> übereinstimmend</span>'+
