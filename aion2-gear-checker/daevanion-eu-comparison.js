@@ -129,7 +129,8 @@ style.textContent=[
 ].join('\n');
 document.head.append(style);
 const panel=document.createElement('section');panel.id='daeva-eu-compare';
-container.before(panel);
+// Render the selected board grid first; comparison details follow below.
+container.after(panel);
 const itemRow=(x,i,different)=>{
  const path=x.path;
  return '<div class="eu-card '+(different?'difference':'need')+'"><div><strong>'+(i+1)+'. '+
