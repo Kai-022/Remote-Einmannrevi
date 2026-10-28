@@ -1,0 +1,55 @@
+{
+  "version": 1,
+  "game": "AION 2",
+  "region": "eu",
+  "className": "Cleric",
+  "level": 45,
+  "sourceName": "Aion2Data · Europe Cleric class meta",
+  "sourceUrl": "https://aion2data.com/rankings/meta/cleric/eu",
+  "sourcePlannerUrl": "https://aion2data.com/daevanion/cleric?b=AAAAAEOH6sDdQSjgHwgE5AeiAHWD7sDdAQ.AAAAAIGHAsKVoYtgfZASfB2iCxmHgMJDAQ.AAAAAMeBLoD9AQqwfwgg_A-EBFYG6gKfAQ.AABmAB4CCYHmAxHwDwRU7j8ShJ9PCaGEcMIB.AAAAAAAAAAAAAAAAHwAA4A.wAAgABAACAAEAAYAAgAAgADAAEAAIAAQAAgABg",
+  "countedAt": "2026-10-28T07:16:00Z",
+  "profiles": 99,
+  "completeBoards": 96,
+  "selection": "Nodes unlocked by >=50% of the fully read EU Clerics and connected to their board's start.",
+  "notes": "Aggregate majority build, not individual profile exports. Combat Power ranking is not verified PvE DPS, and roles are not labelled. No per-node percentages or player names are represented.",
+  "boardOrder": [
+    "71",
+    "72",
+    "73",
+    "74",
+    "76",
+    "75"
+  ],
+  "boards": {
+    "71": {
+      "name": "Nezekan",
+      "majorityCount": 67,
+      "bitsHex": "000000004387eac0dd4128e01f0804e407a2007583eec0dd01"
+    },
+    "72": {
+      "name": "Zikel",
+      "majorityCount": 63,
+      "bitsHex": "00000000818702c295a18b607d90127c1da20b198780c24301"
+    },
+    "73": {
+      "name": "Vaizel",
+      "majorityCount": 66,
+      "bitsHex": "00000000c7812e80fd010ab07f0820fc0f84045606ea029f01"
+    },
+    "74": {
+      "name": "Triniel",
+      "majorityCount": 75,
+      "bitsHex": "000066001e020981e60311f00f0454ee3f12849f4f09a18470c201"
+    },
+    "75": {
+      "name": "Ariel",
+      "majorityCount": 18,
+      "bitsHex": "c000200010000800040006000200008000c000400020001000080006"
+    },
+    "76": {
+      "name": "Azphel",
+      "majorityCount": 8,
+      "bitsHex": "0000000000000000000000001f0000e0"
+    }
+  }
+}
