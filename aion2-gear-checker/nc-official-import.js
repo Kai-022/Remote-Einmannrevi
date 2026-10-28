@@ -150,6 +150,10 @@ const useData=(d,ref)=>{
  isDemo=false;$('charname').value=displayName;$('dash').classList.remove('hidden');
  $('type').textContent='NCSOFT · ÖFFENTLICHE PROFILDATEN';
  store();render();
+ if(typeof window!=='undefined'){
+  window.aionGuideTracker?.render?.();
+  if(typeof Event==='function')window.dispatchEvent(new Event('aion2:character-imported'));
+ }
  const when=new Date(d.generatedAt);
  const displayDate=Number.isNaN(when.getTime())?d.generatedAt:when.toLocaleString('de-DE');
  note('Import erfolgreich: '+count+' Gear-Slots, '+detailed+' Gegenstandsdetails und '+rawSkills.length+
