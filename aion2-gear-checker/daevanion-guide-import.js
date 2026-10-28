@@ -13,6 +13,47 @@ const key=()=>KEY+String(data?.sourceRef?.sid||'lokal')+':'+String(data?.sourceR
 const boardNames=codec.LABELS;
 let lastKey='',guideList=[],chosenId='',editing=false,manualBoard='71',message='',previewURL='';
 const native=window.aionDaevanion;
+
+const sheet=document.createElement('style');
+sheet.textContent=[
+ '#daeva-guide-library{margin:12px 0 15px;color:#ecf1f8}',
+ '#daeva-guide-library details{border:1px solid #8d744c;border-radius:10px;background:#1b293b;margin-bottom:11px;overflow:hidden}',
+ '#daeva-guide-library details>summary{cursor:pointer;color:#eecf99;background:#29313c;padding:13px;font-weight:800;font-size:14px}',
+ '#daeva-guide-library .dg-form{padding:13px;display:grid;gap:9px}',
+ '#daeva-guide-library label{font-size:12px;font-weight:700;color:#e1c596}',
+ '#daeva-guide-library textarea,#daeva-guide-library input:not([type=file]),#daeva-guide-library select{width:100%;min-width:0;background:#121e2f;border:1px solid #5e6f87;border-radius:8px;color:#eaf1f9;padding:10px;font-size:13px}',
+ '#daeva-guide-library input[type=file]{width:100%;color:#dce5ef;font-size:12px}',
+ '#daeva-guide-library p{color:#bfcbd9;line-height:1.5;font-size:11px;margin:3px 0}',
+ '#daeva-guide-library button{border:1px solid #7d8ea5;background:#293d55;color:#f0f3fa;border-radius:8px;padding:9px 12px;cursor:pointer;font-size:12px;font-weight:700}',
+ '#daeva-guide-library #dg-import-button{background:#614b2e;border-color:#d2ac72;color:#fff0cb}',
+ '#daeva-guide-library .dg-toolbar{display:flex;align-items:end;flex-wrap:wrap;gap:9px;border:1px solid #52657c;background:#1a2839;border-radius:11px;padding:12px}',
+ '#daeva-guide-library .dg-select{min-width:180px;flex:1;display:grid;gap:5px}',
+ '#daeva-guide-library .dg-manual{padding:11px;background:#152438;border:1px solid #405b71;border-radius:10px;display:grid;gap:8px}',
+ '#daeva-guide-library .dg-preview{display:grid;justify-items:start;gap:7px}',
+ '#daeva-guide-library .dg-preview img{display:block;max-width:100%;max-height:340px;border:1px solid #62758a;border-radius:9px;object-fit:contain}',
+ '#daeva-guide-library .dg-preview a{font-size:12px;color:#b9dcff}',
+ '#daeva-guide-library .dg-edit-banner{border:1px solid #bf985b;background:#332b22;border-radius:8px;padding:11px;font-size:12px;line-height:1.5;margin:9px 0;display:flex;align-items:center;flex-wrap:wrap;gap:8px}',
+ '#daeva-guide-library .dg-edit-banner button{background:#60412f;border-color:#cd967e}',
+ '#daeva-guide-library #dg-message{color:#e3d7b1;min-height:17px;margin:7px 0}',
+ '#daeva-guide-comparison{background:#16263a;border:1px solid #7e724f;border-radius:10px;margin:13px 0;overflow:hidden}',
+ '#daeva-guide-comparison>summary{padding:14px;color:#eecf99;font-size:14px;font-weight:800;cursor:pointer;background:#29313c}',
+ '#daeva-guide-comparison .dg-compare-inner{padding:13px}',
+ '#daeva-guide-comparison h4{font-size:15px;color:#efd2a1;margin:15px 0 8px}',
+ '#daeva-guide-comparison p{font-size:12px;color:#c4ccdb;line-height:1.5}',
+ '#daeva-guide-comparison a{color:#bcdafc}',
+ '#daeva-guide-comparison .dg-counters{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}',
+ '#daeva-guide-comparison .dg-counters span{font-size:12px;padding:7px;border-radius:7px;background:#203a4c;border:1px solid #4d7185}',
+ '#daeva-guide-comparison .dg-warning{color:#f1d89d;border:1px solid #87704a;padding:9px;border-radius:8px}',
+ '#daeva-guide-comparison .dg-compare-row{display:flex;align-items:center;gap:10px;padding:10px;background:#1d3047;border:1px solid #4c5d73;border-left:4px solid #e4bf72;border-radius:8px;margin:7px 0}',
+ '#daeva-guide-comparison .dg-compare-row.other{border-left-color:#d7838a}',
+ '#daeva-guide-comparison .dg-compare-row>div{flex:1;min-width:0}',
+ '#daeva-guide-comparison .dg-compare-row b{display:block;font-size:12px}',
+ '#daeva-guide-comparison .dg-compare-row small{display:block;font-size:11px;color:#b9c9d9;margin-top:4px}',
+ '#daeva-guide-comparison button{padding:7px;font-size:11px;border-radius:7px;flex-shrink:0}',
+ '@media(max-width:600px){#daeva-guide-library .dg-toolbar{align-items:stretch}#daeva-guide-library .dg-select{flex-basis:100%}#daeva-guide-comparison .dg-compare-row{flex-wrap:wrap}#daeva-guide-comparison button{margin-left:auto}}'
+].join('\n');
+document.head.append(sheet);
+
 function current(){return guideList.find(g=>g.id===chosenId)||null}
 function sanitize(){
  guideList=guideList.filter(g=>g&&typeof g.id==='string'&&typeof g.title==='string'&&g.boards&&typeof g.boards==='object')
