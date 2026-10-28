@@ -2,7 +2,8 @@ name: AION 2 Daevanion Advisor Test
 on:
   push:
     paths:
-      - 'aion2-gear-checker/daevanion-advisor.js'
+      - 'aion2-gear-checker/daevanion-eu-comparison.js'
+      - 'aion2-gear-checker/daevanion-eu-cleric-meta.json'
       - 'aion2-gear-checker/cleric-board-references.json'
       - 'aion2-gear-checker/nc-visuals.js'
       - 'aion2-gear-checker/armory.html'
@@ -22,6 +23,6 @@ jobs:
           node-version: '22'
       - name: Check Daevanion node planner
         run: |
-          node --check aion2-gear-checker/daevanion-advisor.js
+          node --check aion2-gear-checker/daevanion-eu-comparison.js
           node --check aion2-gear-checker/nc-visuals.js
           node aion2-gear-checker/tests/daevanion-advisor.mjs
