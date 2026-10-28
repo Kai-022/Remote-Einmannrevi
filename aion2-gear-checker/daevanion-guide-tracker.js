@@ -201,7 +201,7 @@ function render(){
   (changes?'+'+changes+' erfüllte Guide-Ziele':'keine neuen Ziele')+
   (regressions?' · '+regressions+' nicht mehr nachweisbar':'')+'</strong>'+
   '<small>Verglichen mit deinem vorherigen gespeicherten Importstand.</small></div>':'';
- const confirmed=result.confirmed,unknown=result.unknown,denominator=result.available;
+ const confirmed=result.confirmed,unknown=result.unknown,denominator=result.total;
  const percent=denominator?Math.round(100*confirmed/denominator):0;
  const original=guide.source&&/^https:\/\//.test(guide.source)?
   '<a href="'+esc(guide.source)+'" target="_blank" rel="noopener noreferrer">Guide-Quelle öffnen</a>':'';
@@ -223,7 +223,7 @@ function render(){
  '<div class="gt-head"><div><h3>'+esc(guide.title)+'</h3>'+
  '<p>'+esc(data?.name||'Dein Charakter')+' · '+profileDate+sourceDate+'</p>'+
  (preset?'<p>Build: '+esc(preset.role)+' · '+esc(preset.author)+'</p>':'')+
- '</div><div class="gt-percent"><strong>'+percent+' %</strong><small>prüfbare Ziele</small></div></div>'+
+ '</div><div class="gt-percent"><strong>'+percent+' %</strong><small>aller Guide-Ziele nachgewiesen</small></div></div>'+
  '<div class="gt-progress"><span style="width:'+percent+'%"></span></div>'+
  changeBanner+
  '<div class="gt-summary"><span><b>'+confirmed+'</b> Ziele erkannt</span>'+
@@ -231,8 +231,8 @@ function render(){
  (unknown?'<span><b>'+unknown+'</b> nicht prüfbar</span>':'')+
  '<span><b>'+result.improvements.length+'</b> weitere Ausbaustufen</span></div>'+
  '<p class="gt-muted">Fortschritt: '+ratio+' aus den verfügbaren Charakterdaten überprüfbar'+unknownText+
- '. Keine manuellen Erledigt-Häkchen; die Anzeige wird bei einem neuen Charakterimport aktualisiert.</p>'+
- '<div class="gt-toolbar"><button type="button" data-gt-refresh>Jetzt mit Charakterdaten abgleichen</button>'+
+ '. Nicht auslesbare Ziele zählen zur Guide-Gesamtzahl, aber nicht als falsch oder fehlend. Nur bestätigte NCSOFT-Daten erhöhen den Fortschritt; ein neuer Charakterimport aktualisiert ihn.</p>'+
+ '<div class="gt-toolbar"><button type="button" data-gt-refresh>Gespeicherten Stand vergleichen</button>'+
  (original?'<span>'+original+'</span>':'')+'</div>'+
  (!sourceComplete?'<p class="gt-alert">Dieser Charakterstand wurde nicht mit einem bestätigten NCSOFT-Importzeitpunkt gespeichert. Für eine automatische Verlaufskontrolle importiere bitte deinen Charakter neu.</p>':'')+
  nextActions(result)+
@@ -246,7 +246,7 @@ function render(){
 }
 section.addEventListener('click',e=>{
  if(!e.target.closest('[data-gt-refresh]'))return;
- notice='Daten erneut geprüft. Falls du im Spiel geskillt hast, importiere den aktuellen Charakterstand erneut, damit Änderungen sichtbar werden.';
+ notice='Der gespeicherte Charakterstand wurde neu mit dem Guide verglichen. Für neue Spielfortschritte musst du deinen Charakter erneut importieren.';
  render();
 });
 window.addEventListener('aion2:character-imported',()=>{
