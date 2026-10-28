@@ -94,6 +94,12 @@ for(const [id,b] of Object.entries(boards)){
  }
 }
 assert(marked>100,'actual node positions are compared to imported template');
+get('dg-manual-board').value='73';
+get('dg-guide-link').value='{"boards":{"Vaizel":[4,5]}}';
+toolbar.listeners.click[0]({target:{id:'dg-import-one'}});
+saved=JSON.parse(memory.get(savedKey));
+assert.deepEqual([...saved.guides[0].boards['73']],[4,5],'single guide board replaces only selected board');
+assert.equal(saved.guides[0].boards['71'].length,example.boards['71'].length,'other boards stay unchanged');
 get('dg-manual-board').value='71';
 toolbar.listeners.click[0]({target:{id:'dg-manual-start'}});
 assert(toolbar.innerHTML.includes('Bearbeiten aktiv'));
