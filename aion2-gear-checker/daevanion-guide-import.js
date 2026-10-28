@@ -204,7 +204,7 @@ function renderToolbar(){
   '<button type="button" id="dg-clear-board">Dieses Guide-Board leeren</button></div>':'')+
  '<p id="dg-message" role="status">'+esc(message)+'</p>';
 }
-function renderAll(){renderToolbar();renderComparison()}
+function renderAll(){renderToolbar();renderComparison();window.aionGuideSteps?.render?.()}
 function redraw(){window.aionBoardsRefresh?.()}
 function selectOwnBoard(id){
  const button=grid.querySelector('[data-board="'+id+'"]');
@@ -339,7 +339,15 @@ window.aionDaevanion={
   native.render?.();
   if(load())renderToolbar();
   renderComparison();
+  window.aionGuideSteps?.render?.();
  }
+};
+window.aionGuideLibrary={
+ current:()=>{load();return current()},
+ characterKey:key,
+ ownBoards,
+ isEditing:()=>editing,
+ showNode:(boardId,index)=>window.aionBoardSelect?.(String(boardId),Number(index))
 };
 $('aion-board-button')?.addEventListener('click',()=>{if(load())renderAll();else renderComparison()});
 load();renderAll();redraw();
