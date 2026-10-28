@@ -63,7 +63,7 @@ function sanitize(){
    const id=codec.boardId(name);
    if(id&&Array.isArray(cells))boards[id]=[...new Set(cells.filter(x=>Number.isInteger(x)&&x>=0&&x<225))].sort((a,b)=>a-b);
   }
-  return {id:g.id.slice(0,75),title:g.title.slice(0,90),source:String(g.source||'').slice(0,1500),format:String(g.format||'Manuell').slice(0,35),boards};
+  return {id:g.id.slice(0,75),title:g.title.slice(0,90),source:String(g.source||'').slice(0,1500),format:String(g.format||'Manuell').slice(0,35),templateId:String(g.templateId||'').slice(0,95),boards};
  });
 }
 function load(){
@@ -91,11 +91,11 @@ function newId(){return 'guide-'+Date.now().toString(36)+'-'+Math.random().toStr
 function put(parsed,title,source){
  load();
  if(guideList.length>=20)throw Error('Maximal 20 eigene Guides pro Charakter.');
- const g={id:newId(),title:(title||'Guide '+(guideList.length+1)).slice(0,90),source:(source||parsed.sourceUrl||'').slice(0,1500),
-  format:parsed.format,boards:parsed.boards};
+ const g={id:newId(),title:(title||parsed.title||'Guide '+(guideList.length+1)).slice(0,90),source:(source||parsed.sourceUrl||'').slice(0,1500),
+  format:parsed.format,templateId:String(parsed.templateId||''),boards:parsed.boards};
  guideList.push(g);chosenId=g.id;editing=false;
  if(!persist())throw Error('Der Guide konnte nicht gespeichert werden.');
- message='✓ '+g.title+' importiert. Wähle ein Board, um die Knoten zu vergleichen.';
+ message='✓ '+g.title+' importiert. Der Charakterfortschritt wird aus deinen gespeicherten NCSOFT-Daten verglichen.';
  renderAll();redraw();
  return g;
 }
@@ -147,9 +147,10 @@ function compare(){
 function renderComparison(){
  load();
  const guide=current(),eu=$('daeva-eu-fold');
- if(eu)eu.style.display=guide?'none':'';
- comparison.style.display=guide?'':'none';
- if(!guide)return;
+ const hasNodes=!!guide&&Object.values(guide.boards||{}).some(cells=>Array.isArray(cells)&&cells.length>0);
+ if(eu)eu.style.display=hasNodes?'none':'';
+ comparison.style.display=hasNodes?'':'none';
+ if(!hasNodes)return;
  const stats=compare();
  const source=guide.source.startsWith('https://')?'<a target="_blank" rel="noopener noreferrer" href="'+esc(guide.source)+'">Original-Guide öffnen</a>':'';
  const textRow=(x,i,other)=>'<div class="dg-compare-row '+(other?'other':'wanted')+'">'+
@@ -184,10 +185,10 @@ function renderToolbar(){
  toolbar.innerHTML='<details id="dg-import-panel"'+(open?' open':'')+'><summary>＋ Guide-Board hinzufügen / importieren</summary>'+
  '<div class="dg-form"><label for="dg-guide-name">Name der Vorlage</label>'+
  '<input id="dg-guide-name" maxlength="90" placeholder="z. B. Kleriker PvE Guide" value="'+esc(priorName)+'">'+
- '<label for="dg-guide-link">Aion2Data-Freigabelink oder Board-JSON einfügen</label>'+
+ '<label for="dg-guide-link">Guide-Link (z. B. Mobalytics / Aion2Data) oder Board-JSON einfügen</label>'+
  '<textarea id="dg-guide-link" rows="3" spellcheck="false" placeholder="https://aion2data.com/daevanion/cleric?b=…">'+esc(priorText)+'</textarea>'+
  '<button type="button" id="dg-import-button">Link / Board-Daten importieren</button>'+
- '<p>Unterstützt Aion2Data-Kleriker-Freigabelinks (fünf oder sechs Tafeln) und eigene JSON-Boards mit Zellen 0–224 bzw. {row, col}. Andere Guide-Webseiten können nicht automatisch ausgelesen werden.</p>'+
+ '<p>Unterstützt den Mobalytics Condemnation-Kleriker-Guide inklusive Skill- und Stigma-Zielen, Aion2Data-Kleriker-Boardlinks und eigene Board-JSON-Daten. Andere Websites benötigen zunächst eine unterstützte Vorlage; Bild-Boards müssen manuell übertragen werden.</p>'+
  '<div class="dg-manual"><label for="dg-manual-board">Ein einzelnes Board manuell übertragen</label><select id="dg-manual-board">'+boards+'</select>'+
  '<button type="button" id="dg-manual-start">Gewähltes Board durch Antippen bearbeiten</button>'+
  '<button type="button" id="dg-import-one">Nur dieses Board aus dem Guide-Link übernehmen</button>'+
@@ -204,7 +205,7 @@ function renderToolbar(){
   '<button type="button" id="dg-clear-board">Dieses Guide-Board leeren</button></div>':'')+
  '<p id="dg-message" role="status">'+esc(message)+'</p>';
 }
-function renderAll(){renderToolbar();renderComparison();window.aionGuideSteps?.render?.()}
+function renderAll(){renderToolbar();renderComparison();window.aionGuideTracker?.render?.();}
 function redraw(){window.aionBoardsRefresh?.()}
 function selectOwnBoard(id){
  const button=grid.querySelector('[data-board="'+id+'"]');
@@ -333,13 +334,15 @@ window.aionDaevanion={
  ...native,
  classify:(id,node)=>{
   load();
-  return current()?guideState(id,node):native.classify(id,node);
+  const guide=current();
+  const hasCells=!!guide&&Object.values(guide.boards||{}).some(v=>Array.isArray(v)&&v.length>0);
+  return hasCells?guideState(id,node):native.classify(id,node);
  },
  render:()=>{
   native.render?.();
   if(load())renderToolbar();
   renderComparison();
-  window.aionGuideSteps?.render?.();
+  window.aionGuideTracker?.render?.();
  }
 };
 window.aionGuideLibrary={
