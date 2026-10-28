@@ -101,7 +101,10 @@ function inspect(){
 }
 const style=document.createElement('style');
 style.textContent=[
- '#daeva-eu-compare{padding:15px;margin-bottom:16px;border:1px solid #957a4d;background:#15243a;border-radius:12px}',
+ '#daeva-eu-fold{border:1px solid #957a4d;background:#15243a;border-radius:12px;margin:12px 0 17px;overflow:hidden}',
+ '#daeva-eu-fold>summary{padding:15px;cursor:pointer;font-weight:800;color:#efd19b;background:#222c3d;list-style-position:inside}',
+ '#daeva-eu-fold[open]>summary{border-bottom:1px solid #54627a}',
+ '#daeva-eu-fold>#daeva-eu-compare{border:0;background:none;border-radius:0;margin:0}',
  '#daeva-eu-compare h3{color:#efd19b;font-size:19px;margin:6px 0 9px}',
  '#daeva-eu-compare h4{color:#ead29f;font-size:15px;margin:18px 0 9px}',
  '#daeva-eu-compare p{color:#bfcbde;line-height:1.5;font-size:12px}',
@@ -129,8 +132,12 @@ style.textContent=[
 ].join('\n');
 document.head.append(style);
 const panel=document.createElement('section');panel.id='daeva-eu-compare';
-// Render the selected board grid first; comparison details follow below.
-container.after(panel);
+// The long EU comparison is optional and collapsed by default; boards stay visible.
+const fold=document.createElement('details');fold.id='daeva-eu-fold';
+const foldTitle=document.createElement('summary');
+foldTitle.textContent='EU-Top-Kleriker · Vergleich und Empfehlungen aufklappen';
+fold.append(foldTitle,panel);
+container.after(fold);
 const itemRow=(x,i,different)=>{
  const path=x.path;
  return '<div class="eu-card '+(different?'difference':'need')+'"><div><strong>'+(i+1)+'. '+
