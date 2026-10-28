@@ -51,8 +51,7 @@ function evaluateCategory(data,preset,category){
  return goalRows;
 }
 function evaluate(data,preset,guideBoards,boardCalculator){
- if(!preset)return {skills:[],groups:{},confirmed:0,needed:0,unknown:0,improvements:[],
-  specialties:[],board:null,all:[],characterName:data?.name||'',asOf:data?.importedAt||null};
+ preset=preset||{active:[],passives:[],stigmas:[],specialties:[]};
  const active=evaluateCategory(data,preset,'active');
  const passive=evaluateCategory(data,preset,'passive');
  const stigma=evaluateCategory(data,preset,'stigma');
