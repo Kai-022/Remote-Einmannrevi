@@ -3,6 +3,9 @@ on:
   push:
     paths:
       - 'aion2-gear-checker/daevanion-eu-comparison.js'
+      - 'aion2-gear-checker/daevanion-guide-codec.js'
+      - 'aion2-gear-checker/daevanion-guide-import.js'
+      - 'aion2-gear-checker/tests/daevanion-guide-import.mjs'
       - 'aion2-gear-checker/daevanion-eu-cleric-meta.json'
       - 'aion2-gear-checker/cleric-board-references.json'
       - 'aion2-gear-checker/nc-visuals.js'
@@ -26,3 +29,6 @@ jobs:
           node --check aion2-gear-checker/daevanion-eu-comparison.js
           node --check aion2-gear-checker/nc-visuals.js
           node aion2-gear-checker/tests/daevanion-advisor.mjs
+          node --check aion2-gear-checker/daevanion-guide-codec.js
+          node --check aion2-gear-checker/daevanion-guide-import.js
+          node aion2-gear-checker/tests/daevanion-guide-import.mjs
