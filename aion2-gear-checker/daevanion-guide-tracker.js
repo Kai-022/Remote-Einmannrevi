@@ -23,6 +23,9 @@ stylesheet.textContent=[
  '#dg-character-tracker .gt-percent strong{display:block;color:#afedc7;font-size:22px;font-weight:850}',
  '#dg-character-tracker .gt-percent small{display:block;font-size:10px;color:#d1e9db}',
  '#dg-character-tracker .gt-progress{height:10px;background:#0f1927;border:1px solid #465d6e;border-radius:9px;overflow:hidden;margin:9px 0}',
+ '#dg-character-tracker .gt-import-change{margin:9px 0;padding:11px;background:#1b3a30;border:1px solid #60a481;border-radius:8px;color:#b6efcb;font-size:12px}',
+ '#dg-character-tracker .gt-import-change strong{display:block}',
+ '#dg-character-tracker .gt-import-change small{display:block;margin-top:5px;color:#bed7c6;font-size:11px}',
  '#dg-character-tracker .gt-progress span{height:100%;display:block;background:#5dbd8e}',
  '#dg-character-tracker .gt-summary{display:flex;gap:7px;flex-wrap:wrap;margin:10px 0}',
  '#dg-character-tracker .gt-summary span{border:1px solid #53677e;border-radius:7px;padding:7px;background:#1c3046;font-size:11px;color:#cbd6e5}',
@@ -190,6 +193,14 @@ function render(){
  const result=logic.evaluate(data,preset,guide,boardCore);
  lastResults=result;
  const {history}=recordHistory(guide,result);
+ const latest=history[history.length-1];
+ const changes=latest&&!latest.first?latest.newly?.length||0:0;
+ const regressions=latest&&!latest.first?latest.removed?.length||0:0;
+ const changeBanner=changes||regressions?
+  '<div class="gt-import-change"><strong>Seit dem letzten Profilimport: '+
+  (changes?'+'+changes+' erfüllte Guide-Ziele':'keine neuen Ziele')+
+  (regressions?' · '+regressions+' nicht mehr nachweisbar':'')+'</strong>'+
+  '<small>Verglichen mit deinem vorherigen gespeicherten Importstand.</small></div>':'';
  const confirmed=result.confirmed,unknown=result.unknown,denominator=result.available;
  const percent=denominator?Math.round(100*confirmed/denominator):0;
  const original=guide.source&&/^https:\/\//.test(guide.source)?
@@ -214,6 +225,7 @@ function render(){
  (preset?'<p>Build: '+esc(preset.role)+' · '+esc(preset.author)+'</p>':'')+
  '</div><div class="gt-percent"><strong>'+percent+' %</strong><small>prüfbare Ziele</small></div></div>'+
  '<div class="gt-progress"><span style="width:'+percent+'%"></span></div>'+
+ changeBanner+
  '<div class="gt-summary"><span><b>'+confirmed+'</b> Ziele erkannt</span>'+
  '<span><b>'+result.needed+'</b> offen</span>'+
  (unknown?'<span><b>'+unknown+'</b> nicht prüfbar</span>':'')+
