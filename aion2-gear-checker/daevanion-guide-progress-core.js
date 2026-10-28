@@ -17,7 +17,8 @@ function signature(guide){
  return JSON.stringify(normalized);
 }
 function measure(boards,guide){
- const boardSummary=[],owned={},errors=[],unknown={},unknownTargets=0;
+ const boardSummary=[],owned={},errors=[],unknown={};
+ let unknownTargets=0;
  let total=0,confirmed=0,missing=0,known=0;
  for(const id of ORDER){
   const raw=guide?.boards?.[id];
