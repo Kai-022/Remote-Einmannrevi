@@ -137,4 +137,8 @@ data.characterExtras.boards={};
 window.aionGuideSteps.render();
 assert(panel.innerHTML.includes('Charakterdaten')||panel.innerHTML.includes('Charakter-Tafel'));
 assert.equal(window.aionGuideSteps.getPlan().totals.unavailable,297);
+guide.boards={'71':[]};
+data.characterExtras.boards=boards;
+window.aionGuideSteps.render();
+assert(panel.innerHTML.includes('noch keine Knoten gespeichert'),'empty guide should ask for manual node selection');
 console.log('Guide step-by-step PASS: 297 authentic targets, shortest connector paths, next-node highlight, confirm/undo, character isolation, missing boards');
