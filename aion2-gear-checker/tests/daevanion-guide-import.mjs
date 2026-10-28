@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
 import vm from 'node:vm';
 const root=new URL('../',import.meta.url);
+const preset=await readFile(new URL('daevanion-build-presets.js',root),'utf8');
 const codec=await readFile(new URL('daevanion-guide-codec.js',root),'utf8');
 const importer=await readFile(new URL('daevanion-guide-import.js',root),'utf8');
 const html=await readFile(new URL('armory.html',root),'utf8');
@@ -50,6 +51,7 @@ const ctx={
  atob:s=>Buffer.from(s,'base64').toString('binary'),
  console,Math,Date
 };
+vm.runInNewContext(preset,ctx,{timeout:4000});
 vm.runInNewContext(codec,ctx,{timeout:4000});
 const parse=ctx.window.AionGuideBoardCodec.parse;
 const example=parse(meta.sourcePlannerUrl);
@@ -114,6 +116,22 @@ saved=JSON.parse(memory.get(savedKey));
 const cell=(boards['71'].nodes[index].row-1)*15+(boards['71'].nodes[index].col-1);
 assert(saved.guides[0].boards['71'].includes(cell),'manual tap alters the guide only');
 assert.equal(boards['71'].nodes[index].open,false,'game profile is not changed');
+
+// The exact Mobalytics article is a sourced build guide, NOT fabricated node coordinates.
+const source='https://mobalytics.gg/gamebase/guides/aion-2-cleric-condemnation-pve-build';
+const article=ctx.window.AionGuideBoardCodec.parse(source);
+assert.equal(article.templateId,'mobalytics-cleric-condemnation-pve');
+assert.equal(Object.keys(article.boards).length,0);
+get('dg-guide-link').value=source;
+get('dg-guide-name').value='';
+toolbar.listeners.click[0]({target:{id:'dg-import-button'}});
+saved=JSON.parse(memory.get(savedKey));
+assert.equal(saved.guides.length,2);
+assert.equal(saved.guides[1].templateId,'mobalytics-cleric-condemnation-pve');
+assert.equal(saved.guides[1].source,source);
+assert(saved.guides[1].title.includes('Mobalytics'));
+assert.equal(get('daeva-eu-fold').style.display,'','EU consensus remains visible for an image-only article');
+assert.equal(detail.style.display,'none','do not fake a visual-board comparison when the guide has no encoded nodes');
 
 data.sourceRef={sid:'1305',id:'other-eu-character'};
 ctx.window.aionDaevanion.render();
