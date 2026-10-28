@@ -84,6 +84,8 @@ function parseJSON(value){
 }
 function parse(value){
  const s=String(value||'').trim();
+ const known=window.AionGuidePresets?.match?.(s);
+ if(known)return known;
  if(s.length>35000)throw Error('Die Eingabe ist zu lang.');
  if(!s)throw Error('Bitte einen Guide-Link oder Board-Code einfügen.');
  if(s.startsWith('{'))return parseJSON(s);
