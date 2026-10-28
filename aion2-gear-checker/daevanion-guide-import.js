@@ -188,6 +188,7 @@ function renderToolbar(){
  '<label for="dg-guide-link">Guide-Link (z. B. Mobalytics / Aion2Data) oder Board-JSON einfügen</label>'+
  '<textarea id="dg-guide-link" rows="3" spellcheck="false" placeholder="https://aion2data.com/daevanion/cleric?b=…">'+esc(priorText)+'</textarea>'+
  '<button type="button" id="dg-import-button">Link / Board-Daten importieren</button>'+
+ (window.AionGuidePresets?.knownUrls?.length?'<button type="button" id="dg-use-mobalytics">Mobalytics Condemnation PvE direkt übernehmen</button>':'')+
  '<p>Unterstützt den Mobalytics Condemnation-Kleriker-Guide inklusive Skill- und Stigma-Zielen, Aion2Data-Kleriker-Boardlinks und eigene Board-JSON-Daten. Andere Websites benötigen zunächst eine unterstützte Vorlage; Bild-Boards müssen manuell übertragen werden.</p>'+
  '<div class="dg-manual"><label for="dg-manual-board">Ein einzelnes Board manuell übertragen</label><select id="dg-manual-board">'+boards+'</select>'+
  '<button type="button" id="dg-manual-start">Gewähltes Board durch Antippen bearbeiten</button>'+
@@ -252,7 +253,13 @@ toolbar.addEventListener('change',event=>{
 });
 toolbar.addEventListener('click',event=>{
  const id=event.target.id;
- if(id==='dg-import-button'){
+ if(id==='dg-use-mobalytics'){
+  try{
+   const link=window.AionGuidePresets?.knownUrls?.[0];
+   if(!link)throw Error('Der Mobalytics-Guide ist nicht verfügbar.');
+   put(codec.parse(link),'');
+  }catch(e){message=String(e.message||e);renderToolbar();$('dg-import-panel').open=true}
+ }else if(id==='dg-import-button'){
   const value=$('dg-guide-link')?.value||'',title=($('dg-guide-name')?.value||'').trim();
   try{const parsed=codec.parse(value);put(parsed,title);}catch(e){message=String(e.message||e);renderToolbar();$('dg-import-panel').open=true}
  }else if(id==='dg-import-one'){
